@@ -4,12 +4,12 @@ export const API_BASE_URL = "https://localhost:7083"
 // Função para obter a URL base da API
 export const getApiBaseUrl = (): string => {
   // Prioriza a variável de ambiente se estiver definida
-  const envUrl = process.env.NEXT_PUBLIC_API_URL
-  if (envUrl) {
-    console.log("🌍 Usando URL da variável de ambiente:", envUrl)
-    return envUrl
+  const useUrl = process.env.USE_PUBLIC_API_URL
+  const apiUrl = "https://0e928fa89364.ngrok-free.app"
+  if (useUrl) {
+    console.log("🌍 Usando URL da variável de ambiente:", apiUrl)
+    return apiUrl
   }
-
   // Caso contrário, usa a URL configurada acima
   // console.log("🔗 Usando URL configurada:", API_BASE_URL)
   return API_BASE_URL
