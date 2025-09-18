@@ -47,4 +47,4 @@ export function useCategories() {
     error,
     mutate,
   }
-} 
+}
