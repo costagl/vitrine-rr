@@ -31,4 +31,4 @@ export function useAuthToken() {
   }, []);
 
   return { token, isLoading };
-} 
+}

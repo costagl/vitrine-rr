@@ -3,4 +3,4 @@ export interface Category {
   nome: string
   descricao?: string
   ativo: number
-} 
+}
