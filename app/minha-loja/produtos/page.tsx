@@ -1,0 +1,284 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/navbar";
+import { ProductForm } from "@/components/products/product-form";
+import { ProductList } from "@/components/products/product-list";
+import { ProductSearch } from "@/components/products/product-search";
+import { ProductPagination } from "@/components/products/product-pagination";
+import { ProductStats } from "@/components/products/product-stats";
+import { ProductDetailModal } from "@/components/products/product-detail-modal";
+import { Plus, Package, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import {
+  useProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "@/hooks/use-products";
+import type {
+  Product,
+  ProductSearchParams,
+  CreateProductRequest,
+} from "@/types/product";
+import { useAuthToken } from "@/hooks/use-auth-token";
+
+export default function ProductsManagementPage() {
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [searchParams, setSearchParams] = useState<ProductSearchParams>({
+    pagina: 1,
+    limite: 10,
+    busca: "",
+    idCategoriaProduto: undefined,
+    ativo: null,
+  });
+
+  // Hooks para operações CRUD
+  const { data, isLoading, error, mutate } = useProducts(searchParams);
+  const {
+    mutate: createProduct,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateProduct();
+  const {
+    mutate: updateProduct,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateProduct();
+  const {
+    mutate: deleteProduct,
+    isLoading: isDeleting,
+    error: deleteError,
+  } = useDeleteProduct();
+
+  const { token, isLoading: authTokenLoading } = useAuthToken();
+
+  // Extrair produtos e informações de paginação
+  const products = data?.produtos || [];
+  const pagination = data?.paginacao || {
+    total: 0,
+    paginas: 0,
+    paginaAtual: 1,
+    limite: 10,
+  };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (!authTokenLoading && !token) {
+      console.warn("Token não encontrado, redirecionando para login...");
+      router.push("/login");
+    }
+  }, [token, authTokenLoading, router]);
+
+  const handleAddProduct = () => {
+    setEditingProduct(null);
+    setShowForm(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setShowForm(true);
+  };
+
+  const handleDeleteProduct = async (productId: number) => {
+    if (confirm("Tem certeza que deseja excluir este produto?")) {
+      try {
+        await deleteProduct(productId.toString());
+        mutate(); // Atualizar lista de produtos
+      } catch (err) {
+        console.error("Erro ao excluir produto:", err);
+      }
+    }
+  };
+
+  const handleSaveProduct = async (productData: CreateProductRequest) => {
+    try {
+      if (editingProduct) {
+        // Editar produto existente
+        await updateProduct({
+          ...productData,
+          id: editingProduct.id.toString(),
+        });
+      } else {
+        // Adicionar novo produto
+        await createProduct(productData);
+      }
+      setShowForm(false);
+      setEditingProduct(null);
+      mutate(); // Atualizar lista de produtos
+    } catch (err) {
+      console.error("Erro ao salvar produto:", err);
+    }
+  };
+
+  const handleSearchChange = (newParams: Partial<ProductSearchParams>) => {
+    // Only update if there are actual changes to avoid unnecessary re-renders
+    const updatedParams = { ...searchParams, ...newParams, pagina: 1 };
+
+    // Check if the params are actually different before setting state
+    if (JSON.stringify(updatedParams) !== JSON.stringify(searchParams)) {
+      setSearchParams(updatedParams);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    setSearchParams({ ...searchParams, pagina: page });
+  };
+
+  const handleLimitChange = (limit: number) => {
+    setSearchParams({ ...searchParams, limite: limit, pagina: 1 });
+  };
+
+  const handleViewProductDetails = (product: Product) => {
+    setSelectedProduct(product);
+    setDetailModalOpen(true);
+  };
+
+  if (authTokenLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (!token) {
+    return null; // Não renderiza nada enquanto redireciona
+  }
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-4">
+            <Link href="/minha-loja">
+              <Button variant="outline" size="sm">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Voltar
+              </Button>
+            </Link>
+            <div>
+              <h1 className="text-3xl font-bold flex items-center gap-2">
+                <Package className="h-8 w-8" />
+                Gerenciar Produtos
+              </h1>
+              <p className="text-gray-600 mt-1">
+                {user?.loja?.nome && `Loja: ${user.loja.nome}`}
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={handleAddProduct}
+            className="flex items-center gap-2"
+            disabled={isCreating || isUpdating || isDeleting}
+          >
+            <Plus className="h-4 w-4" />
+            Adicionar Produto
+          </Button>
+        </div>
+
+        {/* Estatísticas */}
+        <ProductStats products={products} isLoading={isLoading} />
+
+        {/* Barra de Pesquisa */}
+        <ProductSearch
+          searchParams={searchParams}
+          onSearchChange={handleSearchChange}
+        />
+
+        {/* Formulário de Produto */}
+        {showForm && (
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>
+                {editingProduct ? "Editar Produto" : "Adicionar Novo Produto"}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ProductForm
+                product={editingProduct}
+                onSave={handleSaveProduct}
+                onCancel={() => {
+                  setShowForm(false);
+                  setEditingProduct(null);
+                }}
+                isLoading={isCreating || isUpdating}
+              />
+              {(createError || updateError) && (
+                <div className="text-red-500 mt-2">
+                  {createError?.message || updateError?.message}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Lista de Produtos */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center justify-between">
+              <span>Lista de Produtos</span>
+              <Badge variant="secondary">{pagination.total} produto(s)</Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <div className="text-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <p className="mt-2 text-gray-500">Carregando produtos...</p>
+              </div>
+            ) : error ? (
+              <div className="text-red-500 text-center py-8">
+                Erro ao carregar produtos: {error.message}
+              </div>
+            ) : (
+              <ProductList
+                products={products}
+                onEdit={handleEditProduct}
+                onDelete={handleDeleteProduct}
+                onOpenDetail={handleViewProductDetails}
+                isDeleting={isDeleting}
+              />
+            )}
+            {deleteError && (
+              <div className="text-red-500 mt-2">
+                Erro ao excluir produto: {deleteError.message}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Paginação */}
+        {pagination.paginas > 1 && (
+          <ProductPagination
+            pagination={pagination}
+            onPageChange={handlePageChange}
+            onLimitChange={handleLimitChange}
+          />
+        )}
+
+        {/* Modal de Detalhes do Produto */}
+        <ProductDetailModal
+          isOpen={detailModalOpen}
+          onClose={() => setDetailModalOpen(false)}
+          product={selectedProduct}
+          onEdit={handleEditProduct}
+          onDelete={handleDeleteProduct}
+        />
+      </div>
+    </div>
+  );
+}
