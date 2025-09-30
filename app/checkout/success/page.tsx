@@ -1,21 +1,30 @@
-"use client"
+"use client";
 
-import { useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle, ArrowRight } from "lucide-react"
+import { Suspense } from "react"; 
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CheckCircle, ArrowRight } from "lucide-react";
 
 const plans: Record<string, { name: string; price: number }> = {
   basico: { name: "Básico", price: 29 },
   profissional: { name: "Profissional", price: 79 },
   empresarial: { name: "Empresarial", price: 199 },
-}
+};
 
 export default function CheckoutSuccessPage() {
-  const searchParams = useSearchParams()
-  const planId = searchParams.get("plano") || "basico"
-  const selectedPlan = plans[planId] || plans.basico
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>
+      <CheckoutSuccessContent />
+    </Suspense>
+  );
+}
+
+function CheckoutSuccessContent() {
+  const searchParams = useSearchParams();
+  const planId = searchParams.get("plano") || "basico";
+  const selectedPlan = plans[planId] || plans.basico;
 
   return (
     <div className="container mx-auto py-16 px-4">
@@ -58,5 +67,5 @@ export default function CheckoutSuccessPage() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

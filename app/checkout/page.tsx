@@ -18,6 +18,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { CreditCard, Smartphone, FileText, Shield, Check } from "lucide-react";
+import { Suspense } from "react";
 
 interface Plan {
   id: string;
@@ -65,8 +66,15 @@ const plans: Record<string, Plan> = {
     ],
   },
 };
-
 export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div>Carregando...</div>}>  {/* Envolvendo com Suspense */}
+      <CheckoutContent />
+    </Suspense>
+  );
+}
+
+function CheckoutContent() {
   const searchParams = useSearchParams();
   const planId = searchParams.get("plano") || "basico";
   const selectedPlan = plans[planId] || plans.basico;
