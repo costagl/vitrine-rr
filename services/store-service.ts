@@ -123,81 +123,83 @@ export class StoreService {
 
   // TODO: Limpar Código Depois
   static async abrirMinhaLoja(): Promise<void> {
-  // Verificar se o token está presente
-  const token = localStorage.getItem("token");
+    // Verificar se o token está presente
+    const token = localStorage.getItem("token");
 
-  if (!token) {
-    console.error("❌ Token de autenticação não encontrado. Faça login novamente.");
-    return; // Early return para evitar a execução do código abaixo
-  }
-
-  console.log("✅ Token encontrado:", token);
-
-  // Criar headers com o token
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-    Accept: "application/json",
-  };
-
-  try {
-    console.log("PRIMEIRA LINHA");
-    const url = `${getApiBaseUrl()}${API_ENDPOINTS.STORE.VERIFY_LAYOUT_THEME}`;
-    console.log("❗ URL que será consumida:", url);
-
-    const response = await fetch(url, {
-      method: "GET",
-      headers: headers,
-    });
-
-    // Verificar se a resposta foi bem-sucedida
-    if (!response.ok) {
-      const responseText = await response.text();
-      console.log("🚨 Resposta da API não OK:", response.status);
-      console.log("Erro detalhado:", responseText);
-
-      const errorData = JSON.parse(responseText);
-      throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+    if (!token) {
+      console.error(
+        "❌ Token de autenticação não encontrado. Faça login novamente."
+      );
+      return; // Early return para evitar a execução do código abaixo
     }
 
-    console.log("✅ Resposta da API foi bem-sucedida!");
+    console.log("✅ Token encontrado:", token);
 
-    // Parse a resposta de sucesso
-    const data = await response.json(); // já retorna um objeto JavaScript
-    console.log("🔍 Dados recebidos da API:", JSON.stringify(data, null, 2));
-
-    const { idTema, idLayout } = data;
-    console.log(`📦 idTema: ${idTema}, idLayout: ${idLayout}`);
-
-    let layouts: { [key: string]: string } = {
-      "1": "layout-1",
-      "2": "layout-2",
-      "3": "layout-3",
-    };
-    let temas: { [key: string]: string } = {
-      "1": "tema-1",
-      "2": "tema-2",
-      "3": "tema-3",
+    // Criar headers com o token
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
     };
 
-    console.log("🔧 Layouts definidos:", layouts);
-    console.log("🔧 Temas definidos:", temas);
+    try {
+      console.log("PRIMEIRA LINHA");
+      const url = `${getApiBaseUrl()}${
+        API_ENDPOINTS.STORE.VERIFY_LAYOUT_THEME
+      }`;
+      console.log("❗ URL que será consumida:", url);
 
-    const layoutSelecionado = layouts[idLayout];
-    const temaSelecionado = temas[idTema];
+      const response = await fetch(url, {
+        method: "GET",
+        headers: headers,
+      });
 
-    console.log(
-      `✅ Layout Selecionado: ${layoutSelecionado}, Tema Selecionado: ${temaSelecionado}`
-    );
+      // Verificar se a resposta foi bem-sucedida
+      if (!response.ok) {
+        const responseText = await response.text();
+        console.log("🚨 Resposta da API não OK:", response.status);
+        console.log("Erro detalhado:", responseText);
 
-    let lojaUrl = `http://localhost:3000/minha-loja/${layoutSelecionado}`;
-    console.log("🔗 Redirecionando para a URL:", lojaUrl);
+        const errorData = JSON.parse(responseText);
+        throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+      }
 
-    window.open(lojaUrl, "_blank");
+      console.log("✅ Resposta da API foi bem-sucedida!");
 
-  } catch (error) {
-    console.error("❌ Erro ao buscar dados de layout/tema:", error);
+      // Parse a resposta de sucesso
+      const data = await response.json(); // já retorna um objeto JavaScript
+      console.log("🔍 Dados recebidos da API:", JSON.stringify(data, null, 2));
+
+      const { idTema, idLayout } = data;
+      console.log(`📦 idTema: ${idTema}, idLayout: ${idLayout}`);
+
+      let layouts: { [key: string]: string } = {
+        "1": "layout-1",
+        "2": "layout-2",
+        "3": "layout-3",
+      };
+      let temas: { [key: string]: string } = {
+        "1": "tema-1",
+        "2": "tema-2",
+        "3": "tema-3",
+      };
+
+      console.log("🔧 Layouts definidos:", layouts);
+      console.log("🔧 Temas definidos:", temas);
+
+      const layoutSelecionado = layouts[idLayout];
+      const temaSelecionado = temas[idTema];
+
+      console.log(
+        `✅ Layout Selecionado: ${layoutSelecionado}, Tema Selecionado: ${temaSelecionado}`
+      );
+
+      let lojaUrl = `http://localhost:3000/minha-loja/${layoutSelecionado}`;
+      console.log("🔗 Redirecionando para a URL:", lojaUrl);
+
+      window.open(lojaUrl, "_blank");
+    } catch (error) {
+      console.error("❌ Erro ao buscar dados de layout/tema:", error);
+    }
   }
-}
-
 }
