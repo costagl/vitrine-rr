@@ -1,38 +1,18 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState } from "react"
 import useSWR, { mutate as globalMutate } from "swr"
 import { useToast } from "@/hooks/use-toast"
 import { ProductService } from "@/services/product-service"
-import type { CreateProductRequest, UpdateProductRequest, ProductSearchParams, ApiError } from "@/types/product"
-
-// Chave para o cache do SWR
-const getProductsKey = (params?: ProductSearchParams) => {
-  if (!params) return "products"
-
-  const queryString = new URLSearchParams()
-  if (params.pagina) queryString.append("pagina", params.pagina.toString())
-  if (params.limite) queryString.append("limite", params.limite.toString())
-  if (params.busca) queryString.append("busca", params.busca)
-  if (params.ativo !== null && params.ativo !== undefined) {
-    queryString.append("ativo", params.ativo.toString())
-  }
-  if (params.idCategoriaProduto !== null && params.idCategoriaProduto !== undefined) {
-    queryString.append("idCategoriaProduto", params.idCategoriaProduto.toString())
-  }
-
-  return `products?${queryString.toString()}`
-}
+import type { CreateProductRequest, UpdateProductRequest, Product, ApiError } from "@/types/product"
 
 /**
- * Hook para listar produtos com paginação e filtros
+ * Hook para listar produtos
  */
-export function useProducts(params?: ProductSearchParams) {
+export function useProducts() {
   const { toast } = useToast()
 
-  const key = useMemo(() => getProductsKey(params), [params])
-
-  const { data, error, isLoading, mutate } = useSWR(key, () => ProductService.listarProdutos(), {
+  const { data, error, isLoading, mutate } = useSWR<Product[]>("products", () => ProductService.listarProdutos(), {
     onError: (err: ApiError) => {
       console.error("Erro ao listar produtos:", err)
       toast({
@@ -45,7 +25,7 @@ export function useProducts(params?: ProductSearchParams) {
   })
 
   return {
-    data: data,
+    products: data || [],
     isLoading,
     error,
     mutate,
@@ -98,7 +78,7 @@ export function useCreateProduct() {
       const result = await ProductService.cadastrarProduto(data)
 
       // Invalidar cache para recarregar a lista
-      globalMutate((key) => typeof key === "string" && key.startsWith("products"))
+      globalMutate("products")
 
       toast({
         title: "Produto cadastrado",
@@ -134,7 +114,7 @@ export function useUpdateProduct() {
       const result = await ProductService.alterarProduto(id, updateData)
 
       // Invalidar cache para recarregar a lista e o detalhe
-      globalMutate((key) => typeof key === "string" && key.startsWith("products"))
+      globalMutate("products")
       globalMutate(`product-${id}`)
 
       toast({
@@ -170,7 +150,7 @@ export function useDeleteProduct() {
       await ProductService.excluirProduto(id)
 
       // Invalidar cache para recarregar a lista
-      globalMutate((key) => typeof key === "string" && key.startsWith("products"))
+      globalMutate("products")
 
       toast({
         title: "Produto excluído",

@@ -1,14 +1,7 @@
-import { apiClient } from "@/utils/api-client";
-import { API_ENDPOINTS } from "@/config/api";
-import type {
-  Product,
-  CreateProductRequest,
-  UpdateProductRequest,
-  ProductResponse,
-  ProductListResponse,
-  ProductSearchParams,
-} from "@/types/product";
-import { getApiBaseUrl } from "@/config/api-url";
+import { apiClient } from "@/utils/api-client"
+import { API_ENDPOINTS } from "@/config/api"
+import type { Product, CreateProductRequest, UpdateProductRequest, ProductResponse } from "@/types/product"
+import { getApiBaseUrl } from "@/config/api-url"
 
 export class ProductService {
   /**
@@ -17,165 +10,86 @@ export class ProductService {
    * @returns Produto cadastrado
    */
   static async cadastrarProduto(data: CreateProductRequest): Promise<Product> {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
     if (!token) {
-      throw new Error(
-        "Token de autenticação não encontrado. Faça login novamente."
-      );
+      throw new Error("Token de autenticação não encontrado. Faça login novamente.")
     }
 
     const headers = {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
       Accept: "application/json",
-    };
+    }
 
     try {
-      const fullUrl = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.CADASTRAR}`;
+      const fullUrl = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.CADASTRAR}`
 
       const response = await fetch(fullUrl, {
         method: "POST",
         headers: headers,
         body: JSON.stringify(data),
-      });
+      })
 
-      const responseText = await response.text();
+      const responseText = await response.text()
 
       if (!response.ok) {
         try {
-          const errorData = JSON.parse(responseText);
-          throw new Error(errorData.message || `Erro HTTP ${response.status}`);
+          const errorData = JSON.parse(responseText)
+          throw new Error(errorData.message || `Erro HTTP ${response.status}`)
         } catch (parseError) {
-          throw new Error(`Erro HTTP ${response.status}: ${responseText}`);
+          throw new Error(`Erro HTTP ${response.status}: ${responseText}`)
         }
       }
 
       try {
-        const responseData = JSON.parse(responseText);
-        return responseData.data;
+        const responseData = JSON.parse(responseText)
+        return responseData.data
       } catch (parseError) {
-        throw new Error("Resposta da API não está em formato JSON válido");
+        throw new Error("Resposta da API não está em formato JSON válido")
       }
     } catch (error) {
-      console.error("❌ ProductService: Erro ao cadastrar produto:", error);
-      throw error;
+      console.error("❌ ProductService: Erro ao cadastrar produto:", error)
+      throw error
     }
   }
 
   /**
-   * Lista todos os produtos com opções de paginação e filtros
-   * @param params Parâmetros de busca e paginação
-   * @returns Lista de produtos e informações de paginação
+   * Lista todos os produtos do usuário autenticado
+   * @returns Lista de produtos
    */
-  static async listar1Produtos(
-    params?: ProductSearchParams
-  ): Promise<ProductListResponse["data"]> {
-    console.log("🔍 ProductService: Listando produtos com parâmetros:", params);
+  static async listarProdutos(): Promise<Product[]> {
+    console.log("🔍 ProductService: Listando produtos")
 
-    // Verificar se o token está presente antes de fazer a requisição
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
-      throw new Error(
-        "Token de autenticação não encontrado. Faça login novamente."
-      );
+      throw new Error("Token de autenticação não encontrado. Faça login novamente.")
     }
-
-    // Construir query string para os parâmetros
-    const queryParams = new URLSearchParams();
-
-    if (params) {
-      if (params.pagina) queryParams.append("pagina", params.pagina.toString());
-      if (params.limite) queryParams.append("limite", params.limite.toString());
-      if (params.busca) queryParams.append("busca", params.busca);
-      if (params.ativo !== null && params.ativo !== undefined) {
-        queryParams.append("ativo", params.ativo.toString());
-      }
-      if (
-        params.idCategoriaProduto !== null &&
-        params.idCategoriaProduto !== undefined
-      ) {
-        queryParams.append(
-          "idCategoriaProduto",
-          params.idCategoriaProduto.toString()
-        );
-      }
-    }
-
-    const queryString = queryParams.toString();
-    const endpoint = queryString
-      ? `${API_ENDPOINTS.PRODUTO.LISTAR}?${queryString}`
-      : API_ENDPOINTS.PRODUTO.LISTAR;
-
-    // try {
-    //   const response = await apiClient.get<ProductListResponse>(endpoint);
-    //   console.log(
-    //     "✅ ProductService: Produtos listados com sucesso:",
-    //     response.data
-    //   );
-    //   const data = response.data;
-    //   //TODO:
-    //   return response.data!.data;
 
     try {
-      const apiUrl = `https://localhost:7083${endpoint}`;
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token de autenticação não encontrado.');
-      }
-
-      const response = await fetch(apiUrl, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Erro ao listar produtos');
-      }
-
-      const data = await response.json();
-      console.log("✅ ProductService: Produtos listados com sucesso:", data);
-
-      return data
-    } catch (error) {
-      console.error("❌ ProductService: Erro ao listar produtos:", error);
-      throw error;
-    }
-  }
-  //TODO:
-  static async listarProdutos() {
-    try {
-      const endpoint = 'https://localhost:7083/produto/listar';
-
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Token de autenticação não encontrado.');
-      }
+      const endpoint = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.LISTAR}`
 
       const response = await fetch(endpoint, {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-      });
+      })
 
       if (!response.ok) {
-        throw new Error('Erro ao listar produtos');
+        throw new Error(`Erro HTTP ${response.status}: Erro ao listar produtos`)
       }
 
-      const data = await response.json();
-      console.log("✅ ProductService: Produtos listados com sucesso:", data);
-      return data
+      const data = await response.json()
+      console.log("✅ ProductService: Produtos listados com sucesso:", data)
+
+      // A API retorna diretamente um array de produtos
+      return Array.isArray(data) ? data : []
     } catch (error) {
-      console.error('Erro ao carregar produtos:', error);
+      console.error("❌ ProductService: Erro ao listar produtos:", error)
+      throw error
     }
   }
-
 
   /**
    * Busca um produto específico pelo ID
@@ -183,27 +97,21 @@ export class ProductService {
    * @returns Detalhes do produto
    */
   static async listarProdutoPorId(id: string): Promise<Product> {
-    console.log(`🔍 ProductService: Buscando produto com ID: ${id}`);
+    console.log(`🔍 ProductService: Buscando produto com ID: ${id}`)
 
-    // Verificar se o token está presente antes de fazer a requisição
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
-      throw new Error(
-        "Token de autenticação não encontrado. Faça login novamente."
-      );
+      throw new Error("Token de autenticação não encontrado. Faça login novamente.")
     }
 
     try {
-      const response = await apiClient.get<ProductResponse>(
-        API_ENDPOINTS.PRODUTO.LISTAR_POR_ID(id)
-      );
+      const response = await apiClient.get<ProductResponse>(API_ENDPOINTS.PRODUTO.LISTAR_POR_ID(id))
 
-      console.log("✅ ProductService: Produto encontrado:", response.data);
-      return response.data!.data;
+      console.log("✅ ProductService: Produto encontrado:", response.data)
+      return response.data!.data
     } catch (error) {
-      console.error("❌ ProductService: Erro ao buscar produto:", error);
-      throw error;
+      console.error("❌ ProductService: Erro ao buscar produto:", error)
+      throw error
     }
   }
 
@@ -213,35 +121,22 @@ export class ProductService {
    * @param data Dados atualizados do produto
    * @returns Produto atualizado
    */
-  static async alterarProduto(
-    id: string,
-    data: UpdateProductRequest
-  ): Promise<Product> {
-    console.log(`📝 ProductService: Alterando produto ${id} com dados:`, data);
+  static async alterarProduto(id: string, data: UpdateProductRequest): Promise<Product> {
+    console.log(`📝 ProductService: Alterando produto ${id} com dados:`, data)
 
-    // Verificar se o token está presente antes de fazer a requisição
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
-      throw new Error(
-        "Token de autenticação não encontrado. Faça login novamente."
-      );
+      throw new Error("Token de autenticação não encontrado. Faça login novamente.")
     }
 
     try {
-      const response = await apiClient.put<ProductResponse>(
-        API_ENDPOINTS.PRODUTO.ALTERAR(id),
-        data
-      );
+      const response = await apiClient.put<ProductResponse>(API_ENDPOINTS.PRODUTO.ALTERAR(id), data)
 
-      console.log(
-        "✅ ProductService: Produto alterado com sucesso:",
-        response.data
-      );
-      return response.data!.data;
+      console.log("✅ ProductService: Produto alterado com sucesso:", response.data)
+      return response.data!.data
     } catch (error) {
-      console.error("❌ ProductService: Erro ao alterar produto:", error);
-      throw error;
+      console.error("❌ ProductService: Erro ao alterar produto:", error)
+      throw error
     }
   }
 
@@ -251,30 +146,21 @@ export class ProductService {
    * @returns Confirmação de exclusão
    */
   static async excluirProduto(id: string): Promise<void> {
-    console.log(`🗑️ ProductService: Excluindo produto com ID: ${id}`);
+    console.log(`🗑️ ProductService: Excluindo produto com ID: ${id}`)
 
-    // Verificar se o token está presente antes de fazer a requisição
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
-      throw new Error(
-        "Token de autenticação não encontrado. Faça login novamente."
-      );
+      throw new Error("Token de autenticação não encontrado. Faça login novamente.")
     }
 
     try {
-      const response = await apiClient.delete<ProductResponse>(
-        API_ENDPOINTS.PRODUTO.EXCLUIR(id)
-      );
+      const response = await apiClient.delete<ProductResponse>(API_ENDPOINTS.PRODUTO.EXCLUIR(id))
 
-      console.log(
-        "✅ ProductService: Produto excluído com sucesso:",
-        response.data
-      );
-      return;
+      console.log("✅ ProductService: Produto excluído com sucesso:", response.data)
+      return
     } catch (error) {
-      console.error("❌ ProductService: Erro ao excluir produto:", error);
-      throw error;
+      console.error("❌ ProductService: Erro ao excluir produto:", error)
+      throw error
     }
   }
 }
