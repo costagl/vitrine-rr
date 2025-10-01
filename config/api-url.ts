@@ -11,7 +11,7 @@ export const getApiBaseUrl = (): string => {
     return apiUrl
   }
   // Caso contrário, usa a URL configurada acima
-  console.log("🔗 Usando URL configurada:", API_BASE_URL)
+  // console.log("🔗 Usando URL configurada:", API_BASE_URL)
   return API_BASE_URL
 }
 

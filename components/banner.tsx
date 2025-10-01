@@ -30,7 +30,7 @@ export default function Banner() {
               <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-accent/30 rounded-lg"></div>
               <div className="relative bg-card p-6 rounded-lg shadow-lg border">
                 <img
-                  src="/placeholder.svg?height=400&width=500"
+                  src="/search-rafiki.png"
                   alt="Plataforma de loja online"
                   className="rounded-md w-full h-auto"
                 />

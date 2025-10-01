@@ -67,7 +67,7 @@ export class ProductService {
    * @param params Parâmetros de busca e paginação
    * @returns Lista de produtos e informações de paginação
    */
-  static async listarProdutos(
+  static async listar1Produtos(
     params?: ProductSearchParams
   ): Promise<ProductListResponse["data"]> {
     console.log("🔍 ProductService: Listando produtos com parâmetros:", params);
@@ -107,19 +107,75 @@ export class ProductService {
       ? `${API_ENDPOINTS.PRODUTO.LISTAR}?${queryString}`
       : API_ENDPOINTS.PRODUTO.LISTAR;
 
-    try {
-      const response = await apiClient.get<ProductListResponse>(endpoint);
+    // try {
+    //   const response = await apiClient.get<ProductListResponse>(endpoint);
+    //   console.log(
+    //     "✅ ProductService: Produtos listados com sucesso:",
+    //     response.data
+    //   );
+    //   const data = response.data;
+    //   //TODO:
+    //   return response.data!.data;
 
-      console.log(
-        "✅ ProductService: Produtos listados com sucesso:",
-        response.data
-      );
-      return response.data!.data;
+    try {
+      const apiUrl = `https://localhost:7083${endpoint}`;
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado.');
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao listar produtos');
+      }
+
+      const data = await response.json();
+      console.log("✅ ProductService: Produtos listados com sucesso:", data);
+
+      return data
     } catch (error) {
       console.error("❌ ProductService: Erro ao listar produtos:", error);
       throw error;
     }
   }
+  //TODO:
+  static async listarProdutos() {
+    try {
+      const endpoint = 'https://localhost:7083/produto/listar';
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Token de autenticação não encontrado.');
+      }
+
+      const response = await fetch(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao listar produtos');
+      }
+
+      const data = await response.json();
+      console.log("✅ ProductService: Produtos listados com sucesso:", data);
+      return data
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+    }
+  }
+
 
   /**
    * Busca um produto específico pelo ID

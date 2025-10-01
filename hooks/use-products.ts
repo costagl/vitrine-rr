@@ -30,10 +30,9 @@ const getProductsKey = (params?: ProductSearchParams) => {
 export function useProducts(params?: ProductSearchParams) {
   const { toast } = useToast()
 
-  // Memoize the key to prevent unnecessary re-renders
   const key = useMemo(() => getProductsKey(params), [params])
 
-  const { data, error, isLoading, mutate } = useSWR(key, () => ProductService.listarProdutos(params), {
+  const { data, error, isLoading, mutate } = useSWR(key, () => ProductService.listarProdutos(), {
     onError: (err: ApiError) => {
       console.error("Erro ao listar produtos:", err)
       toast({

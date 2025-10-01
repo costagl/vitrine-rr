@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
@@ -21,12 +21,12 @@ import {
   useUpdateProduct,
   useDeleteProduct,
 } from "@/hooks/use-products";
+import { useAuthToken } from "@/hooks/use-auth-token";
 import type {
   Product,
   ProductSearchParams,
   CreateProductRequest,
 } from "@/types/product";
-import { useAuthToken } from "@/hooks/use-auth-token";
 
 export default function ProductsManagementPage() {
   const { isAuthenticated, user } = useAuth();
@@ -60,18 +60,22 @@ export default function ProductsManagementPage() {
     isLoading: isDeleting,
     error: deleteError,
   } = useDeleteProduct();
-
   const { token, isLoading: authTokenLoading } = useAuthToken();
 
-  // Extrair produtos e informações de paginação
-  const products = data?.produtos || [];
-  const pagination = data?.paginacao || {
+  const products = data || [];
+  //TODO:
+  //console.log(products);
+  const pagination = data || {
     total: 0,
     paginas: 0,
     paginaAtual: 1,
     limite: 10,
   };
 
+  console.log("produtos: ", data?.produtos);
+  console.log("paginação: ", pagination);
+
+  // Redirecionamento caso não esteja autenticado
   useEffect(() => {
     if (!isAuthenticated) {
       router.push("/login");
@@ -80,16 +84,12 @@ export default function ProductsManagementPage() {
 
   useEffect(() => {
     if (!authTokenLoading && !token) {
-      console.warn("Token não encontrado, redirecionando para login...");
       router.push("/login");
     }
   }, [token, authTokenLoading, router]);
 
-  const handleAddProduct = () => {
-    setEditingProduct(null);
-    setShowForm(true);
-  };
-
+  // Funções para CRUD
+  const handleAddProduct = () => setShowForm(true);
   const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setShowForm(true);
@@ -99,7 +99,7 @@ export default function ProductsManagementPage() {
     if (confirm("Tem certeza que deseja excluir este produto?")) {
       try {
         await deleteProduct(productId.toString());
-        mutate(); // Atualizar lista de produtos
+        mutate();
       } catch (err) {
         console.error("Erro ao excluir produto:", err);
       }
@@ -109,59 +109,49 @@ export default function ProductsManagementPage() {
   const handleSaveProduct = async (productData: CreateProductRequest) => {
     try {
       if (editingProduct) {
-        // Editar produto existente
         await updateProduct({
           ...productData,
           id: editingProduct.id.toString(),
         });
       } else {
-        // Adicionar novo produto
         await createProduct(productData);
       }
       setShowForm(false);
       setEditingProduct(null);
-      mutate(); // Atualizar lista de produtos
+      mutate();
     } catch (err) {
       console.error("Erro ao salvar produto:", err);
     }
   };
 
-  const handleSearchChange = (newParams: Partial<ProductSearchParams>) => {
-    // Only update if there are actual changes to avoid unnecessary re-renders
-    const updatedParams = { ...searchParams, ...newParams, pagina: 1 };
+  const handleSearchChange = useCallback(
+    (newParams: Partial<ProductSearchParams>) => {
+      const updatedParams = { ...searchParams, ...newParams, pagina: 1 };
+      if (JSON.stringify(updatedParams) !== JSON.stringify(searchParams)) {
+        setSearchParams(updatedParams);
+      }
+    },
+    [searchParams]
+  );
 
-    // Check if the params are actually different before setting state
-    if (JSON.stringify(updatedParams) !== JSON.stringify(searchParams)) {
-      setSearchParams(updatedParams);
-    }
-  };
-
-  const handlePageChange = (page: number) => {
+  const handlePageChange = (page: number) =>
     setSearchParams({ ...searchParams, pagina: page });
-  };
-
-  const handleLimitChange = (limit: number) => {
+  const handleLimitChange = (limit: number) =>
     setSearchParams({ ...searchParams, limite: limit, pagina: 1 });
-  };
-
   const handleViewProductDetails = (product: Product) => {
     setSelectedProduct(product);
     setDetailModalOpen(true);
   };
 
-  if (authTokenLoading) {
-    return <div>Carregando...</div>;
-  }
+  // Verifica se o token está sendo carregado
+  if (authTokenLoading) return <div>Carregando...</div>;
 
-  if (!token) {
-    return null; // Não renderiza nada enquanto redireciona
-  }
+  if (!token) return null; // Não renderiza enquanto redireciona
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Link href="/minha-loja">
@@ -190,16 +180,12 @@ export default function ProductsManagementPage() {
           </Button>
         </div>
 
-        {/* Estatísticas */}
         <ProductStats products={products} isLoading={isLoading} />
-
-        {/* Barra de Pesquisa */}
         <ProductSearch
           searchParams={searchParams}
           onSearchChange={handleSearchChange}
         />
 
-        {/* Formulário de Produto */}
         {showForm && (
           <Card className="mb-6">
             <CardHeader>
@@ -226,7 +212,6 @@ export default function ProductsManagementPage() {
           </Card>
         )}
 
-        {/* Lista de Produtos */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
@@ -261,7 +246,6 @@ export default function ProductsManagementPage() {
           </CardContent>
         </Card>
 
-        {/* Paginação */}
         {pagination.paginas > 1 && (
           <ProductPagination
             pagination={pagination}
@@ -270,7 +254,6 @@ export default function ProductsManagementPage() {
           />
         )}
 
-        {/* Modal de Detalhes do Produto */}
         <ProductDetailModal
           isOpen={detailModalOpen}
           onClose={() => setDetailModalOpen(false)}
