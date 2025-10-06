@@ -35,7 +35,7 @@ export const validateSlide2 = async (formData: FormData): Promise<FormErrors> =>
   console.log("🔍 Iniciando validação do slide 2 com dados:", {
     nomeLoja: formData.nomeLoja,
     subdominio: formData.subdominio,
-    categoriaVenda: formData.categoriaVenda,
+    categoriaLoja: formData.categoriaLoja,
     cnpj: formData.cnpj,
   })
 
@@ -80,8 +80,8 @@ export const validateSlide2 = async (formData: FormData): Promise<FormErrors> =>
     }
   }
 
-  if (!formData.categoriaVenda) {
-    errors.categoriaVenda = "Categoria de venda é obrigatória"
+  if (!formData.categoriaLoja) {
+    errors.categoriaLoja = "Categoria de loja é obrigatória"
   }
 
   if (formData.cnpj && formData.cnpj.replace(/\D/g, "").length !== 14) {

@@ -14,8 +14,8 @@ import {
   Users,
 } from "lucide-react";
 
-// 🎛️ CONTROLE DE SIMULAÇÃO - Altere para false para desabilitar
-const ENABLE_SIMULATION = true;
+// CONTROLE DE SIMULAÇÃO
+const ENABLE_SIMULATION = false;
 
 interface Store {
   id: string;
@@ -245,23 +245,48 @@ const lojasMock: Store[] = [
 ];
 
 export default function CatalogoPage() {
-  const [lojas, setLojas] = useState<Store[]>(
-    ENABLE_SIMULATION ? lojasMock : []
-  );
-  const [lojasFiltradas, setLojasFiltradas] = useState<Store[]>(
-    ENABLE_SIMULATION ? lojasMock : []
-  );
+  const [lojas, setLojas] = useState<Store[]>(ENABLE_SIMULATION ? lojasMock : []);
+  const [lojasFiltradas, setLojasFiltradas] = useState<Store[]>(ENABLE_SIMULATION ? lojasMock : []);
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todas as Categorias");
   const [termoBusca, setTermoBusca] = useState("");
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
   useEffect(() => {
     if (!ENABLE_SIMULATION) {
-      // Em modo real, aqui você faria a chamada para a API real
-      // Por exemplo: fetchLojasFromAPI()
-      setLojas([]);
-      setLojasFiltradas([]);
-      return;
+      fetch("https://localhost:7083/lojas", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Erro na resposta da requisição");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const lojasData = data.lojas.map((loja: any) => ({
+            id: loja.id.toString(),
+            nome: loja.nomeLoja,
+            categoria: loja.categoriaLoja,
+            subdomain: loja.subdominio,
+            descricao: "Descrição não disponível", // Você pode adicionar descrições específicas, caso necessário
+            rating: 0, // A avaliação pode vir de algum dado extra, ou você pode adicionar lógica para calcular isso
+            totalAvaliacoes: 0, // A mesma coisa para avaliações
+            cidade: "Resende",
+            estado: "RJ",
+            totalProdutos: 0, // Também pode ser fornecido de alguma outra maneira
+            imagemCapa: "/placeholder.svg?height=200&width=300", // Ou você pode definir uma URL de imagem
+            isActive: true, // Baseado na lógica de seu sistema
+            criadaEm: "2023-01-01", // Data de criação fictícia ou real
+          }));
+
+          setLojas(lojasData);
+        })
+        .catch((error) => {
+          console.error("Erro ao listar lojas:", error); // Trata erros
+        });
     }
 
     let resultado = lojas;
@@ -400,7 +425,7 @@ export default function CatalogoPage() {
         </div>
 
         {/* Grid de Lojas */}
-        {ENABLE_SIMULATION && lojasFiltradas.length > 0 ? (
+        {!ENABLE_SIMULATION && lojasFiltradas.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {lojasFiltradas.map((loja) => (
               <div

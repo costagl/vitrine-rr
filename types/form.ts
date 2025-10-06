@@ -8,7 +8,7 @@ export interface FormData {
   cnpj: string
   nomeLoja: string
   subdominio: string
-  categoriaVenda: string
+  categoriaLoja: string
   email: string
   senha: string
   confirmarSenha: string

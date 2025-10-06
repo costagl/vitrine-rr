@@ -36,7 +36,7 @@ export interface RegisterRequest {
   cnpj?: string
   nomeLoja: string
   subdominio: string
-  categoriaVenda: string
+  IdCategoriaLoja: string
   email: string
   senha: string
   confirmarSenha: string

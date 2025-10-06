@@ -1,21 +1,40 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import type { StepProps } from "@/types/form"
 import { FormInput } from "./form-input"
 import { FormSelect } from "./form-select"
 import { SubdomainInput } from "./subdomain-input"
 
-const categoryOptions = [
-  { value: "roupas", label: "Roupas e Acessórios" },
-  { value: "eletronicos", label: "Eletrônicos" },
-  { value: "alimentos", label: "Alimentos" },
-  { value: "beleza", label: "Beleza e Cuidados Pessoais" },
-  { value: "casa", label: "Casa e Decoração" },
-  { value: "esportes", label: "Esportes e Lazer" },
-  { value: "outros", label: "Outros" },
-]
+interface Categoria {
+  id: number
+  titulo: string
+}
 
 export function StepStoreInfo({ formData, errors, attempted, onChange, onSelectChange, onCNPJChange }: StepProps) {
+  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([])
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("https://localhost:7083/produto/listar-categoria-loja")
+        const data: Categoria[] = await response.json()
+
+        const formattedCategories = data.map((category) => ({
+          value: category.id.toString(),
+          label: category.titulo,
+        }))
+        
+        setCategoryOptions(formattedCategories)
+      } catch (error) {
+        console.error("Erro ao buscar categorias:", error)
+      }
+    }
+
+    fetchCategories()
+  }, [])
+
+  // console.log("categorias: ", categoryOptions)
   return (
     <div className="w-full flex-shrink-0 p-6">
       <form className="grid grid-cols-1 gap-4">
@@ -54,12 +73,12 @@ export function StepStoreInfo({ formData, errors, attempted, onChange, onSelectC
         />
 
         <FormSelect
-          id="categoriaVenda"
-          label="Categoria de Venda"
+          id="categoriaLoja"
+          label="Categoria de Loja"
           placeholder="Selecione a categoria"
-          value={formData.categoriaVenda}
-          onValueChange={(value) => onSelectChange(value, "categoriaVenda")}
-          error={errors.categoriaVenda}
+          value={formData.categoriaLoja}
+          onValueChange={(value) => onSelectChange(value, "categoriaLoja")}
+          error={errors.categoriaLoja}
           attempted={attempted}
           options={categoryOptions}
         />

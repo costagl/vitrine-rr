@@ -6,7 +6,7 @@ export class AuthService {
   static async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await apiClient.post<LoginResponse>(API_ENDPOINTS.AUTH.LOGIN, credentials)
 
-    console.log("📥 RESPOSTA DO LOGIN RECEBIDA:")
+    console.log("RESPOSTA DO LOGIN RECEBIDA:")
     console.log("- Success:", response.success)
     console.log("- Data presente:", !!response.data)
     return response.data!
