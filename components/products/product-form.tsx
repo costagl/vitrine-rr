@@ -1,27 +1,38 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { Product, CreateProductRequest } from "@/types/product"
-import { categories } from "@/data/categories"
-import { useAuth } from "@/contexts/auth-context"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { Product, CreateProductRequest } from "@/types/product";
+import { categories } from "@/data/categories";
+import { useAuth } from "@/contexts/auth-context";
 
 interface ProductFormProps {
-  product?: Product | null
-  onSave: (product: CreateProductRequest) => void
-  onCancel: () => void
-  isLoading?: boolean
+  product?: Product | null;
+  onSave: (product: CreateProductRequest) => void;
+  onCancel: () => void;
+  isLoading?: boolean;
 }
 
-export function ProductForm({ product, onSave, onCancel, isLoading = false }: ProductFormProps) {
-  const { user, isAuthenticated } = useAuth()
+export function ProductForm({
+  product,
+  onSave,
+  onCancel,
+  isLoading = false,
+}: ProductFormProps) {
+  const { user, isAuthenticated } = useAuth();
 
   const [formData, setFormData] = useState<CreateProductRequest>({
     titulo: "",
@@ -38,9 +49,9 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
     largura: 0,
     profundidade: 0,
     idCategoriaProduto: 0,
-  })
+  });
 
-  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (product) {
@@ -59,129 +70,134 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
         largura: product.largura,
         profundidade: product.profundidade,
         idCategoriaProduto: product.idCategoriaProduto,
-      })
+      });
     }
-  }, [product])
+  }, [product]);
 
   const generateSKU = () => {
-    const timestamp = Date.now().toString().slice(-6)
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase()
-    return `SKU${timestamp}${random}`
-  }
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `SKU${timestamp}${random}`;
+  };
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {}
+    const newErrors: Record<string, string> = {};
 
     // Verificar se o usuário está autenticado
     if (!isAuthenticated) {
-      newErrors.auth = "Você precisa estar logado para cadastrar produtos"
-      return newErrors
+      newErrors.auth = "Você precisa estar logado para cadastrar produtos";
+      return newErrors;
     }
 
     // Verificar se o token está presente
-    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    const token =
+      typeof window !== "undefined" ? localStorage.getItem("token") : null;
     if (!token) {
-      newErrors.auth = "Token de autenticação não encontrado. Faça login novamente."
-      return newErrors
+      newErrors.auth =
+        "Token de autenticação não encontrado. Faça login novamente.";
+      return newErrors;
     }
 
     if (!formData.titulo.trim()) {
-      newErrors.titulo = "Título é obrigatório"
+      newErrors.titulo = "Título é obrigatório";
     } else if (formData.titulo.length > 255) {
-      newErrors.titulo = "Título deve ter no máximo 255 caracteres"
+      newErrors.titulo = "Título deve ter no máximo 255 caracteres";
     }
 
     if (!formData.descricao.trim()) {
-      newErrors.descricao = "Descrição é obrigatória"
+      newErrors.descricao = "Descrição é obrigatória";
     }
 
     if (formData.valorUnitario <= 0) {
-      newErrors.valorUnitario = "Valor unitário deve ser maior que zero"
+      newErrors.valorUnitario = "Valor unitário deve ser maior que zero";
     }
 
-    if (formData.valorPromocional && formData.valorPromocional >= formData.valorUnitario) {
-      newErrors.valorPromocional = "Valor promocional deve ser menor que o valor unitário"
-    }
+    //TODO:
+    // if (formData.valorPromocional && formData.valorPromocional >= formData.valorUnitario) {
+    //   newErrors.valorPromocional = "Valor promocional deve ser menor que o valor unitário"
+    // }
 
     if (!formData.sku.trim()) {
-      newErrors.sku = "SKU é obrigatório"
+      newErrors.sku = "SKU é obrigatório";
     } else if (formData.sku.length > 100) {
-      newErrors.sku = "SKU deve ter no máximo 100 caracteres"
+      newErrors.sku = "SKU deve ter no máximo 100 caracteres";
     }
 
     if (!formData.imagem.trim()) {
-      newErrors.imagem = "URL da imagem é obrigatória"
+      newErrors.imagem = "URL da imagem é obrigatória";
     } else if (formData.imagem.length > 255) {
-      newErrors.imagem = "URL da imagem deve ter no máximo 255 caracteres"
+      newErrors.imagem = "URL da imagem deve ter no máximo 255 caracteres";
     }
 
     if (formData.estoque < 0) {
-      newErrors.estoque = "Estoque não pode ser negativo"
+      newErrors.estoque = "Estoque não pode ser negativo";
     }
 
     if (formData.peso < 0) {
-      newErrors.peso = "Peso não pode ser negativo"
+      newErrors.peso = "Peso não pode ser negativo";
     }
 
     if (formData.altura < 0) {
-      newErrors.altura = "Altura não pode ser negativa"
+      newErrors.altura = "Altura não pode ser negativa";
     }
 
     if (formData.largura < 0) {
-      newErrors.largura = "Largura não pode ser negativa"
+      newErrors.largura = "Largura não pode ser negativa";
     }
 
     if (formData.profundidade < 0) {
-      newErrors.profundidade = "Profundidade não pode ser negativa"
+      newErrors.profundidade = "Profundidade não pode ser negativa";
     }
 
     if (formData.idCategoriaProduto === 0) {
-      newErrors.idCategoriaProduto = "Categoria é obrigatória"
+      newErrors.idCategoriaProduto = "Categoria é obrigatória";
     }
 
-    setErrors(newErrors)
-    return Object.keys(newErrors).length === 0
-  }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    console.log("📝 Tentando salvar produto:", formData)
+    console.log("📝 Tentando salvar produto:", formData);
 
     // Verificar se o token está presente no localStorage
-    const token = localStorage.getItem("token")
-    console.log("🔐 Token presente:", !!token)
+    const token = localStorage.getItem("token");
+    console.log("🔐 Token presente:", !!token);
     if (token) {
     } else {
-      console.error("🚫 Token não encontrado no localStorage")
+      console.error("🚫 Token não encontrado no localStorage");
       setErrors({
         auth: "Token de autenticação não encontrado. Faça login novamente.",
-      })
-      return
+      });
+      return;
     }
 
     if (validateForm()) {
-      onSave(formData)
+      onSave(formData);
     } else {
-      console.log("❌ Validação falhou:", errors)
+      console.log("❌ Validação falhou:", errors);
     }
-  }
+  };
 
   const handleChange = (field: keyof CreateProductRequest, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors((prev) => ({ ...prev, [field]: "" }))
+      setErrors((prev) => ({ ...prev, [field]: "" }));
     }
-  }
+  };
 
   // Mostrar erro de autenticação se houver
   if (errors.auth) {
     return (
       <div className="text-center py-8">
         <div className="text-red-500 mb-4">{errors.auth}</div>
-        <Button onClick={() => (window.location.href = "/login")}>Fazer Login</Button>
+        <Button onClick={() => (window.location.href = "/login")}>
+          Fazer Login
+        </Button>
       </div>
-    )
+    );
   }
 
   return (
@@ -204,7 +220,9 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 disabled={isLoading}
                 maxLength={255}
               />
-              {errors.titulo && <p className="text-red-500 text-sm">{errors.titulo}</p>}
+              {errors.titulo && (
+                <p className="text-red-500 text-sm">{errors.titulo}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -228,7 +246,9 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                   Gerar
                 </Button>
               </div>
-              {errors.sku && <p className="text-red-500 text-sm">{errors.sku}</p>}
+              {errors.sku && (
+                <p className="text-red-500 text-sm">{errors.sku}</p>
+              )}
             </div>
           </div>
 
@@ -243,7 +263,9 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
               className={errors.descricao ? "border-red-500" : ""}
               disabled={isLoading}
             />
-            {errors.descricao && <p className="text-red-500 text-sm">{errors.descricao}</p>}
+            {errors.descricao && (
+              <p className="text-red-500 text-sm">{errors.descricao}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -257,17 +279,28 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
               disabled={isLoading}
               maxLength={255}
             />
-            {errors.imagem && <p className="text-red-500 text-sm">{errors.imagem}</p>}
+            {errors.imagem && (
+              <p className="text-red-500 text-sm">{errors.imagem}</p>
+            )}
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="categoria">Categoria *</Label>
             <Select
-              value={formData.idCategoriaProduto.toString()}
-              onValueChange={(value) => handleChange("idCategoriaProduto", Number.parseInt(value))}
+              value={
+                formData.idCategoriaProduto
+                  ? formData.idCategoriaProduto.toString()
+                  : ""
+              }
+              onValueChange={(value) =>
+                handleChange("idCategoriaProduto", Number.parseInt(value))
+              }
               disabled={isLoading}
             >
-              <SelectTrigger className={errors.idCategoriaProduto ? "border-red-500" : ""}>
+              <SelectTrigger
+                className={errors.idCategoriaProduto ? "border-red-500" : ""}
+              >
+                {/* Este SelectValue exibe o placeholder quando não há valor selecionado */}
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -278,7 +311,11 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 ))}
               </SelectContent>
             </Select>
-            {errors.idCategoriaProduto && <p className="text-red-500 text-sm">{errors.idCategoriaProduto}</p>}
+            {errors.idCategoriaProduto && (
+              <p className="text-red-500 text-sm">
+                {errors.idCategoriaProduto}
+              </p>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -298,12 +335,19 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 step="0.01"
                 min="0"
                 value={formData.valorUnitario}
-                onChange={(e) => handleChange("valorUnitario", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange(
+                    "valorUnitario",
+                    Number.parseFloat(e.target.value) || 0
+                  )
+                }
                 placeholder="0,00"
                 className={errors.valorUnitario ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.valorUnitario && <p className="text-red-500 text-sm">{errors.valorUnitario}</p>}
+              {errors.valorUnitario && (
+                <p className="text-red-500 text-sm">{errors.valorUnitario}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -315,13 +359,22 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 min="0"
                 value={formData.valorPromocional || ""}
                 onChange={(e) =>
-                  handleChange("valorPromocional", e.target.value ? Number.parseFloat(e.target.value) : undefined)
+                  handleChange(
+                    "valorPromocional",
+                    e.target.value
+                      ? Number.parseFloat(e.target.value)
+                      : undefined
+                  )
                 }
                 placeholder="0,00"
                 className={errors.valorPromocional ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.valorPromocional && <p className="text-red-500 text-sm">{errors.valorPromocional}</p>}
+              {errors.valorPromocional && (
+                <p className="text-red-500 text-sm">
+                  {errors.valorPromocional}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -331,12 +384,16 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 type="number"
                 min="0"
                 value={formData.estoque}
-                onChange={(e) => handleChange("estoque", Number.parseInt(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange("estoque", Number.parseInt(e.target.value) || 0)
+                }
                 placeholder="0"
                 className={errors.estoque ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.estoque && <p className="text-red-500 text-sm">{errors.estoque}</p>}
+              {errors.estoque && (
+                <p className="text-red-500 text-sm">{errors.estoque}</p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -357,12 +414,16 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 step="0.01"
                 min="0"
                 value={formData.peso}
-                onChange={(e) => handleChange("peso", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange("peso", Number.parseFloat(e.target.value) || 0)
+                }
                 placeholder="0,00"
                 className={errors.peso ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.peso && <p className="text-red-500 text-sm">{errors.peso}</p>}
+              {errors.peso && (
+                <p className="text-red-500 text-sm">{errors.peso}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -373,12 +434,16 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 step="0.01"
                 min="0"
                 value={formData.altura}
-                onChange={(e) => handleChange("altura", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange("altura", Number.parseFloat(e.target.value) || 0)
+                }
                 placeholder="0,00"
                 className={errors.altura ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.altura && <p className="text-red-500 text-sm">{errors.altura}</p>}
+              {errors.altura && (
+                <p className="text-red-500 text-sm">{errors.altura}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -389,12 +454,19 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 step="0.01"
                 min="0"
                 value={formData.largura}
-                onChange={(e) => handleChange("largura", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange(
+                    "largura",
+                    Number.parseFloat(e.target.value) || 0
+                  )
+                }
                 placeholder="0,00"
                 className={errors.largura ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.largura && <p className="text-red-500 text-sm">{errors.largura}</p>}
+              {errors.largura && (
+                <p className="text-red-500 text-sm">{errors.largura}</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -405,12 +477,19 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
                 step="0.01"
                 min="0"
                 value={formData.profundidade}
-                onChange={(e) => handleChange("profundidade", Number.parseFloat(e.target.value) || 0)}
+                onChange={(e) =>
+                  handleChange(
+                    "profundidade",
+                    Number.parseFloat(e.target.value) || 0
+                  )
+                }
                 placeholder="0,00"
                 className={errors.profundidade ? "border-red-500" : ""}
                 disabled={isLoading}
               />
-              {errors.profundidade && <p className="text-red-500 text-sm">{errors.profundidade}</p>}
+              {errors.profundidade && (
+                <p className="text-red-500 text-sm">{errors.profundidade}</p>
+              )}
             </div>
           </div>
         </CardContent>
@@ -426,7 +505,9 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
             <Switch
               id="ativo"
               checked={formData.ativo === 1}
-              onCheckedChange={(checked) => handleChange("ativo", checked ? 1 : 0)}
+              onCheckedChange={(checked) =>
+                handleChange("ativo", checked ? 1 : 0)
+              }
               disabled={isLoading}
             />
             <Label htmlFor="ativo">Produto ativo</Label>
@@ -437,12 +518,22 @@ export function ProductForm({ product, onSave, onCancel, isLoading = false }: Pr
       {/* Botões */}
       <div className="flex gap-4 pt-4">
         <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? "Salvando..." : product ? "Atualizar Produto" : "Adicionar Produto"}
+          {isLoading
+            ? "Salvando..."
+            : product
+            ? "Atualizar Produto"
+            : "Adicionar Produto"}
         </Button>
-        <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={isLoading}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="flex-1"
+          disabled={isLoading}
+        >
           Cancelar
         </Button>
       </div>
     </form>
-  )
+  );
 }

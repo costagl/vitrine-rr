@@ -327,7 +327,7 @@ export default function ProdutosLayout1Page() {
         </div>
       </div>
 
-      <CartModal />
+      <CartModal/>
     </div>
   )
 }

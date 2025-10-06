@@ -66,7 +66,7 @@ export default function Layout1Page() {
   const [error, setError] = useState<string | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
 
-  const categorias = ["Roupas Masculinas", "Roupas Femininas", "Calçados", "Acessórios", "Bolsas", "Relógios"]
+  const categorias = ["Todos os produtos", "Roupas Masculinas", "Roupas Femininas", "Calçados", "Acessórios", "Bolsas", "Relógios"]
 
   // Buscar produtos da API
   useEffect(() => {
@@ -212,7 +212,7 @@ export default function Layout1Page() {
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm" className="flex items-center gap-2">
                 <User className="h-5 w-5" />
-                <span className="hidden md:block">Minha Conta</span>
+                <span className="hidden md:block">Contato</span>
               </Button>
               <Button variant="ghost" size="sm" className="flex items-center gap-2">
                 <Heart className="h-5 w-5" />
@@ -233,7 +233,7 @@ export default function Layout1Page() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center space-x-8 py-3">
             {categorias.map((categoria, index) => (
-              <Link key={index} href="#" className="hover:text-blue-200 transition-colors font-medium">
+              <Link key={index} href="http://localhost:3000/minha-loja/layout-1/produtos" className="hover:text-blue-200 transition-colors font-medium">
                 {categoria}
               </Link>
             ))}

@@ -9,14 +9,14 @@ export interface Product {
   estoque: number
   sku: string
   imagem: string
-  ativo: number // 0 ou 1 (byte no backend)
+  ativo: number // 0 ou 1
   peso: number
   descricao: string
   altura: number
   largura: number
   profundidade: number
   idCategoriaProduto: number
-  // Campos de navegação (opcionais para exibição)
+  // Campos de navegação
   categoriaProduto?: {
     id: number
     nome: string
@@ -42,6 +42,7 @@ export interface CreateProductRequest {
   largura: number
   profundidade: number
   idCategoriaProduto: number
+  formDataToSend?: FormData
 }
 
 export interface UpdateProductRequest {

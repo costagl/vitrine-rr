@@ -78,7 +78,7 @@ export default function MinhaLojaPage() {
           )}
         </div>
 
-        {/* Nova Seção - Informações da Loja */}
+        {/* Informações da Loja */}
         {user?.loja && (
           <Card className="mb-8 border-l-4 border-l-primary">
             <CardHeader className="pb-4">

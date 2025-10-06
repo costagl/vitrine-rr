@@ -1,15 +1,15 @@
 // Lista de categorias
 export const categories = [
-  { id: 1, nome: "Eletrônicos" },
-  { id: 2, nome: "Roupas" },
-  { id: 3, nome: "Alimentos" },
-  { id: 4, nome: "Beleza" },
-  { id: 5, nome: "Saúde" },
-  { id: 6, nome: "Brinquedos" },
-  { id: 7, nome: "Automóveis" },
-  { id: 8, nome: "Móveis" },
-  { id: 9, nome: "Esportes" },
-  { id: 10, nome: "Livros" }
+  { id: 21, nome: "Eletrônicos" },
+  { id: 22, nome: "Roupas" },
+  { id: 23, nome: "Alimentos" },
+  { id: 24, nome: "Beleza" },
+  { id: 25, nome: "Saúde" },
+  { id: 26, nome: "Brinquedos" },
+  { id: 27, nome: "Automóveis" },
+  { id: 28, nome: "Móveis" },
+  { id: 29, nome: "Esportes" },
+  { id: 30, nome: "Livros" }
 ];
 
 export function getCategoryNameById(id: number): string {
