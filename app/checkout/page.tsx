@@ -32,7 +32,7 @@ const plans: Record<string, Plan> = {
   basico: {
     id: "basico",
     name: "Básico",
-    price: 29,
+    price: 0,
     description: "Ideal para iniciantes",
     features: [
       "Até 5 produtos",

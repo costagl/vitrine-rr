@@ -28,6 +28,7 @@ interface Store {
   cidade: string;
   estado: string;
   totalProdutos: number;
+  logotipo?: string;
   imagemCapa: string;
   isActive: boolean;
   criadaEm: string;
@@ -271,15 +272,16 @@ export default function CatalogoPage() {
             nome: loja.nomeLoja,
             categoria: loja.categoriaLoja,
             subdomain: loja.subdominio,
-            descricao: "Descrição não disponível", // Você pode adicionar descrições específicas, caso necessário
-            rating: 0, // A avaliação pode vir de algum dado extra, ou você pode adicionar lógica para calcular isso
-            totalAvaliacoes: 0, // A mesma coisa para avaliações
+            logotipo : loja.logotipo,
+            descricao: "Descrição não disponível",
+            rating: loja.avaliacao || 5,
+            totalAvaliacoes: 5,
             cidade: "Resende",
             estado: "RJ",
-            totalProdutos: 0, // Também pode ser fornecido de alguma outra maneira
-            imagemCapa: "/placeholder.svg?height=200&width=300", // Ou você pode definir uma URL de imagem
-            isActive: true, // Baseado na lógica de seu sistema
-            criadaEm: "2023-01-01", // Data de criação fictícia ou real
+            totalProdutos: 20,
+            imagemCapa: "/placeholder.svg?height=200&width=300",
+            isActive: true,
+            criadaEm: "2023-01-01",
           }));
 
           setLojas(lojasData);
@@ -435,7 +437,7 @@ export default function CatalogoPage() {
                 {/* Imagem da Loja */}
                 <div className="relative">
                   <img
-                    src={loja.imagemCapa || "/placeholder.svg"}
+                    src={loja.logotipo || "/placeholder.svg"}
                     alt={loja.nome}
                     className="w-full h-48 object-cover"
                   />

@@ -28,16 +28,16 @@ export default function PlanosPage() {
         {/* Plano Básico */}
         <Card className="flex flex-col border-border">
           <CardHeader>
-            <CardTitle className="text-2xl">Básico</CardTitle>
+            <CardTitle className="text-2xl">Gratuito</CardTitle>
             <CardDescription>Ideal para iniciantes</CardDescription>
             <div className="mt-4">
-              <span className="text-4xl font-bold">R$29</span>
+              <span className="text-4xl font-bold">R$0</span>
               <span className="text-muted-foreground">/mês</span>
             </div>
           </CardHeader>
           <CardContent className="flex-grow">
             <ul className="space-y-3">
-              <PlanFeature>Até 5 produtos</PlanFeature>
+              <PlanFeature>Até 10 produtos</PlanFeature>
               <PlanFeature>Análises básicas</PlanFeature>
               <PlanFeature>Suporte por email</PlanFeature>
               <PlanFeature>Personalização limitada</PlanFeature>
