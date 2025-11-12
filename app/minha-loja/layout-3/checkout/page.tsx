@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 import {
   ArrowLeft,
   CreditCard,
@@ -22,15 +29,15 @@ import {
   Heart,
   Palette,
   Gift,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function Layout3CheckoutPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({
     "1": 1,
     "2": 2,
     "3": 1,
-  })
+  });
 
   const produtos = [
     {
@@ -57,26 +64,29 @@ export default function Layout3CheckoutPage() {
       cores: ["#8B4513", "#D2691E"],
       tipo: "Set 12 pcs",
     },
-  ]
+  ];
 
-  const subtotal = produtos.reduce((acc, produto) => acc + produto.preco * quantities[produto.id], 0)
-  const frete = subtotal > 150 ? 0 : 12.9
-  const total = subtotal + frete
+  const subtotal = produtos.reduce(
+    (acc, produto) => acc + produto.preco * quantities[produto.id],
+    0
+  );
+  const frete = subtotal > 150 ? 0 : 12.9;
+  const total = subtotal + frete;
 
   const updateQuantity = (id: string, change: number) => {
     setQuantities((prev) => ({
       ...prev,
       [id]: Math.max(1, prev[id] + change),
-    }))
-  }
+    }));
+  };
 
   const removeItem = (id: string) => {
     setQuantities((prev) => {
-      const newQuantities = { ...prev }
-      delete newQuantities[id]
-      return newQuantities
-    })
-  }
+      const newQuantities = { ...prev };
+      delete newQuantities[id];
+      return newQuantities;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -101,7 +111,9 @@ export default function Layout3CheckoutPage() {
             </h1>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-purple-500" />
-              <span className="text-sm text-purple-600 font-medium">Seguro</span>
+              <span className="text-sm text-purple-600 font-medium">
+                Seguro
+              </span>
             </div>
           </div>
         </div>
@@ -114,7 +126,11 @@ export default function Layout3CheckoutPage() {
             {/* Progress Criativo */}
             <div className="flex items-center justify-center mb-8">
               <div className="flex items-center space-x-6">
-                <div className={`flex flex-col items-center ${step >= 1 ? "text-purple-600" : "text-gray-400"}`}>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 1 ? "text-purple-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
                       step >= 1
@@ -124,14 +140,22 @@ export default function Layout3CheckoutPage() {
                   >
                     <Gift className="h-5 w-5" />
                   </div>
-                  <span className="text-xs font-bold tracking-wide">ENTREGA</span>
+                  <span className="text-xs font-bold tracking-wide">
+                    ENTREGA
+                  </span>
                 </div>
                 <div
                   className={`w-12 h-1 rounded-full ${
-                    step >= 2 ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-200"
+                    step >= 2
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                      : "bg-gray-200"
                   } transition-all`}
                 ></div>
-                <div className={`flex flex-col items-center ${step >= 2 ? "text-purple-600" : "text-gray-400"}`}>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 2 ? "text-purple-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
                       step >= 2
@@ -141,14 +165,22 @@ export default function Layout3CheckoutPage() {
                   >
                     <CreditCard className="h-5 w-5" />
                   </div>
-                  <span className="text-xs font-bold tracking-wide">PAGAMENTO</span>
+                  <span className="text-xs font-bold tracking-wide">
+                    PAGAMENTO
+                  </span>
                 </div>
                 <div
                   className={`w-12 h-1 rounded-full ${
-                    step >= 3 ? "bg-gradient-to-r from-purple-500 to-pink-500" : "bg-gray-200"
+                    step >= 3
+                      ? "bg-gradient-to-r from-purple-500 to-pink-500"
+                      : "bg-gray-200"
                   } transition-all`}
                 ></div>
-                <div className={`flex flex-col items-center ${step >= 3 ? "text-purple-600" : "text-gray-400"}`}>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 3 ? "text-purple-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all ${
                       step >= 3
@@ -158,7 +190,9 @@ export default function Layout3CheckoutPage() {
                   >
                     <Sparkles className="h-5 w-5" />
                   </div>
-                  <span className="text-xs font-bold tracking-wide">SUCESSO</span>
+                  <span className="text-xs font-bold tracking-wide">
+                    SUCESSO
+                  </span>
                 </div>
               </div>
             </div>
@@ -179,7 +213,10 @@ export default function Layout3CheckoutPage() {
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="nome" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="nome"
+                          className="text-purple-700 font-medium"
+                        >
                           Nome Completo
                         </Label>
                         <Input
@@ -189,7 +226,10 @@ export default function Layout3CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="email" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="email"
+                          className="text-purple-700 font-medium"
+                        >
                           Email
                         </Label>
                         <Input
@@ -202,7 +242,10 @@ export default function Layout3CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="telefone" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="telefone"
+                          className="text-purple-700 font-medium"
+                        >
                           Telefone
                         </Label>
                         <Input
@@ -212,7 +255,10 @@ export default function Layout3CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cpf" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="cpf"
+                          className="text-purple-700 font-medium"
+                        >
                           CPF
                         </Label>
                         <Input
@@ -223,7 +269,10 @@ export default function Layout3CheckoutPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="endereco" className="text-purple-700 font-medium">
+                      <Label
+                        htmlFor="endereco"
+                        className="text-purple-700 font-medium"
+                      >
                         Endereço Completo
                       </Label>
                       <Input
@@ -234,7 +283,10 @@ export default function Layout3CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
-                        <Label htmlFor="cidade" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="cidade"
+                          className="text-purple-700 font-medium"
+                        >
                           Cidade
                         </Label>
                         <Input
@@ -244,7 +296,10 @@ export default function Layout3CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="estado" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="estado"
+                          className="text-purple-700 font-medium"
+                        >
                           Estado
                         </Label>
                         <Select>
@@ -259,7 +314,10 @@ export default function Layout3CheckoutPage() {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="cep" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="cep"
+                          className="text-purple-700 font-medium"
+                        >
                           CEP
                         </Label>
                         <Input
@@ -306,7 +364,9 @@ export default function Layout3CheckoutPage() {
                     <Card className="cursor-pointer border-2 border-gray-200 hover:border-purple-300 hover:shadow-lg transition-all">
                       <CardContent className="p-6 text-center">
                         <div className="w-8 h-8 bg-green-600 rounded-full mx-auto mb-3 flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">PIX</span>
+                          <span className="text-white text-xs font-bold">
+                            PIX
+                          </span>
                         </div>
                         <p className="font-bold">PIX</p>
                         <p className="text-sm text-green-600">10% desconto</p>
@@ -323,7 +383,10 @@ export default function Layout3CheckoutPage() {
 
                   <div className="space-y-6">
                     <div>
-                      <Label htmlFor="numeroCartao" className="text-purple-700 font-medium">
+                      <Label
+                        htmlFor="numeroCartao"
+                        className="text-purple-700 font-medium"
+                      >
                         Número do Cartão
                       </Label>
                       <Input
@@ -334,7 +397,10 @@ export default function Layout3CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="validade" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="validade"
+                          className="text-purple-700 font-medium"
+                        >
                           Validade
                         </Label>
                         <Input
@@ -344,7 +410,10 @@ export default function Layout3CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cvv" className="text-purple-700 font-medium">
+                        <Label
+                          htmlFor="cvv"
+                          className="text-purple-700 font-medium"
+                        >
                           CVV
                         </Label>
                         <Input
@@ -355,7 +424,10 @@ export default function Layout3CheckoutPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="nomeCartao" className="text-purple-700 font-medium">
+                      <Label
+                        htmlFor="nomeCartao"
+                        className="text-purple-700 font-medium"
+                      >
                         Nome no Cartão
                       </Label>
                       <Input
@@ -396,7 +468,9 @@ export default function Layout3CheckoutPage() {
                   <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
                     Pedido Confirmado!
                   </h2>
-                  <p className="text-gray-600 mb-4">Seu pedido #ART-12345 foi realizado com sucesso.</p>
+                  <p className="text-gray-600 mb-4">
+                    Seu pedido #ART-12345 foi realizado com sucesso.
+                  </p>
                   <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border-green-200 mb-6">
                     <Sparkles className="h-3 w-3 mr-1" />
                     Pagamento Aprovado
@@ -404,7 +478,9 @@ export default function Layout3CheckoutPage() {
                   <div className="space-y-2 text-sm text-gray-600 mb-8">
                     <p>Você receberá um email de confirmação em breve.</p>
                     <p>Seus materiais de arte chegarão em 2-4 dias úteis</p>
-                    <p className="text-purple-600 font-medium">✨ Prepare-se para criar obras incríveis!</p>
+                    <p className="text-purple-600 font-medium">
+                      ✨ Prepare-se para criar obras incríveis!
+                    </p>
                   </div>
                   <div className="flex gap-4 max-w-md mx-auto">
                     <Button
@@ -437,12 +513,18 @@ export default function Layout3CheckoutPage() {
                   {produtos
                     .filter((produto) => quantities[produto.id])
                     .map((produto) => (
-                      <div key={produto.id} className="flex items-center gap-3 pb-4 border-b border-purple-100">
+                      <div
+                        key={produto.id}
+                        className="flex items-center gap-3 pb-4 border-b border-purple-100"
+                      >
                         <div className="relative">
-                          <img
+                          <Image
                             src={produto.imagem || "/placeholder.svg"}
                             alt={produto.nome}
                             className="w-16 h-16 object-cover rounded-lg border-2 border-purple-100"
+                            layout="responsive"
+                            width={500}
+                            height={300}
                           />
                           <div className="absolute -top-1 -right-1 flex gap-1">
                             {produto.cores.slice(0, 3).map((cor, index) => (
@@ -455,8 +537,12 @@ export default function Layout3CheckoutPage() {
                           </div>
                         </div>
                         <div className="flex-1">
-                          <h4 className="font-bold text-sm text-gray-800">{produto.nome}</h4>
-                          <p className="text-xs text-purple-600">{produto.tipo}</p>
+                          <h4 className="font-bold text-sm text-gray-800">
+                            {produto.nome}
+                          </h4>
+                          <p className="text-xs text-purple-600">
+                            {produto.tipo}
+                          </p>
                           <div className="flex items-center gap-2 mt-2">
                             <Button
                               variant="ghost"
@@ -466,7 +552,9 @@ export default function Layout3CheckoutPage() {
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="text-sm font-bold text-purple-600">{quantities[produto.id]}</span>
+                            <span className="text-sm font-bold text-purple-600">
+                              {quantities[produto.id]}
+                            </span>
                             <Button
                               variant="ghost"
                               size="sm"
@@ -487,7 +575,10 @@ export default function Layout3CheckoutPage() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold text-purple-600">
-                            R$ {(produto.preco * quantities[produto.id]).toFixed(2)}
+                            R${" "}
+                            {(produto.preco * quantities[produto.id]).toFixed(
+                              2
+                            )}
                           </p>
                         </div>
                       </div>
@@ -498,14 +589,22 @@ export default function Layout3CheckoutPage() {
                   <div className="space-y-3">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Subtotal</span>
-                      <span className="font-medium">R$ {subtotal.toFixed(2)}</span>
+                      <span className="font-medium">
+                        R$ {subtotal.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="flex items-center gap-1 text-gray-600">
                         <Truck className="h-4 w-4" />
                         Frete
                       </span>
-                      <span className={frete === 0 ? "text-green-600 font-bold" : "font-medium"}>
+                      <span
+                        className={
+                          frete === 0
+                            ? "text-green-600 font-bold"
+                            : "font-medium"
+                        }
+                      >
                         {frete === 0 ? "GRÁTIS" : `R$ ${frete.toFixed(2)}`}
                       </span>
                     </div>
@@ -552,5 +651,5 @@ export default function Layout3CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,27 +1,34 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
-import { Edit, Trash2, Eye, EyeOff, Package, Tag } from "lucide-react"
-import type { Product } from "@/types/product"
-import { getCategoryNameById } from "@/data/categories"
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { Edit, Trash2, Eye, EyeOff, Package, Tag } from "lucide-react";
+import type { Product } from "@/types/product";
+import { getCategoryNameById } from "@/data/categories";
+import Image from "next/image";
 
 interface ProductListProps {
-  products: Product[]
-  onEdit: (product: Product) => void
-  onDelete: (productId: number) => void
-  onOpenDetail?: (product: Product) => void
-  isDeleting?: boolean
+  products: Product[];
+  onEdit: (product: Product) => void;
+  onDelete: (productId: number) => void;
+  onOpenDetail?: (product: Product) => void;
+  isDeleting?: boolean;
 }
 
-export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleting = false }: ProductListProps) {
+export function ProductList({
+  products,
+  onEdit,
+  onDelete,
+  onOpenDetail,
+  isDeleting = false,
+}: ProductListProps) {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(value)
-  }
+    }).format(value);
+  };
 
   if (products.length === 0) {
     return (
@@ -29,10 +36,15 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
         <div className="text-gray-400 mb-4">
           <Package className="mx-auto h-12 w-12" />
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Nenhum produto encontrado</h3>
-        <p className="text-gray-500">Comece adicionando produtos à sua loja ou ajuste os filtros de pesquisa.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Nenhum produto encontrado
+        </h3>
+        <p className="text-gray-500">
+          Comece adicionando produtos à sua loja ou ajuste os filtros de
+          pesquisa.
+        </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -43,10 +55,13 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
             <div className="flex items-start gap-4">
               {/* Imagem do Produto */}
               <div className="flex-shrink-0">
-                <img
+                <Image
                   src={product.imagem || "/placeholder.svg?height=80&width=80"}
                   alt={product.titulo}
                   className="h-20 w-20 object-cover rounded-md border"
+                  layout="responsive"
+                  width={500}
+                  height={300}
                 />
               </div>
 
@@ -55,8 +70,12 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-lg font-semibold text-gray-900 truncate">{product.titulo}</h3>
-                      <Badge variant={product.ativo === 1 ? "default" : "secondary"}>
+                      <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        {product.titulo}
+                      </h3>
+                      <Badge
+                        variant={product.ativo === 1 ? "default" : "secondary"}
+                      >
                         {product.ativo === 1 ? (
                           <>
                             <Eye className="h-3 w-3 mr-1" /> Ativo
@@ -69,11 +88,15 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
                       </Badge>
                     </div>
 
-                    <p className="text-gray-600 text-sm mb-2 line-clamp-2">{product.descricao}</p>
+                    <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                      {product.descricao}
+                    </p>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm text-gray-500 mb-2">
                       <div className="flex items-center gap-1">
-                        <span className="font-medium text-green-600">{formatCurrency(product.valorUnitario)}</span>
+                        <span className="font-medium text-green-600">
+                          {formatCurrency(product.valorUnitario)}
+                        </span>
                         {product.valorPromocional && (
                           <span className="text-xs text-red-600">
                             (Promo: {formatCurrency(product.valorPromocional)})
@@ -83,12 +106,20 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
 
                       <div className="flex items-center gap-1">
                         <Tag className="h-3 w-3" />
-                        <span>{getCategoryNameById(product.idCategoriaProduto)}</span>
+                        <span>
+                          {getCategoryNameById(product.idCategoriaProduto)}
+                        </span>
                       </div>
 
                       <div className="flex items-center gap-1">
                         <Package className="h-3 w-3" />
-                        <span className={product.estoque > 0 ? "text-green-600" : "text-red-600"}>
+                        <span
+                          className={
+                            product.estoque > 0
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
                           Estoque: {product.estoque}
                         </span>
                       </div>
@@ -148,5 +179,5 @@ export function ProductList({ products, onEdit, onDelete, onOpenDetail, isDeleti
         </Card>
       ))}
     </div>
-  )
+  );
 }

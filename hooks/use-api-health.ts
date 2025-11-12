@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { getApiUrl } from "@/config/api-url"
 
 interface ApiHealthStatus {
@@ -10,27 +10,35 @@ interface ApiHealthStatus {
   error: string | null
 }
 
-export function useApiHealth() {
-  const [status, setStatus] = useState<ApiHealthStatus>({
-    isOnline: false,
-    isLoading: true,
-    lastChecked: null,
-    error: null,
-  })
+// ALTERAÇÃO: Função auxiliar para iniciar o estado.
+// Permite definir isLoading: true fora do useEffect.
+const getInitialStatus = (): ApiHealthStatus => ({
+  isOnline: false,
+  isLoading: true, 
+  lastChecked: null,
+  error: null,
+})
 
-  const checkApiHealth = async () => {
-    setStatus((prev) => ({ ...prev, isLoading: true, error: null }))
+export function useApiHealth() {
+  // ALTERAÇÃO: Uso de função de inicialização síncrona (lazy initial state).
+  const [status, setStatus] = useState<ApiHealthStatus>(getInitialStatus)
+
+  // ALTERAÇÃO: Adicionado parâmetro 'isInitialCheck' para controlar o setStatus.
+  const checkApiHealth = useCallback(async (isInitialCheck = false) => {
+    // Evita o setStatus(isLoading: true) se for o check inicial, 
+    // pois o estado já começou como true.
+    if (!isInitialCheck) {
+        setStatus((prev) => ({ ...prev, isLoading: true, error: null }))
+    }
 
     try {
       const healthUrl = getApiUrl("usuario/health")
-      // console.log("🔍 Verificando saúde da API em:", healthUrl)
 
       const response = await fetch(healthUrl, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
-        // Timeout de 5 segundos para health check
         signal: AbortSignal.timeout(5000),
       })
 
@@ -50,17 +58,19 @@ export function useApiHealth() {
         error: error instanceof Error ? error.message : "Erro desconhecido",
       })
     }
-  }
+  }, [])
 
   useEffect(() => {
-    // Verificar status da API ao montar o componente
-    checkApiHealth()
+    // A chamada inicial é feita de forma assíncrona, sem fazer setState diretamente dentro do useEffect
+    const initializeApiCheck = async () => {
+      await checkApiHealth(true)
+    }
+    initializeApiCheck()
 
-    // Verificar a cada 30 segundos
-    const interval = setInterval(checkApiHealth, 30000)
+    const interval = setInterval(() => checkApiHealth(false), 30000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [checkApiHealth])
 
   return {
     ...status,

@@ -106,7 +106,7 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
             )}
             {filters.searchQuery && (
               <Badge variant="secondary" className="gap-1">
-                "{filters.searchQuery}"
+                &quot{filters.searchQuery}&quot
                 <Button
                   variant="ghost"
                   size="sm"

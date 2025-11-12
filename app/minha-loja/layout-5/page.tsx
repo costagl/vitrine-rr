@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 import {
   Search,
   ShoppingBag,
@@ -18,14 +18,15 @@ import {
   Award,
   Package,
   Truck,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import Image from "next/image";
 
 export default function Layout5() {
-  const [cartCount, setCartCount] = useState(0)
+  const [cartCount, setCartCount] = useState(0);
 
   const products = [
     {
@@ -88,7 +89,7 @@ export default function Layout5() {
       sales: 67,
       icon: "🦈",
     },
-  ]
+  ];
 
   const categories = [
     { name: "Topo de Bolo", icon: "🎂", count: 45 },
@@ -97,7 +98,7 @@ export default function Layout5() {
     { name: "Cofres", icon: "🐷", count: 19 },
     { name: "Lembrancinhas", icon: "🎁", count: 56 },
     { name: "Personalizados", icon: "✨", count: 78 },
-  ]
+  ];
 
   const testimonials = [
     {
@@ -121,7 +122,7 @@ export default function Layout5() {
       text: "Recebemos com muito carinho! Embalagem linda e produto impecável. Super recomendo! 💕",
       product: "Porta Recado",
     },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -160,7 +161,9 @@ export default function Layout5() {
                 <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
                   Doce Encanto
                 </h1>
-                <p className="text-xs text-gray-500 hidden md:block">Biscuit & Bolos Cenográficos ✨</p>
+                <p className="text-xs text-gray-500 hidden md:block">
+                  Biscuit & Bolos Cenográficos ✨
+                </p>
               </div>
             </div>
 
@@ -177,13 +180,21 @@ export default function Layout5() {
 
             {/* Actions */}
             <div className="flex items-center gap-2 md:gap-4">
-              <Button variant="ghost" size="icon" className="relative hover:bg-pink-50 rounded-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-pink-50 rounded-full"
+              >
                 <Heart className="h-5 w-5 text-pink-400" />
                 <span className="absolute -top-1 -right-1 bg-pink-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   3
                 </span>
               </Button>
-              <Button variant="ghost" size="icon" className="relative hover:bg-purple-50 rounded-full">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="relative hover:bg-purple-50 rounded-full"
+              >
                 <ShoppingBag className="h-5 w-5 text-purple-400" />
                 <span className="absolute -top-1 -right-1 bg-purple-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {cartCount}
@@ -217,7 +228,10 @@ export default function Layout5() {
               >
                 <span className="mr-2">{category.icon}</span>
                 {category.name}
-                <Badge variant="secondary" className="ml-2 bg-pink-100 text-pink-600">
+                <Badge
+                  variant="secondary"
+                  className="ml-2 bg-pink-100 text-pink-600"
+                >
                   {category.count}
                 </Badge>
               </Button>
@@ -242,14 +256,19 @@ export default function Layout5() {
             className="absolute bottom-20 left-1/4 w-24 h-24 bg-blue-300 rounded-full opacity-20 animate-bounce"
             style={{ animationDelay: "1s", animationDuration: "3.5s" }}
           />
-          <div className="absolute top-1/2 right-1/3 text-6xl opacity-10 animate-pulse">🎂</div>
+          <div className="absolute top-1/2 right-1/3 text-6xl opacity-10 animate-pulse">
+            🎂
+          </div>
           <div
             className="absolute bottom-1/4 left-1/3 text-5xl opacity-10 animate-pulse"
             style={{ animationDelay: "1s" }}
           >
             🧁
           </div>
-          <div className="absolute top-1/3 left-10 text-4xl opacity-10 animate-pulse" style={{ animationDelay: "2s" }}>
+          <div
+            className="absolute top-1/3 left-10 text-4xl opacity-10 animate-pulse"
+            style={{ animationDelay: "2s" }}
+          >
             ✨
           </div>
         </div>
@@ -269,8 +288,8 @@ export default function Layout5() {
             </h2>
 
             <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Peças artesanais em biscuit e bolos cenográficos feitos com muito amor e carinho para tornar sua festa
-              inesquecível! 🎉
+              Peças artesanais em biscuit e bolos cenográficos feitos com muito
+              amor e carinho para tornar sua festa inesquecível! 🎉
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -294,15 +313,21 @@ export default function Layout5() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-4 mt-12 max-w-2xl mx-auto">
               <div className="text-center p-4 bg-white rounded-2xl shadow-md border-2 border-pink-100">
-                <div className="text-3xl md:text-4xl font-bold text-pink-500 mb-1">500+</div>
+                <div className="text-3xl md:text-4xl font-bold text-pink-500 mb-1">
+                  500+
+                </div>
                 <div className="text-sm text-gray-600">Clientes Felizes 😊</div>
               </div>
               <div className="text-center p-4 bg-white rounded-2xl shadow-md border-2 border-purple-100">
-                <div className="text-3xl md:text-4xl font-bold text-purple-500 mb-1">1000+</div>
+                <div className="text-3xl md:text-4xl font-bold text-purple-500 mb-1">
+                  1000+
+                </div>
                 <div className="text-sm text-gray-600">Peças Criadas 🎨</div>
               </div>
               <div className="text-center p-4 bg-white rounded-2xl shadow-md border-2 border-blue-100">
-                <div className="text-3xl md:text-4xl font-bold text-blue-500 mb-1">100%</div>
+                <div className="text-3xl md:text-4xl font-bold text-blue-500 mb-1">
+                  100%
+                </div>
                 <div className="text-sm text-gray-600">Amor & Dedicação 💖</div>
               </div>
             </div>
@@ -318,7 +343,8 @@ export default function Layout5() {
               Produtos em Destaque 🌟
             </h3>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Criações únicas e especiais, feitas sob medida para deixar sua festa ainda mais encantadora!
+              Criações únicas e especiais, feitas sob medida para deixar sua
+              festa ainda mais encantadora!
             </p>
           </div>
 
@@ -331,10 +357,13 @@ export default function Layout5() {
                 <CardContent className="p-0">
                   {/* Image */}
                   <div className="relative overflow-hidden bg-gradient-to-br from-pink-50 to-purple-50">
-                    <img
+                    <Image
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                      layout="responsive"
+                      width={500}
+                      height={300}
                     />
                     <div className="absolute top-4 right-4 bg-white rounded-full p-2 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
                       <Heart className="h-5 w-5 text-pink-500" />
@@ -345,12 +374,17 @@ export default function Layout5() {
                         Mais Vendido
                       </Badge>
                     </div>
-                    <div className="absolute bottom-4 left-4 text-4xl animate-bounce">{product.icon}</div>
+                    <div className="absolute bottom-4 left-4 text-4xl animate-bounce">
+                      {product.icon}
+                    </div>
                   </div>
 
                   {/* Content */}
                   <div className="p-6">
-                    <Badge variant="outline" className="mb-3 border-pink-200 text-pink-600">
+                    <Badge
+                      variant="outline"
+                      className="mb-3 border-pink-200 text-pink-600"
+                    >
                       {product.category}
                     </Badge>
 
@@ -361,16 +395,25 @@ export default function Layout5() {
                     <div className="flex items-center gap-2 mb-3">
                       <div className="flex items-center">
                         {[...Array(product.rating)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <Star
+                            key={i}
+                            className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                          />
                         ))}
                       </div>
-                      <span className="text-xs text-gray-500">({product.sales} vendas)</span>
+                      <span className="text-xs text-gray-500">
+                        ({product.sales} vendas)
+                      </span>
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
-                        <div className="text-2xl font-bold text-pink-500">R$ {product.price.toFixed(2)}</div>
-                        <div className="text-xs text-gray-500">ou 3x sem juros</div>
+                        <div className="text-2xl font-bold text-pink-500">
+                          R$ {product.price.toFixed(2)}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          ou 3x sem juros
+                        </div>
                       </div>
                       <Button
                         size="sm"
@@ -415,7 +458,9 @@ export default function Layout5() {
                 <Award className="h-8 w-8 text-white" />
               </div>
               <h4 className="font-bold text-lg mb-2">Qualidade Premium</h4>
-              <p className="text-sm text-gray-600">Materiais de primeira linha e acabamento impecável em cada peça</p>
+              <p className="text-sm text-gray-600">
+                Materiais de primeira linha e acabamento impecável em cada peça
+              </p>
             </Card>
 
             <Card className="text-center p-6 border-2 border-purple-200 hover:border-purple-400 hover:shadow-xl transition-all rounded-3xl">
@@ -423,7 +468,9 @@ export default function Layout5() {
                 <Sparkles className="h-8 w-8 text-white" />
               </div>
               <h4 className="font-bold text-lg mb-2">100% Personalizado</h4>
-              <p className="text-sm text-gray-600">Criamos exatamente do jeito que você sonhou para sua festa</p>
+              <p className="text-sm text-gray-600">
+                Criamos exatamente do jeito que você sonhou para sua festa
+              </p>
             </Card>
 
             <Card className="text-center p-6 border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all rounded-3xl">
@@ -431,7 +478,9 @@ export default function Layout5() {
                 <Package className="h-8 w-8 text-white" />
               </div>
               <h4 className="font-bold text-lg mb-2">Embalagem Especial</h4>
-              <p className="text-sm text-gray-600">Cada produto é embalado com muito carinho e cuidado</p>
+              <p className="text-sm text-gray-600">
+                Cada produto é embalado com muito carinho e cuidado
+              </p>
             </Card>
 
             <Card className="text-center p-6 border-2 border-pink-200 hover:border-pink-400 hover:shadow-xl transition-all rounded-3xl">
@@ -439,7 +488,9 @@ export default function Layout5() {
                 <Truck className="h-8 w-8 text-white" />
               </div>
               <h4 className="font-bold text-lg mb-2">Entrega Rápida</h4>
-              <p className="text-sm text-gray-600">Enviamos para todo Brasil com segurança e agilidade</p>
+              <p className="text-sm text-gray-600">
+                Enviamos para todo Brasil com segurança e agilidade
+              </p>
             </Card>
           </div>
         </div>
@@ -452,7 +503,9 @@ export default function Layout5() {
             <h3 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
               O que nossas clientes dizem 🥰
             </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">A felicidade de vocês é nossa maior recompensa!</p>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              A felicidade de vocês é nossa maior recompensa!
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -470,13 +523,19 @@ export default function Layout5() {
                       <h4 className="font-bold">{testimonial.name}</h4>
                       <div className="flex items-center gap-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <Star
+                            key={i}
+                            className="h-3 w-3 fill-yellow-400 text-yellow-400"
+                          />
                         ))}
                       </div>
                     </div>
                   </div>
                   <p className="text-gray-600 mb-3">{testimonial.text}</p>
-                  <Badge variant="outline" className="border-pink-200 text-pink-600">
+                  <Badge
+                    variant="outline"
+                    className="border-pink-200 text-pink-600"
+                  >
                     Comprou: {testimonial.product}
                   </Badge>
                 </CardContent>
@@ -489,21 +548,34 @@ export default function Layout5() {
       {/* CTA Section */}
       <section className="py-16 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 text-6xl animate-bounce">🎂</div>
-          <div className="absolute bottom-10 right-10 text-6xl animate-bounce" style={{ animationDelay: "1s" }}>
+          <div className="absolute top-10 left-10 text-6xl animate-bounce">
+            🎂
+          </div>
+          <div
+            className="absolute bottom-10 right-10 text-6xl animate-bounce"
+            style={{ animationDelay: "1s" }}
+          >
             🧁
           </div>
-          <div className="absolute top-1/2 left-1/4 text-5xl animate-pulse">✨</div>
-          <div className="absolute top-1/3 right-1/4 text-5xl animate-pulse" style={{ animationDelay: "2s" }}>
+          <div className="absolute top-1/2 left-1/4 text-5xl animate-pulse">
+            ✨
+          </div>
+          <div
+            className="absolute top-1/3 right-1/4 text-5xl animate-pulse"
+            style={{ animationDelay: "2s" }}
+          >
             💕
           </div>
         </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
           <div className="max-w-3xl mx-auto">
-            <h3 className="text-3xl md:text-5xl font-bold mb-6">Receba Novidades e Promoções! 🎁</h3>
+            <h3 className="text-3xl md:text-5xl font-bold mb-6">
+              Receba Novidades e Promoções! 🎁
+            </h3>
             <p className="text-lg md:text-xl mb-8 opacity-90">
-              Cadastre-se e ganhe <strong>10% OFF</strong> na primeira compra + frete grátis!
+              Cadastre-se e ganhe <strong>10% OFF</strong> na primeira compra +
+              frete grátis!
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 max-w-lg mx-auto">
@@ -511,7 +583,10 @@ export default function Layout5() {
                 placeholder="Seu melhor e-mail 💌"
                 className="flex-1 bg-white text-gray-900 rounded-full px-6 py-6 border-0"
               />
-              <Button size="lg" className="bg-white text-pink-500 hover:bg-pink-50 rounded-full px-8 shadow-lg">
+              <Button
+                size="lg"
+                className="bg-white text-pink-500 hover:bg-pink-50 rounded-full px-8 shadow-lg"
+              >
                 <Gift className="mr-2 h-5 w-5" />
                 Quero Desconto!
               </Button>
@@ -537,7 +612,8 @@ export default function Layout5() {
                 <h4 className="text-xl font-bold">Doce Encanto</h4>
               </div>
               <p className="text-gray-300 text-sm mb-4">
-                Criando momentos mágicos com biscuit e bolos cenográficos feitos com muito amor! 💕
+                Criando momentos mágicos com biscuit e bolos cenográficos feitos
+                com muito amor! 💕
               </p>
               <div className="flex gap-3">
                 <div className="bg-pink-500/20 hover:bg-pink-500/30 p-2 rounded-full cursor-pointer transition-colors">
@@ -553,11 +629,21 @@ export default function Layout5() {
             <div>
               <h4 className="font-bold mb-4 text-pink-300">Links Rápidos</h4>
               <ul className="space-y-2 text-sm">
-                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">Sobre Nós</li>
-                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">Produtos</li>
-                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">Como Encomendar</li>
-                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">Galeria de Fotos</li>
-                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">Depoimentos</li>
+                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">
+                  Sobre Nós
+                </li>
+                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">
+                  Produtos
+                </li>
+                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">
+                  Como Encomendar
+                </li>
+                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">
+                  Galeria de Fotos
+                </li>
+                <li className="text-gray-300 hover:text-pink-300 cursor-pointer transition-colors">
+                  Depoimentos
+                </li>
               </ul>
             </div>
 
@@ -574,7 +660,9 @@ export default function Layout5() {
                 <li className="text-gray-300 hover:text-purple-300 cursor-pointer transition-colors">
                   💌 Porta Recado
                 </li>
-                <li className="text-gray-300 hover:text-purple-300 cursor-pointer transition-colors">🐷 Cofres</li>
+                <li className="text-gray-300 hover:text-purple-300 cursor-pointer transition-colors">
+                  🐷 Cofres
+                </li>
                 <li className="text-gray-300 hover:text-purple-300 cursor-pointer transition-colors">
                   🎁 Lembrancinhas
                 </li>
@@ -612,9 +700,12 @@ export default function Layout5() {
           {/* Bottom Bar */}
           <div className="border-t border-gray-700 pt-8 text-center">
             <p className="text-gray-400 text-sm mb-2">
-              © 2025 Doce Encanto - Biscuit & Bolos Cenográficos. Todos os direitos reservados.
+              © 2025 Doce Encanto - Biscuit & Bolos Cenográficos. Todos os
+              direitos reservados.
             </p>
-            <p className="text-gray-500 text-xs">Feito com muito 💕 e dedicação | CNPJ: 12.345.678/0001-90</p>
+            <p className="text-gray-500 text-xs">
+              Feito com muito 💕 e dedicação | CNPJ: 12.345.678/0001-90
+            </p>
           </div>
         </div>
       </footer>
@@ -629,5 +720,5 @@ export default function Layout5() {
         }
       `}</style>
     </div>
-  )
+  );
 }

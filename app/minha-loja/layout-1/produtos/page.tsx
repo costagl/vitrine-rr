@@ -278,6 +278,9 @@ export default function ProdutosLayout1Page() {
                             alt={product.titulo}
                             fill
                             className="object-cover"
+                            layout="responsive" 
+                            width={500}
+                            height={300}
                           />
                           {hasDiscount && (
                             <Badge variant="destructive" className="absolute top-2 right-2">
@@ -326,8 +329,6 @@ export default function ProdutosLayout1Page() {
           </main>
         </div>
       </div>
-
-      <CartModal/>
     </div>
   )
 }

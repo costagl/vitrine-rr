@@ -1,31 +1,53 @@
-"use client"
+"use client";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Edit, Trash2, Eye, EyeOff, Package, DollarSign, Ruler, Weight } from "lucide-react"
-import type { Product } from "@/types/product"
-import { getCategoryNameById } from "@/data/categories"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Edit,
+  Trash2,
+  Eye,
+  EyeOff,
+  Package,
+  DollarSign,
+  Ruler,
+  Weight,
+} from "lucide-react";
+import type { Product } from "@/types/product";
+import { getCategoryNameById } from "@/data/categories";
+import Image from "next/image";
 
 interface ProductDetailModalProps {
-  isOpen: boolean
-  onClose: () => void
-  product: Product | null
-  onEdit?: (product: Product) => void
-  onDelete?: (productId: number) => void
+  isOpen: boolean;
+  onClose: () => void;
+  product: Product | null;
+  onEdit?: (product: Product) => void;
+  onDelete?: (productId: number) => void;
 }
 
-export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete }: ProductDetailModalProps) {
-  if (!product) return null
+export function ProductDetailModal({
+  isOpen,
+  onClose,
+  product,
+  onEdit,
+  onDelete,
+}: ProductDetailModalProps) {
+  if (!product) return null;
 
   // Formatar valores monetários
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("pt-BR", {
       style: "currency",
       currency: "BRL",
-    }).format(value)
-  }
+    }).format(value);
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -51,10 +73,13 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
           {/* Imagem do produto */}
           <div className="md:col-span-1">
             <div className="aspect-square rounded-md border overflow-hidden">
-              <img
+              <Image
                 src={product.imagem || "/placeholder.svg?height=300&width=300"}
                 alt={product.titulo}
                 className="w-full h-full object-cover"
+                layout="responsive"
+                width={500}
+                height={300}
               />
             </div>
           </div>
@@ -64,7 +89,9 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
             <div>
               <h3 className="text-xl font-semibold">{product.titulo}</h3>
               <p className="text-gray-500 text-sm">SKU: {product.sku}</p>
-              <p className="text-gray-500 text-sm">{getCategoryNameById(product.idCategoriaProduto)}</p>
+              <p className="text-gray-500 text-sm">
+                {getCategoryNameById(product.idCategoriaProduto)}
+              </p>
             </div>
 
             <p className="text-gray-700">{product.descricao}</p>
@@ -75,7 +102,9 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
                 <DollarSign className="h-4 w-4 text-green-600" />
                 <div>
                   <p className="text-sm text-gray-500">Valor Unitário</p>
-                  <p className="font-semibold text-lg">{formatCurrency(product.valorUnitario)}</p>
+                  <p className="font-semibold text-lg">
+                    {formatCurrency(product.valorUnitario)}
+                  </p>
                 </div>
               </div>
 
@@ -84,7 +113,9 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
                   <DollarSign className="h-4 w-4 text-red-600" />
                   <div>
                     <p className="text-sm text-gray-500">Valor Promocional</p>
-                    <p className="font-semibold text-lg text-red-600">{formatCurrency(product.valorPromocional)}</p>
+                    <p className="font-semibold text-lg text-red-600">
+                      {formatCurrency(product.valorPromocional)}
+                    </p>
                   </div>
                 </div>
               )}
@@ -95,7 +126,11 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
               <Package className="h-4 w-4 text-blue-600" />
               <div>
                 <p className="text-sm text-gray-500">Estoque</p>
-                <p className={`font-semibold ${product.estoque > 0 ? "text-green-600" : "text-red-600"}`}>
+                <p
+                  className={`font-semibold ${
+                    product.estoque > 0 ? "text-green-600" : "text-red-600"
+                  }`}
+                >
                   {product.estoque} unidades
                 </p>
               </div>
@@ -151,8 +186,8 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
                 variant="outline"
                 className="text-red-600 hover:text-red-700 hover:border-red-300"
                 onClick={() => {
-                  onDelete(product.id)
-                  onClose()
+                  onDelete(product.id);
+                  onClose();
                 }}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -163,8 +198,8 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
             {onEdit && (
               <Button
                 onClick={() => {
-                  onEdit(product)
-                  onClose()
+                  onEdit(product);
+                  onClose();
                 }}
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -175,5 +210,5 @@ export function ProductDetailModal({ isOpen, onClose, product, onEdit, onDelete 
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

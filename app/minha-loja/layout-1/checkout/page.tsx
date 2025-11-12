@@ -1,23 +1,40 @@
-"use client"
+"use client";
 
+import Image from 'next/image'
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, CreditCard, Truck, Shield, MapPin, CheckCircle, Minus, Plus, X } from "lucide-react"
+import {
+  ArrowLeft,
+  CreditCard,
+  Truck,
+  Shield,
+  MapPin,
+  CheckCircle,
+  Minus,
+  Plus,
+  X,
+} from "lucide-react"
 
 export default function Layout1CheckoutPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({
     "1": 2,
     "2": 1,
     "3": 1,
-  })
+  });
 
   const produtos = [
     {
@@ -44,26 +61,29 @@ export default function Layout1CheckoutPage() {
       cor: "Branco",
       tamanho: "42",
     },
-  ]
+  ];
 
-  const subtotal = produtos.reduce((acc, produto) => acc + produto.preco * quantities[produto.id], 0)
-  const frete = subtotal > 99 ? 0 : 15.9
-  const total = subtotal + frete
+  const subtotal = produtos.reduce(
+    (acc, produto) => acc + produto.preco * quantities[produto.id],
+    0
+  );
+  const frete = subtotal > 99 ? 0 : 15.9;
+  const total = subtotal + frete;
 
   const updateQuantity = (id: string, change: number) => {
     setQuantities((prev) => ({
       ...prev,
       [id]: Math.max(1, prev[id] + change),
-    }))
-  }
+    }));
+  };
 
   const removeItem = (id: string) => {
     setQuantities((prev) => {
-      const newQuantities = { ...prev }
-      delete newQuantities[id]
-      return newQuantities
-    })
-  }
+      const newQuantities = { ...prev };
+      delete newQuantities[id];
+      return newQuantities;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -71,11 +91,16 @@ export default function Layout1CheckoutPage() {
       <header className="bg-white shadow-sm border-b">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/layout-1" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+            <Link
+              href="/layout-1"
+              className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+            >
               <ArrowLeft className="h-5 w-5" />
               <span>Voltar à loja</span>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Finalizar Compra</h1>
+            <h1 className="text-2xl font-bold text-gray-900">
+              Finalizar Compra
+            </h1>
             <div className="flex items-center gap-2">
               <Shield className="h-5 w-5 text-green-600" />
               <span className="text-sm text-gray-600">Compra Segura</span>
@@ -91,7 +116,11 @@ export default function Layout1CheckoutPage() {
             {/* Progress Steps */}
             <div className="flex items-center justify-center mb-8">
               <div className="flex items-center space-x-4">
-                <div className={`flex items-center ${step >= 1 ? "text-blue-600" : "text-gray-400"}`}>
+                <div
+                  className={`flex items-center ${
+                    step >= 1 ? "text-blue-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center ${
                       step >= 1 ? "bg-blue-600 text-white" : "bg-gray-200"
@@ -101,8 +130,16 @@ export default function Layout1CheckoutPage() {
                   </div>
                   <span className="ml-2 font-medium">Entrega</span>
                 </div>
-                <div className={`w-8 h-0.5 ${step >= 2 ? "bg-blue-600" : "bg-gray-200"}`}></div>
-                <div className={`flex items-center ${step >= 2 ? "text-blue-600" : "text-gray-400"}`}>
+                <div
+                  className={`w-8 h-0.5 ${
+                    step >= 2 ? "bg-blue-600" : "bg-gray-200"
+                  }`}
+                ></div>
+                <div
+                  className={`flex items-center ${
+                    step >= 2 ? "text-blue-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center ${
                       step >= 2 ? "bg-blue-600 text-white" : "bg-gray-200"
@@ -112,8 +149,16 @@ export default function Layout1CheckoutPage() {
                   </div>
                   <span className="ml-2 font-medium">Pagamento</span>
                 </div>
-                <div className={`w-8 h-0.5 ${step >= 3 ? "bg-blue-600" : "bg-gray-200"}`}></div>
-                <div className={`flex items-center ${step >= 3 ? "text-blue-600" : "text-gray-400"}`}>
+                <div
+                  className={`w-8 h-0.5 ${
+                    step >= 3 ? "bg-blue-600" : "bg-gray-200"
+                  }`}
+                ></div>
+                <div
+                  className={`flex items-center ${
+                    step >= 3 ? "text-blue-600" : "text-gray-400"
+                  }`}
+                >
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center ${
                       step >= 3 ? "bg-blue-600 text-white" : "bg-gray-200"
@@ -143,7 +188,11 @@ export default function Layout1CheckoutPage() {
                     </div>
                     <div>
                       <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="seu@email.com" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                      />
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -189,7 +238,10 @@ export default function Layout1CheckoutPage() {
                       </Select>
                     </div>
                   </div>
-                  <Button onClick={() => setStep(2)} className="w-full bg-blue-600 hover:bg-blue-700">
+                  <Button
+                    onClick={() => setStep(2)}
+                    className="w-full bg-blue-600 hover:bg-blue-700"
+                  >
                     Continuar para Pagamento
                   </Button>
                 </CardContent>
@@ -217,7 +269,9 @@ export default function Layout1CheckoutPage() {
                     <Card className="cursor-pointer border-2 hover:border-blue-300">
                       <CardContent className="p-4 text-center">
                         <div className="w-8 h-8 bg-green-600 rounded mx-auto mb-2 flex items-center justify-center">
-                          <span className="text-white text-xs font-bold">PIX</span>
+                          <span className="text-white text-xs font-bold">
+                            PIX
+                          </span>
                         </div>
                         <p className="font-medium">PIX</p>
                         <p className="text-sm text-gray-600">5% desconto</p>
@@ -235,7 +289,10 @@ export default function Layout1CheckoutPage() {
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="numero-cartao">Número do Cartão</Label>
-                      <Input id="numero-cartao" placeholder="0000 0000 0000 0000" />
+                      <Input
+                        id="numero-cartao"
+                        placeholder="0000 0000 0000 0000"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
@@ -249,15 +306,25 @@ export default function Layout1CheckoutPage() {
                     </div>
                     <div>
                       <Label htmlFor="nome-cartao">Nome no Cartão</Label>
-                      <Input id="nome-cartao" placeholder="Nome como está no cartão" />
+                      <Input
+                        id="nome-cartao"
+                        placeholder="Nome como está no cartão"
+                      />
                     </div>
                   </div>
 
                   <div className="flex gap-4">
-                    <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
+                    <Button
+                      variant="outline"
+                      onClick={() => setStep(1)}
+                      className="flex-1"
+                    >
                       Voltar
                     </Button>
-                    <Button onClick={() => setStep(3)} className="flex-1 bg-blue-600 hover:bg-blue-700">
+                    <Button
+                      onClick={() => setStep(3)}
+                      className="flex-1 bg-blue-600 hover:bg-blue-700"
+                    >
                       Finalizar Pedido
                     </Button>
                   </div>
@@ -270,9 +337,15 @@ export default function Layout1CheckoutPage() {
               <Card className="text-center">
                 <CardContent className="p-8">
                   <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Pedido Confirmado!</h2>
-                  <p className="text-gray-600 mb-4">Seu pedido #12345 foi realizado com sucesso.</p>
-                  <Badge className="bg-green-100 text-green-800 mb-6">Pagamento Aprovado</Badge>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                    Pedido Confirmado!
+                  </h2>
+                  <p className="text-gray-600 mb-4">
+                    Seu pedido #12345 foi realizado com sucesso.
+                  </p>
+                  <Badge className="bg-green-100 text-green-800 mb-6">
+                    Pagamento Aprovado
+                  </Badge>
                   <div className="space-y-2 text-sm text-gray-600 mb-6">
                     <p>Você receberá um email de confirmação em breve.</p>
                     <p>Prazo de entrega: 3-5 dias úteis</p>
@@ -282,7 +355,9 @@ export default function Layout1CheckoutPage() {
                       Acompanhar Pedido
                     </Button>
                     <Link href="/layout-1" className="flex-1">
-                      <Button className="w-full bg-blue-600 hover:bg-blue-700">Continuar Comprando</Button>
+                      <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                        Continuar Comprando
+                      </Button>
                     </Link>
                   </div>
                 </CardContent>
@@ -300,11 +375,17 @@ export default function Layout1CheckoutPage() {
                 {produtos
                   .filter((produto) => quantities[produto.id])
                   .map((produto) => (
-                    <div key={produto.id} className="flex items-center gap-3 pb-3 border-b">
-                      <img
+                    <div
+                      key={produto.id}
+                      className="flex items-center gap-3 pb-3 border-b"
+                    >
+                      <Image
                         src={produto.imagem || "/placeholder.svg"}
                         alt={produto.nome}
-                        className="w-16 h-16 object-cover rounded border"
+                        width={64}
+                        height={64}
+                        layout="responsive"
+                        className="object-cover rounded border"
                       />
                       <div className="flex-1">
                         <h4 className="font-medium text-sm">{produto.nome}</h4>
@@ -320,7 +401,9 @@ export default function Layout1CheckoutPage() {
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="text-sm">{quantities[produto.id]}</span>
+                          <span className="text-sm">
+                            {quantities[produto.id]}
+                          </span>
                           <Button
                             variant="outline"
                             size="sm"
@@ -340,7 +423,10 @@ export default function Layout1CheckoutPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">R$ {(produto.preco * quantities[produto.id]).toFixed(2)}</p>
+                        <p className="font-medium">
+                          R${" "}
+                          {(produto.preco * quantities[produto.id]).toFixed(2)}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -357,11 +443,19 @@ export default function Layout1CheckoutPage() {
                       <Truck className="h-4 w-4" />
                       Frete
                     </span>
-                    <span className={frete === 0 ? "text-green-600 font-medium" : ""}>
+                    <span
+                      className={
+                        frete === 0 ? "text-green-600 font-medium" : ""
+                      }
+                    >
                       {frete === 0 ? "GRÁTIS" : `R$ ${frete.toFixed(2)}`}
                     </span>
                   </div>
-                  {frete === 0 && <p className="text-xs text-green-600">Frete grátis em compras acima de R$ 99</p>}
+                  {frete === 0 && (
+                    <p className="text-xs text-green-600">
+                      Frete grátis em compras acima de R$ 99
+                    </p>
+                  )}
                 </div>
 
                 <Separator />
@@ -376,7 +470,9 @@ export default function Layout1CheckoutPage() {
                     <Shield className="h-4 w-4" />
                     <span className="font-medium">Compra 100% Segura</span>
                   </div>
-                  <p className="text-xs text-blue-600 mt-1">Seus dados estão protegidos com certificado SSL</p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    Seus dados estão protegidos com certificado SSL
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -384,5 +480,5 @@ export default function Layout1CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

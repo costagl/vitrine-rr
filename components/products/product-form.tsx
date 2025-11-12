@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -53,9 +53,12 @@ export function ProductForm({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Usando useRef para armazenar o valor anterior de `product`
+  const prevProductRef = useRef<Product | null>(product);
+
   useEffect(() => {
-    if (product) {
-      setFormData({
+    if (product && prevProductRef.current?.titulo !== product.titulo) {
+      const updatedFormData = {
         titulo: product.titulo,
         idLoja: product.idLoja,
         valorUnitario: product.valorUnitario,
@@ -70,8 +73,13 @@ export function ProductForm({
         largura: product.largura,
         profundidade: product.profundidade,
         idCategoriaProduto: product.idCategoriaProduto,
-      });
+      };
+
+      setTimeout(() => {
+        setFormData(updatedFormData);
+      }, 0);
     }
+
   }, [product]);
 
   const generateSKU = () => {

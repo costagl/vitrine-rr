@@ -62,30 +62,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Verificar se há um token no localStorage quando o componente é montado
-    const storedToken = manageLocalStorage("get", "token");
-    const storedRefreshToken = manageLocalStorage("get", "refreshToken") || null;
-    const storedUser = manageLocalStorage("get", "user");
+    const loadUserData = async () => {
+      const storedToken = manageLocalStorage("get", "token");
+      const storedRefreshToken = manageLocalStorage("get", "refreshToken") || null;
+      const storedUser = manageLocalStorage("get", "user");
 
-    if (storedToken && storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setToken(storedToken);
-        setRefreshToken(storedRefreshToken);
-        setUser(userData);
-        setIsAuthenticated(true);
-        console.log("✅ Usuário autenticado automaticamente");
-      } catch (error) {
-        console.error("❌ Erro ao carregar dados do usuário:", error);
-        manageLocalStorage("remove", "token");
-        manageLocalStorage("remove", "refreshToken");
-        manageLocalStorage("remove", "user");
+      if (storedToken && storedUser) {
+        try {
+          const userData = JSON.parse(storedUser);
+          setToken(storedToken);
+          setRefreshToken(storedRefreshToken);
+          setUser(userData);
+          setIsAuthenticated(true);
+          console.log("✅ Usuário autenticado automaticamente");
+        } catch (error) {
+          console.error("❌ Erro ao carregar dados do usuário:", error);
+          manageLocalStorage("remove", "token");
+          manageLocalStorage("remove", "refreshToken");
+          manageLocalStorage("remove", "user");
+        }
+      } else {
+        console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
       }
-    } else {
-      console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
-    }
 
-    setLoading(false);
+      setLoading(false);
+    };
+
+    // Chama a função assíncrona para carregar os dados
+    loadUserData();
 
     // Testar conectividade com a API usando a configuração centralizada
     const testarAPI = async () => {

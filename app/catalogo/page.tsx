@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/navbar";
+import { useState, useEffect } from "react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import Navbar from "@/components/navbar"
+import Image from 'next/image'
 import {
   Search,
   Filter,
@@ -252,67 +253,75 @@ export default function CatalogoPage() {
   const [termoBusca, setTermoBusca] = useState("");
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
 
-  useEffect(() => {
-    if (!ENABLE_SIMULATION) {
-      fetch("https://localhost:7083/lojas", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
+useEffect(() => {
+  if (!ENABLE_SIMULATION) {
+    fetch("https://localhost:7083/lojas", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro na resposta da requisição");
+        }
+        return response.json();
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Erro na resposta da requisição");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          const lojasData = data.lojas.map((loja: any) => ({
-            id: loja.id.toString(),
-            nome: loja.nomeLoja,
-            categoria: loja.categoriaLoja,
-            subdomain: loja.subdominio,
-            logotipo : loja.logotipo,
-            descricao: "Descrição não disponível",
-            rating: loja.avaliacao || 5,
-            totalAvaliacoes: 5,
-            cidade: "Resende",
-            estado: "RJ",
-            totalProdutos: 20,
-            imagemCapa: "/placeholder.svg?height=200&width=300",
-            isActive: true,
-            criadaEm: "2023-01-01",
-          }));
+      .then((data) => {
+        const lojasData = data.lojas.map((loja: any) => ({
+          id: loja.id.toString(),
+          nome: loja.nomeLoja,
+          categoria: loja.categoriaLoja,
+          subdomain: loja.subdominio,
+          logotipo: loja.logotipo,
+          descricao: "Descrição não disponível",
+          rating: loja.avaliacao || 5,
+          totalAvaliacoes: 5,
+          cidade: "Resende",
+          estado: "RJ",
+          totalProdutos: 20,
+          imagemCapa: "/placeholder.svg?height=200&width=300",
+          isActive: true,
+          criadaEm: "2023-01-01",
+        }));
 
-          setLojas(lojasData);
-        })
-        .catch((error) => {
-          console.error("Erro ao listar lojas:", error); // Trata erros
-        });
-    }
+        setLojas(lojasData); // Set lojas data only once after fetch
+      })
+      .catch((error) => {
+        console.error("Erro ao listar lojas:", error); // Trata erros
+      });
+  }
+}, []); // Dependência vazia para rodar apenas uma vez ao montar o componente
 
-    let resultado = lojas;
+ useEffect(() => {
+    const filtrarLojas = async () => {
+      let resultado = lojas;
 
-    // Filtrar por categoria
-    if (categoriaFiltro !== "Todas as Categorias") {
-      resultado = resultado.filter(
-        (loja) => loja.categoria === categoriaFiltro
-      );
-    }
+      // Filtrar por categoria
+      if (categoriaFiltro !== "Todas as Categorias") {
+        resultado = resultado.filter((loja) => loja.categoria === categoriaFiltro);
+      }
 
-    // Filtrar por termo de busca
-    if (termoBusca) {
-      resultado = resultado.filter(
-        (loja) =>
-          loja.nome.toLowerCase().includes(termoBusca.toLowerCase()) ||
-          loja.descricao.toLowerCase().includes(termoBusca.toLowerCase()) ||
-          loja.categoria.toLowerCase().includes(termoBusca.toLowerCase()) ||
-          loja.cidade.toLowerCase().includes(termoBusca.toLowerCase())
-      );
-    }
+      // Filtrar por termo de busca
+      if (termoBusca) {
+        resultado = resultado.filter(
+          (loja) =>
+            loja.nome.toLowerCase().includes(termoBusca.toLowerCase()) ||
+            loja.descricao.toLowerCase().includes(termoBusca.toLowerCase()) ||
+            loja.categoria.toLowerCase().includes(termoBusca.toLowerCase()) ||
+            loja.cidade.toLowerCase().includes(termoBusca.toLowerCase())
+        );
+      }
 
-    setLojasFiltradas(resultado);
-  }, [categoriaFiltro, termoBusca, lojas]);
+      // Atualizar o estado se o resultado for diferente do estado anterior
+      // Verificar com JSON.stringify para evitar renderizações desnecessárias
+      if (JSON.stringify(lojasFiltradas) !== JSON.stringify(resultado)) {
+        setLojasFiltradas(resultado);
+      }
+    };
+
+    filtrarLojas(); // Chama a função assíncrona para filtrar as lojas
+  }, [categoriaFiltro, termoBusca, lojas, lojasFiltradas]);
 
   const abrirLoja = (subdomain: string) => {
     const lojaUrl = `https://${subdomain}.vitrine.com.br`;
@@ -436,10 +445,13 @@ export default function CatalogoPage() {
               >
                 {/* Imagem da Loja */}
                 <div className="relative">
-                  <img
+                  <Image
                     src={loja.logotipo || "/placeholder.svg"}
                     alt={loja.nome}
                     className="w-full h-48 object-cover"
+                    layout="responsive" 
+                    width={500}
+                    height={300}
                   />
                   <div className="absolute top-3 right-3">
                     <Badge className="bg-white/90 text-gray-800 hover:bg-white/90">

@@ -108,6 +108,9 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                           alt={item.titulo}
                           fill
                           className="object-cover"
+                          layout="responsive"
+                          width={500}
+                          height={300}
                         />
                         {hasDiscount && (
                           <Badge

@@ -6,20 +6,22 @@ const REMEMBER_ME_KEY = "vitrine_remember_me"
 const REMEMBERED_EMAIL_KEY = "vitrine_remembered_email"
 
 export function useRememberMe() {
-  const [rememberMe, setRememberMe] = useState(false)
-  const [rememberedEmail, setRememberedEmail] = useState("")
+  // ✅ Carrega o estado inicial diretamente no useState.
+  const [rememberMe, setRememberMe] = useState(() => {
+    // A função é executada apenas uma vez na primeira renderização.
+    const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
+    return savedRememberMe
+  })
 
-  useEffect(() => {
-    // Carregar configurações salvas ao montar o componente
+  // ✅ Carrega o email de forma dependente do rememberMe salvo.
+  const [rememberedEmail, setRememberedEmail] = useState(() => {
     const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
     const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY) || ""
-
-    setRememberMe(savedRememberMe)
-    if (savedRememberMe && savedEmail) {
-      setRememberedEmail(savedEmail)
-    }
-  }, [])
-
+    
+    // Retorna o email salvo APENAS se a opção 'rememberMe' também estiver marcada.
+    return savedRememberMe ? savedEmail : ""
+  })
+  
   const handleRememberMeChange = (checked: boolean) => {
     setRememberMe(checked)
 

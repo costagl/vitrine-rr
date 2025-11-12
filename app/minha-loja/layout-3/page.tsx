@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import {
   Search,
   ShoppingCart,
@@ -263,10 +264,13 @@ export default function Layout3Page() {
               >
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden">
-                    <img
+                    <Image
                       src={produto.imagem || "/placeholder.svg"}
                       alt={produto.nome}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                      layout="responsive"
+                      width={500}
+                      height={300}
                     />
 
                     {/* Overlay com efeitos */}

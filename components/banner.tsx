@@ -1,5 +1,6 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
+import Link from "next/link";
+import Image from 'next/image';
+import { Button } from "@/components/ui/button";
 
 export default function Banner() {
   return (
@@ -29,10 +30,13 @@ export default function Banner() {
               <div className="absolute -top-6 -left-6 w-24 h-24 bg-secondary/20 rounded-lg"></div>
               <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-accent/30 rounded-lg"></div>
               <div className="relative bg-card p-6 rounded-lg shadow-lg border">
-                <img
+                <Image
                   src="/search-rafiki.png"
                   alt="Plataforma de loja online"
                   className="rounded-md w-full h-auto"
+                  layout="responsive" 
+                  width={500}
+                  height={300}
                 />
               </div>
             </div>

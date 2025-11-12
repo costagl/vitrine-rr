@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,32 +9,40 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Check, Palette, Layout, Save, ChevronLeft, ChevronRight } from "lucide-react"
-import { cn } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  Check,
+  Palette,
+  Layout,
+  Save,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface StoreSettingsDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 interface LayoutOption {
-  id: string
-  name: string
-  description: string
-  image: string
-  category: string
+  id: string;
+  name: string;
+  description: string;
+  image: string;
+  category: string;
 }
 
 interface ThemeOption {
-  id: string
-  name: string
-  primary: string
-  secondary: string
-  accent: string
-  preview: string[]
+  id: string;
+  name: string;
+  primary: string;
+  secondary: string;
+  accent: string;
+  preview: string[];
 }
 
 const layouts: LayoutOption[] = [
@@ -80,7 +88,7 @@ const layouts: LayoutOption[] = [
     image: "/placeholder.svg?height=200&width=300&text=Moda+Premium",
     category: "Moda",
   },
-]
+];
 
 const themes: ThemeOption[] = [
   {
@@ -131,39 +139,42 @@ const themes: ThemeOption[] = [
     accent: "#2dd4bf",
     preview: ["#0d9488", "#14b8a6", "#2dd4bf", "#f0fdfa"],
   },
-]
+];
 
-const LAYOUTS_PER_PAGE = 3
+const LAYOUTS_PER_PAGE = 3;
 
-export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogProps) {
-  const [selectedLayout, setSelectedLayout] = useState<string>("layout-1")
-  const [selectedTheme, setSelectedTheme] = useState<string>("purple")
-  const [activeTab, setActiveTab] = useState<"layout" | "theme">("layout")
-  const [currentPage, setCurrentPage] = useState(0)
+export function StoreSettingsDialog({
+  open,
+  onOpenChange,
+}: StoreSettingsDialogProps) {
+  const [selectedLayout, setSelectedLayout] = useState<string>("layout-1");
+  const [selectedTheme, setSelectedTheme] = useState<string>("purple");
+  const [activeTab, setActiveTab] = useState<"layout" | "theme">("layout");
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const totalPages = Math.ceil(layouts.length / LAYOUTS_PER_PAGE)
-  const startIndex = currentPage * LAYOUTS_PER_PAGE
-  const endIndex = startIndex + LAYOUTS_PER_PAGE
-  const currentLayouts = layouts.slice(startIndex, endIndex)
+  const totalPages = Math.ceil(layouts.length / LAYOUTS_PER_PAGE);
+  const startIndex = currentPage * LAYOUTS_PER_PAGE;
+  const endIndex = startIndex + LAYOUTS_PER_PAGE;
+  const currentLayouts = layouts.slice(startIndex, endIndex);
 
   const handlePrevPage = () => {
-    setCurrentPage((prev) => Math.max(0, prev - 1))
-  }
+    setCurrentPage((prev) => Math.max(0, prev - 1));
+  };
 
   const handleNextPage = () => {
-    setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1))
-  }
+    setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
+  };
 
   const handleSave = () => {
     console.log("Salvando configurações:", {
       layout: selectedLayout,
       theme: selectedTheme,
-    })
+    });
 
     setTimeout(() => {
-      onOpenChange(false)
-    }, 1000)
-  }
+      onOpenChange(false);
+    }, 1000);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -174,7 +185,8 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
             Configurações da Loja
           </DialogTitle>
           <DialogDescription>
-            Personalize o layout e tema da sua loja para criar a experiência perfeita para seus clientes.
+            Personalize o layout e tema da sua loja para criar a experiência
+            perfeita para seus clientes.
           </DialogDescription>
         </DialogHeader>
 
@@ -186,7 +198,7 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
               "flex items-center gap-2 px-4 py-2 border-b-2 transition-colors",
               activeTab === "layout"
                 ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
             <Layout className="h-4 w-4" />
@@ -198,7 +210,7 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
               "flex items-center gap-2 px-4 py-2 border-b-2 transition-colors",
               activeTab === "theme"
                 ? "border-primary text-primary"
-                : "border-transparent text-muted-foreground hover:text-foreground",
+                : "border-transparent text-muted-foreground hover:text-foreground"
             )}
           >
             <Palette className="h-4 w-4" />
@@ -212,9 +224,12 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
             <div className="space-y-4 px-2.5">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-lg font-semibold mb-2">Escolha o Layout</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Escolha o Layout
+                  </h3>
                   <p className="text-sm text-muted-foreground">
-                    Selecione o layout que melhor representa o estilo da sua loja
+                    Selecione o layout que melhor representa o estilo da sua
+                    loja
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -250,16 +265,21 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                       key={layout.id}
                       className={cn(
                         "cursor-pointer transition-all hover:shadow-md",
-                        selectedLayout === layout.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm",
+                        selectedLayout === layout.id
+                          ? "ring-2 ring-primary shadow-md"
+                          : "hover:shadow-sm"
                       )}
                       onClick={() => setSelectedLayout(layout.id)}
                     >
                       <CardContent className="p-0">
                         <div className="relative">
-                          <img
+                          <Image
                             src={layout.image || "/placeholder.svg"}
                             alt={layout.name}
                             className="w-full h-48 object-cover rounded-t-lg"
+                            layout="responsive"
+                            width={500}
+                            height={300}
                           />
                           {selectedLayout === layout.id && (
                             <div className="absolute top-2 right-2 bg-primary text-primary-foreground rounded-full p-1.5 shadow-lg">
@@ -271,8 +291,12 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                           </Badge>
                         </div>
                         <div className="p-4">
-                          <h4 className="font-semibold text-sm mb-1">{layout.name}</h4>
-                          <p className="text-xs text-muted-foreground line-clamp-2">{layout.description}</p>
+                          <h4 className="font-semibold text-sm mb-1">
+                            {layout.name}
+                          </h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2">
+                            {layout.description}
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
@@ -288,7 +312,9 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                     onClick={() => setCurrentPage(index)}
                     className={cn(
                       "h-2 rounded-full transition-all",
-                      currentPage === index ? "w-8 bg-primary" : "w-2 bg-gray-300 hover:bg-gray-400",
+                      currentPage === index
+                        ? "w-8 bg-primary"
+                        : "w-2 bg-gray-300 hover:bg-gray-400"
                     )}
                     aria-label={`Ir para página ${index + 1}`}
                   />
@@ -300,7 +326,8 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                 <div className="mt-6 p-4 bg-muted/50 rounded-lg border">
                   <h4 className="font-semibold mb-2 flex items-center gap-2">
                     <Layout className="h-4 w-4 text-primary" />
-                    Layout Selecionado: {layouts.find((l) => l.id === selectedLayout)?.name}
+                    Layout Selecionado:{" "}
+                    {layouts.find((l) => l.id === selectedLayout)?.name}
                   </h4>
                   <p className="text-sm text-muted-foreground">
                     {layouts.find((l) => l.id === selectedLayout)?.description}
@@ -325,7 +352,9 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                     key={theme.id}
                     className={cn(
                       "cursor-pointer transition-all hover:shadow-md",
-                      selectedTheme === theme.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm",
+                      selectedTheme === theme.id
+                        ? "ring-2 ring-primary shadow-md"
+                        : "hover:shadow-sm"
                     )}
                     onClick={() => setSelectedTheme(theme.id)}
                   >
@@ -353,16 +382,31 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
                       {/* Informações das cores */}
                       <div className="space-y-1 text-xs">
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: theme.primary }} />
-                          <span className="text-muted-foreground">Primária</span>
+                          <div
+                            className="w-3 h-3 rounded-full border"
+                            style={{ backgroundColor: theme.primary }}
+                          />
+                          <span className="text-muted-foreground">
+                            Primária
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: theme.secondary }} />
-                          <span className="text-muted-foreground">Secundária</span>
+                          <div
+                            className="w-3 h-3 rounded-full border"
+                            style={{ backgroundColor: theme.secondary }}
+                          />
+                          <span className="text-muted-foreground">
+                            Secundária
+                          </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full border" style={{ backgroundColor: theme.accent }} />
-                          <span className="text-muted-foreground">Destaque</span>
+                          <div
+                            className="w-3 h-3 rounded-full border"
+                            style={{ backgroundColor: theme.accent }}
+                          />
+                          <span className="text-muted-foreground">
+                            Destaque
+                          </span>
                         </div>
                       </div>
                     </CardContent>
@@ -376,9 +420,15 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
         <DialogFooter className="border-t pt-4">
           <div className="flex items-center justify-between w-full">
             <div className="text-sm text-muted-foreground">
-              Layout: <span className="font-medium">{layouts.find((l) => l.id === selectedLayout)?.name}</span>
+              Layout:{" "}
+              <span className="font-medium">
+                {layouts.find((l) => l.id === selectedLayout)?.name}
+              </span>
               {" • "}
-              Tema: <span className="font-medium">{themes.find((t) => t.id === selectedTheme)?.name}</span>
+              Tema:{" "}
+              <span className="font-medium">
+                {themes.find((t) => t.id === selectedTheme)?.name}
+              </span>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={() => onOpenChange(false)}>
@@ -393,5 +443,5 @@ export function StoreSettingsDialog({ open, onOpenChange }: StoreSettingsDialogP
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

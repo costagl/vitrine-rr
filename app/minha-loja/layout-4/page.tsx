@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import {
   Heart,
   ShoppingCart,
@@ -26,18 +27,33 @@ import {
   Scissors,
   Stethoscope,
   Home,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function Layout4Page() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [cart, setCart] = useState<any[]>([])
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cart, setCart] = useState<any[]>([]);
 
   const categories = [
-    { id: 1, name: "Cachorros", icon: Dog, color: "bg-orange-100 text-orange-600" },
+    {
+      id: 1,
+      name: "Cachorros",
+      icon: Dog,
+      color: "bg-orange-100 text-orange-600",
+    },
     { id: 2, name: "Gatos", icon: Cat, color: "bg-purple-100 text-purple-600" },
-    { id: 3, name: "Banho e Tosa", icon: Scissors, color: "bg-blue-100 text-blue-600" },
-    { id: 4, name: "Veterinário", icon: Stethoscope, color: "bg-green-100 text-green-600" },
-  ]
+    {
+      id: 3,
+      name: "Banho e Tosa",
+      icon: Scissors,
+      color: "bg-blue-100 text-blue-600",
+    },
+    {
+      id: 4,
+      name: "Veterinário",
+      icon: Stethoscope,
+      color: "bg-green-100 text-green-600",
+    },
+  ];
 
   const featuredProducts = [
     {
@@ -85,7 +101,7 @@ export default function Layout4Page() {
       badge: "Novo",
       pet: "dog",
     },
-  ]
+  ];
 
   const services = [
     {
@@ -120,7 +136,7 @@ export default function Layout4Page() {
       icon: Home,
       color: "bg-orange-50 text-orange-600",
     },
-  ]
+  ];
 
   const testimonials = [
     {
@@ -128,7 +144,8 @@ export default function Layout4Page() {
       name: "Maria Silva",
       pet: "Rex",
       petType: "Golden Retriever",
-      comment: "Melhor petshop da região! Meu Rex adora vir aqui. A equipe é super atenciosa.",
+      comment:
+        "Melhor petshop da região! Meu Rex adora vir aqui. A equipe é super atenciosa.",
       rating: 5,
       image: "/diverse-woman-avatar.png",
     },
@@ -137,11 +154,12 @@ export default function Layout4Page() {
       name: "João Santos",
       pet: "Mimi",
       petType: "Persa",
-      comment: "Produtos de qualidade e preços justos. A Mimi ficou linda depois da tosa!",
+      comment:
+        "Produtos de qualidade e preços justos. A Mimi ficou linda depois da tosa!",
       rating: 5,
       image: "/man-avatar.png",
     },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-purple-50">
@@ -198,7 +216,11 @@ export default function Layout4Page() {
 
             {/* Actions */}
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="icon" className="hidden md:flex relative">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="hidden md:flex relative"
+              >
                 <Heart className="h-6 w-6 text-gray-600" />
               </Button>
               <Button variant="ghost" size="icon" className="relative">
@@ -212,8 +234,17 @@ export default function Layout4Page() {
               <Button variant="ghost" size="icon" className="hidden md:flex">
                 <User className="h-6 w-6 text-gray-600" />
               </Button>
-              <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" />
+                ) : (
+                  <Menu className="h-6 w-6" />
+                )}
               </Button>
             </div>
           </div>
@@ -222,7 +253,11 @@ export default function Layout4Page() {
           <div className="md:hidden mt-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-              <Input type="search" placeholder="Buscar..." className="pl-10 rounded-full border-orange-200" />
+              <Input
+                type="search"
+                placeholder="Buscar..."
+                className="pl-10 rounded-full border-orange-200"
+              />
             </div>
           </div>
         </div>
@@ -232,7 +267,7 @@ export default function Layout4Page() {
           <div className="container mx-auto px-4">
             <div className="hidden md:flex items-center justify-center gap-8 py-4">
               {categories.map((category) => {
-                const Icon = category.icon
+                const Icon = category.icon;
                 return (
                   <button
                     key={category.id}
@@ -241,9 +276,11 @@ export default function Layout4Page() {
                     <div className={`p-2 rounded-full ${category.color}`}>
                       <Icon className="h-4 w-4" />
                     </div>
-                    <span className="font-medium text-gray-700">{category.name}</span>
+                    <span className="font-medium text-gray-700">
+                      {category.name}
+                    </span>
                   </button>
-                )
+                );
               })}
             </div>
           </div>
@@ -266,13 +303,21 @@ export default function Layout4Page() {
 
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center text-white">
-            <Badge className="mb-4 bg-white/20 text-white border-white/30">🎉 Promoção de Inauguração</Badge>
-            <h2 className="text-5xl md:text-6xl font-bold mb-6">Tudo para seu Pet em um só Lugar!</h2>
+            <Badge className="mb-4 bg-white/20 text-white border-white/30">
+              🎉 Promoção de Inauguração
+            </Badge>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">
+              Tudo para seu Pet em um só Lugar!
+            </h2>
             <p className="text-xl mb-8 text-white/90">
-              Produtos premium, serviços especializados e muito carinho para seu melhor amigo
+              Produtos premium, serviços especializados e muito carinho para seu
+              melhor amigo
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8">
+              <Button
+                size="lg"
+                className="bg-white text-orange-600 hover:bg-gray-100 text-lg px-8"
+              >
                 Ver Produtos
               </Button>
               <Button
@@ -290,15 +335,20 @@ export default function Layout4Page() {
       {/* Categories Grid */}
       <section className="py-16 container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Categorias</h2>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+            Categorias
+          </h2>
           <p className="text-gray-600">Encontre tudo o que seu pet precisa</p>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {categories.map((category) => {
-            const Icon = category.icon
+            const Icon = category.icon;
             return (
-              <Card key={category.id} className="border-2 hover:border-orange-300 transition cursor-pointer group">
+              <Card
+                key={category.id}
+                className="border-2 hover:border-orange-300 transition cursor-pointer group"
+              >
                 <CardContent className="p-8 text-center">
                   <div
                     className={`mx-auto w-20 h-20 rounded-full ${category.color} flex items-center justify-center mb-4 group-hover:scale-110 transition`}
@@ -308,7 +358,7 @@ export default function Layout4Page() {
                   <h3 className="font-semibold text-lg">{category.name}</h3>
                 </CardContent>
               </Card>
-            )
+            );
           })}
         </div>
       </section>
@@ -317,7 +367,9 @@ export default function Layout4Page() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Produtos em Destaque</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              Produtos em Destaque
+            </h2>
             <p className="text-gray-600">Os favoritos dos nossos clientes</p>
           </div>
 
@@ -328,22 +380,39 @@ export default function Layout4Page() {
                 className="group hover:shadow-xl transition overflow-hidden border-2 hover:border-orange-300"
               >
                 <div className="relative overflow-hidden bg-gray-50">
-                  <img
+                  <Image
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}
                     className="w-full h-64 object-cover group-hover:scale-110 transition duration-500"
+                    layout="responsive"
+                    width={500}
+                    height={300}
                   />
                   {product.badge && (
-                    <Badge className="absolute top-3 left-3 bg-orange-500 text-white">{product.badge}</Badge>
+                    <Badge className="absolute top-3 left-3 bg-orange-500 text-white">
+                      {product.badge}
+                    </Badge>
                   )}
-                  <Button size="icon" variant="ghost" className="absolute top-3 right-3 bg-white/80 hover:bg-white">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="absolute top-3 right-3 bg-white/80 hover:bg-white"
+                  >
                     <Heart className="h-5 w-5 text-gray-600" />
                   </Button>
                   <div
-                    className={`absolute bottom-3 right-3 p-2 rounded-full ${product.pet === "dog" ? "bg-orange-100" : "bg-purple-100"}`}
+                    className={`absolute bottom-3 right-3 p-2 rounded-full ${
+                      product.pet === "dog" ? "bg-orange-100" : "bg-purple-100"
+                    }`}
                   >
                     {product.pet === "dog" ? (
-                      <Dog className={`h-5 w-5 ${product.pet === "dog" ? "text-orange-600" : "text-purple-600"}`} />
+                      <Dog
+                        className={`h-5 w-5 ${
+                          product.pet === "dog"
+                            ? "text-orange-600"
+                            : "text-purple-600"
+                        }`}
+                      />
                     ) : (
                       <Cat className="h-5 w-5 text-purple-600" />
                     )}
@@ -353,24 +422,34 @@ export default function Layout4Page() {
                   <Badge variant="secondary" className="mb-2 text-xs">
                     {product.category}
                   </Badge>
-                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">{product.name}</h3>
+                  <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                    {product.name}
+                  </h3>
                   <div className="flex items-center gap-1 mb-3">
                     <div className="flex">
                       {[...Array(5)].map((_, i) => (
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
-                            i < Math.floor(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+                            i < Math.floor(product.rating)
+                              ? "fill-yellow-400 text-yellow-400"
+                              : "text-gray-300"
                           }`}
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600">({product.reviews})</span>
+                    <span className="text-sm text-gray-600">
+                      ({product.reviews})
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 mb-4">
-                    <span className="text-2xl font-bold text-orange-600">R$ {product.price.toFixed(2)}</span>
+                    <span className="text-2xl font-bold text-orange-600">
+                      R$ {product.price.toFixed(2)}
+                    </span>
                     {product.oldPrice && (
-                      <span className="text-sm text-gray-400 line-through">R$ {product.oldPrice.toFixed(2)}</span>
+                      <span className="text-sm text-gray-400 line-through">
+                        R$ {product.oldPrice.toFixed(2)}
+                      </span>
                     )}
                   </div>
                   <Button className="w-full bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
@@ -398,15 +477,20 @@ export default function Layout4Page() {
       <section className="py-16 bg-gradient-to-b from-orange-50 to-purple-50">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Nossos Serviços</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              Nossos Serviços
+            </h2>
             <p className="text-gray-600">Cuidados profissionais para seu pet</p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service) => {
-              const Icon = service.icon
+              const Icon = service.icon;
               return (
-                <Card key={service.id} className="hover:shadow-lg transition border-2 hover:border-orange-300">
+                <Card
+                  key={service.id}
+                  className="hover:shadow-lg transition border-2 hover:border-orange-300"
+                >
                   <CardContent className="p-6 text-center">
                     <div
                       className={`mx-auto w-16 h-16 rounded-full ${service.color} flex items-center justify-center mb-4`}
@@ -414,14 +498,18 @@ export default function Layout4Page() {
                       <Icon className="h-8 w-8" />
                     </div>
                     <h3 className="font-bold text-xl mb-2">{service.name}</h3>
-                    <p className="text-gray-600 mb-4 text-sm">{service.description}</p>
-                    <p className="font-semibold text-orange-600 mb-4">{service.price}</p>
+                    <p className="text-gray-600 mb-4 text-sm">
+                      {service.description}
+                    </p>
+                    <p className="font-semibold text-orange-600 mb-4">
+                      {service.price}
+                    </p>
                     <Button className="w-full bg-transparent" variant="outline">
                       Agendar
                     </Button>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
         </div>
@@ -431,19 +519,27 @@ export default function Layout4Page() {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">O que Nossos Clientes Dizem</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+              O que Nossos Clientes Dizem
+            </h2>
             <p className="text-gray-600">Depoimentos de tutores felizes</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {testimonials.map((testimonial) => (
-              <Card key={testimonial.id} className="border-2 hover:border-orange-300 transition">
+              <Card
+                key={testimonial.id}
+                className="border-2 hover:border-orange-300 transition"
+              >
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4 mb-4">
-                    <img
+                    <Image
                       src={testimonial.image || "/placeholder.svg"}
                       alt={testimonial.name}
                       className="w-16 h-16 rounded-full object-cover"
+                      layout="responsive"
+                      width={500}
+                      height={300}
                     />
                     <div className="flex-1">
                       <h4 className="font-bold text-lg">{testimonial.name}</h4>
@@ -452,12 +548,17 @@ export default function Layout4Page() {
                       </p>
                       <div className="flex mt-1">
                         {[...Array(testimonial.rating)].map((_, i) => (
-                          <Star key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                          <Star
+                            key={i}
+                            className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                          />
                         ))}
                       </div>
                     </div>
                   </div>
-                  <p className="text-gray-700 italic">"{testimonial.comment}"</p>
+                  <p className="text-gray-700 italic">
+                    &quot{testimonial.comment}&quot
+                  </p>
                 </CardContent>
               </Card>
             ))}
@@ -473,11 +574,22 @@ export default function Layout4Page() {
         </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Primeira Compra com 15% OFF!</h2>
-          <p className="text-xl text-white/90 mb-8">Cadastre-se agora e ganhe desconto na primeira compra</p>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            Primeira Compra com 15% OFF!
+          </h2>
+          <p className="text-xl text-white/90 mb-8">
+            Cadastre-se agora e ganhe desconto na primeira compra
+          </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-            <Input type="email" placeholder="Seu melhor e-mail" className="bg-white/90 border-none text-lg" />
-            <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
+            <Input
+              type="email"
+              placeholder="Seu melhor e-mail"
+              className="bg-white/90 border-none text-lg"
+            />
+            <Button
+              size="lg"
+              className="bg-white text-orange-600 hover:bg-gray-100"
+            >
               Cadastrar
             </Button>
           </div>
@@ -495,7 +607,9 @@ export default function Layout4Page() {
                 </div>
                 <span className="font-bold text-xl">PetShop Amigo</span>
               </div>
-              <p className="text-gray-400 text-sm">Cuidando com amor do seu melhor amigo desde 2024.</p>
+              <p className="text-gray-400 text-sm">
+                Cuidando com amor do seu melhor amigo desde 2024.
+              </p>
             </div>
 
             <div>
@@ -560,7 +674,9 @@ export default function Layout4Page() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm mb-4 md:mb-0">© 2025 PetShop Amigo. Todos os direitos reservados.</p>
+            <p className="text-gray-400 text-sm mb-4 md:mb-0">
+              © 2025 PetShop Amigo. Todos os direitos reservados.
+            </p>
             <div className="flex gap-4">
               <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
               <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
@@ -570,5 +686,5 @@ export default function Layout4Page() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

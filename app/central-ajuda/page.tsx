@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import Navbar from "@/components/navbar"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -18,7 +19,7 @@ import {
   BookOpen,
   MessageCircle,
 } from "lucide-react"
-import Link from "next/link"
+
 
 const categorias = [
   {

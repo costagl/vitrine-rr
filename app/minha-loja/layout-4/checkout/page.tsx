@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Separator } from "@/components/ui/separator"
+import { useState } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Separator } from "@/components/ui/separator";
 import {
   ArrowLeft,
   PawPrint,
@@ -20,10 +21,10 @@ import {
   Minus,
   Plus,
   Trash2,
-} from "lucide-react"
+} from "lucide-react";
 
 export default function Layout4CheckoutPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
   const [cartItems, setCartItems] = useState([
     {
       id: 1,
@@ -41,27 +42,34 @@ export default function Layout4CheckoutPage() {
       image: "/cat-scratching-post.png",
       pet: "cat",
     },
-  ])
+  ]);
 
   const updateQuantity = (id: number, change: number) => {
     setCartItems((items) =>
-      items.map((item) => (item.id === id ? { ...item, quantity: Math.max(1, item.quantity + change) } : item)),
-    )
-  }
+      items.map((item) =>
+        item.id === id
+          ? { ...item, quantity: Math.max(1, item.quantity + change) }
+          : item
+      )
+    );
+  };
 
   const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id))
-  }
+    setCartItems((items) => items.filter((item) => item.id !== id));
+  };
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const shipping = 15.0
-  const total = subtotal + shipping
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const shipping = 15.0;
+  const total = subtotal + shipping;
 
   const steps = [
     { number: 1, title: "Entrega", icon: MapPin },
     { number: 2, title: "Pagamento", icon: CreditCard },
     { number: 3, title: "Confirmação", icon: CheckCircle2 },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-orange-50 via-white to-purple-50">
@@ -99,35 +107,46 @@ export default function Layout4CheckoutPage() {
             </div>
 
             {steps.map((s) => {
-              const Icon = s.icon
-              const isActive = step === s.number
-              const isCompleted = step > s.number
+              const Icon = s.icon;
+              const isActive = step === s.number;
+              const isCompleted = step > s.number;
               return (
-                <div key={s.number} className="flex flex-col items-center relative">
+                <div
+                  key={s.number}
+                  className="flex flex-col items-center relative"
+                >
                   <div
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all ${
                       isCompleted
                         ? "bg-gradient-to-br from-orange-400 to-pink-500"
                         : isActive
-                          ? "bg-gradient-to-br from-orange-400 to-pink-500"
-                          : "bg-gray-200"
+                        ? "bg-gradient-to-br from-orange-400 to-pink-500"
+                        : "bg-gray-200"
                     }`}
                   >
                     {isCompleted ? (
                       <CheckCircle2 className="h-6 w-6 text-white" />
                     ) : (
-                      <Icon className={`h-6 w-6 ${isActive || isCompleted ? "text-white" : "text-gray-400"}`} />
+                      <Icon
+                        className={`h-6 w-6 ${
+                          isActive || isCompleted
+                            ? "text-white"
+                            : "text-gray-400"
+                        }`}
+                      />
                     )}
                   </div>
                   <span
                     className={`mt-2 text-sm font-medium ${
-                      isActive || isCompleted ? "text-orange-600" : "text-gray-400"
+                      isActive || isCompleted
+                        ? "text-orange-600"
+                        : "text-gray-400"
                     }`}
                   >
                     {s.title}
                   </span>
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -189,35 +208,53 @@ export default function Layout4CheckoutPage() {
                   <Separator />
 
                   <div>
-                    <Label className="text-lg font-semibold mb-4 block">Opções de Entrega</Label>
+                    <Label className="text-lg font-semibold mb-4 block">
+                      Opções de Entrega
+                    </Label>
                     <RadioGroup defaultValue="standard">
                       <div className="flex items-center space-x-2 p-4 border-2 rounded-lg hover:border-orange-300 cursor-pointer">
                         <RadioGroupItem value="standard" id="standard" />
-                        <Label htmlFor="standard" className="flex-1 cursor-pointer">
+                        <Label
+                          htmlFor="standard"
+                          className="flex-1 cursor-pointer"
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <Truck className="h-5 w-5 text-orange-600" />
                               <div>
                                 <p className="font-semibold">Entrega Padrão</p>
-                                <p className="text-sm text-gray-600">5-7 dias úteis</p>
+                                <p className="text-sm text-gray-600">
+                                  5-7 dias úteis
+                                </p>
                               </div>
                             </div>
-                            <span className="font-bold text-orange-600">R$ 15,00</span>
+                            <span className="font-bold text-orange-600">
+                              R$ 15,00
+                            </span>
                           </div>
                         </Label>
                       </div>
                       <div className="flex items-center space-x-2 p-4 border-2 rounded-lg hover:border-orange-300 cursor-pointer mt-2">
                         <RadioGroupItem value="express" id="express" />
-                        <Label htmlFor="express" className="flex-1 cursor-pointer">
+                        <Label
+                          htmlFor="express"
+                          className="flex-1 cursor-pointer"
+                        >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <Package className="h-5 w-5 text-orange-600" />
                               <div>
-                                <p className="font-semibold">Entrega Expressa</p>
-                                <p className="text-sm text-gray-600">2-3 dias úteis</p>
+                                <p className="font-semibold">
+                                  Entrega Expressa
+                                </p>
+                                <p className="text-sm text-gray-600">
+                                  2-3 dias úteis
+                                </p>
                               </div>
                             </div>
-                            <span className="font-bold text-orange-600">R$ 25,00</span>
+                            <span className="font-bold text-orange-600">
+                              R$ 25,00
+                            </span>
                           </div>
                         </Label>
                       </div>
@@ -249,7 +286,9 @@ export default function Layout4CheckoutPage() {
                       <Label htmlFor="credit" className="flex-1 cursor-pointer">
                         <div className="flex items-center gap-3">
                           <CreditCard className="h-5 w-5 text-orange-600" />
-                          <span className="font-semibold">Cartão de Crédito</span>
+                          <span className="font-semibold">
+                            Cartão de Crédito
+                          </span>
                         </div>
                       </Label>
                     </div>
@@ -273,7 +312,11 @@ export default function Layout4CheckoutPage() {
                       </div>
                       <div className="space-y-2">
                         <Label>CVV</Label>
-                        <Input placeholder="000" type="password" maxLength={3} />
+                        <Input
+                          placeholder="000"
+                          type="password"
+                          maxLength={3}
+                        />
                       </div>
                     </div>
 
@@ -281,14 +324,22 @@ export default function Layout4CheckoutPage() {
                       <Label>Parcelas</Label>
                       <select className="w-full p-2 border-2 rounded-md">
                         <option>1x de R$ {total.toFixed(2)} sem juros</option>
-                        <option>2x de R$ {(total / 2).toFixed(2)} sem juros</option>
-                        <option>3x de R$ {(total / 3).toFixed(2)} sem juros</option>
+                        <option>
+                          2x de R$ {(total / 2).toFixed(2)} sem juros
+                        </option>
+                        <option>
+                          3x de R$ {(total / 3).toFixed(2)} sem juros
+                        </option>
                       </select>
                     </div>
                   </div>
 
                   <div className="flex gap-4 mt-6">
-                    <Button onClick={() => setStep(1)} variant="outline" className="flex-1">
+                    <Button
+                      onClick={() => setStep(1)}
+                      variant="outline"
+                      className="flex-1"
+                    >
                       Voltar
                     </Button>
                     <Button
@@ -308,18 +359,30 @@ export default function Layout4CheckoutPage() {
                   <div className="bg-green-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle2 className="h-12 w-12 text-green-600" />
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-800 mb-4">Pedido Confirmado! 🎉</h2>
-                  <p className="text-gray-600 mb-2">Seu pedido #12345 foi realizado com sucesso!</p>
-                  <p className="text-gray-600 mb-8">Enviamos um e-mail com os detalhes da sua compra.</p>
+                  <h2 className="text-3xl font-bold text-gray-800 mb-4">
+                    Pedido Confirmado! 🎉
+                  </h2>
+                  <p className="text-gray-600 mb-2">
+                    Seu pedido #12345 foi realizado com sucesso!
+                  </p>
+                  <p className="text-gray-600 mb-8">
+                    Enviamos um e-mail com os detalhes da sua compra.
+                  </p>
                   <div className="bg-orange-50 p-6 rounded-lg mb-8">
-                    <p className="text-sm text-gray-600 mb-2">Previsão de entrega</p>
-                    <p className="text-2xl font-bold text-orange-600">5-7 dias úteis</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Previsão de entrega
+                    </p>
+                    <p className="text-2xl font-bold text-orange-600">
+                      5-7 dias úteis
+                    </p>
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Button
                       variant="outline"
                       className="flex-1 bg-transparent"
-                      onClick={() => (window.location.href = "/minha-loja/layout-4")}
+                      onClick={() =>
+                        (window.location.href = "/minha-loja/layout-4")
+                      }
                     >
                       Voltar à Loja
                     </Button>
@@ -343,13 +406,20 @@ export default function Layout4CheckoutPage() {
                   {cartItems.map((item) => (
                     <div key={item.id} className="flex gap-4">
                       <div className="relative">
-                        <img
+                        <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           className="w-20 h-20 object-cover rounded-lg"
+                          layout="responsive"
+                          width={500}
+                          height={300}
                         />
                         <div
-                          className={`absolute -top-2 -right-2 p-1 rounded-full ${item.pet === "dog" ? "bg-orange-100" : "bg-purple-100"}`}
+                          className={`absolute -top-2 -right-2 p-1 rounded-full ${
+                            item.pet === "dog"
+                              ? "bg-orange-100"
+                              : "bg-purple-100"
+                          }`}
                         >
                           {item.pet === "dog" ? (
                             <Dog className="h-4 w-4 text-orange-600" />
@@ -359,7 +429,9 @@ export default function Layout4CheckoutPage() {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-semibold text-sm mb-2 line-clamp-2">{item.name}</h4>
+                        <h4 className="font-semibold text-sm mb-2 line-clamp-2">
+                          {item.name}
+                        </h4>
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Button
@@ -370,7 +442,9 @@ export default function Layout4CheckoutPage() {
                             >
                               <Minus className="h-3 w-3" />
                             </Button>
-                            <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                            <span className="text-sm font-medium w-8 text-center">
+                              {item.quantity}
+                            </span>
                             <Button
                               size="icon"
                               variant="outline"
@@ -402,16 +476,22 @@ export default function Layout4CheckoutPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">R$ {subtotal.toFixed(2)}</span>
+                    <span className="font-medium">
+                      R$ {subtotal.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Frete</span>
-                    <span className="font-medium">R$ {shipping.toFixed(2)}</span>
+                    <span className="font-medium">
+                      R$ {shipping.toFixed(2)}
+                    </span>
                   </div>
                   <Separator className="my-2" />
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-orange-600">R$ {total.toFixed(2)}</span>
+                    <span className="text-orange-600">
+                      R$ {total.toFixed(2)}
+                    </span>
                   </div>
                 </div>
 
@@ -420,7 +500,9 @@ export default function Layout4CheckoutPage() {
                     <PawPrint className="h-5 w-5" />
                     <span className="font-semibold">Frete Grátis</span>
                   </div>
-                  <p className="text-sm text-gray-600">Em compras acima de R$ 199,00</p>
+                  <p className="text-sm text-gray-600">
+                    Em compras acima de R$ 199,00
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -428,5 +510,5 @@ export default function Layout4CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

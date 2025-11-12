@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import Image from "next/image";
 import {
   Search,
   ShoppingCart,
@@ -22,85 +23,97 @@ import {
   Facebook,
   Instagram,
   Twitter,
-} from "lucide-react"
-import { getApiBaseUrl } from "@/config/api-url"
-import { API_ENDPOINTS } from "@/config/api"
+} from "lucide-react";
+import { getApiBaseUrl } from "@/config/api-url";
+import { API_ENDPOINTS } from "@/config/api";
 
 interface ApiProduct {
-  id: number
-  titulo: string
-  descricao?: string
-  valorUnitario: number
-  valorPromocional?: number
-  estoque: number
-  ativo: number
-  imagem?: string
-  idLoja: number
-  sku?: string
-  peso?: number
-  altura?: number
-  largura?: number
-  profundidade?: number
-  idCategoriaProduto?: number
-  nomeCategoriaProduto?: string | null
+  id: number;
+  titulo: string;
+  descricao?: string;
+  valorUnitario: number;
+  valorPromocional?: number;
+  estoque: number;
+  ativo: number;
+  imagem?: string;
+  idLoja: number;
+  sku?: string;
+  peso?: number;
+  altura?: number;
+  largura?: number;
+  profundidade?: number;
+  idCategoriaProduto?: number;
+  nomeCategoriaProduto?: string | null;
 }
 
 interface Product {
-  id: number
-  titulo: string
-  descricao: string
-  preco: number
-  precoPromocional?: number
-  quantidade: number
-  status: string
-  imagemUrl?: string
+  id: number;
+  titulo: string;
+  descricao: string;
+  preco: number;
+  precoPromocional?: number;
+  quantidade: number;
+  status: string;
+  imagemUrl?: string;
   categoria?: {
-    id: number
-    nome: string
-  }
+    id: number;
+    nome: string;
+  };
 }
 
 export default function Layout1Page() {
-  const [produtos, setProdutos] = useState<Product[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [searchQuery, setSearchQuery] = useState("")
+  const [produtos, setProdutos] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  const categorias = ["Todos os produtos", "Roupas Masculinas", "Roupas Femininas", "Calçados", "Acessórios", "Bolsas", "Relógios"]
+  const categorias = [
+    "Todos os produtos",
+    "Roupas Masculinas",
+    "Roupas Femininas",
+    "Calçados",
+    "Acessórios",
+    "Bolsas",
+    "Relógios",
+  ];
 
   // Buscar produtos da API
   useEffect(() => {
     async function fetchProdutos() {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
-        const token = localStorage.getItem("token")
+        const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("Token de autenticação não encontrado. Faça login novamente.")
+          throw new Error(
+            "Token de autenticação não encontrado. Faça login novamente."
+          );
         }
 
-        const endpoint = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.LISTAR}`
+        const endpoint = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.LISTAR}`;
         const response = await fetch(endpoint, {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-        })
+        });
 
         if (!response.ok) {
           if (response.status === 401) {
-            throw new Error("Não autorizado. Faça login novamente.")
+            throw new Error("Não autorizado. Faça login novamente.");
           }
-          throw new Error(`Erro ao listar produtos: ${response.statusText}`)
+          throw new Error(`Erro ao listar produtos: ${response.statusText}`);
         }
 
-        const data: ApiProduct[] = await response.json()
-        console.log("✅ Produtos da API:", data)
+        const data: ApiProduct[] = await response.json();
+        console.log("✅ Produtos da API:", data);
 
         // Mapear os campos da API para o formato esperado pelo frontend
-        const produtosMapeados: Product[] = (Array.isArray(data) ? data : []).map((item) => ({
+        const produtosMapeados: Product[] = (
+          Array.isArray(data) ? data : []
+        ).map((item) => ({
           id: item.id,
           titulo: item.titulo,
           descricao: item.descricao || "",
@@ -108,57 +121,57 @@ export default function Layout1Page() {
           precoPromocional: item.valorPromocional,
           quantidade: item.estoque || 0,
           status: item.ativo === 1 ? "ativo" : "inativo",
-          imagemUrl: item.imagem, // Campo correto da API
+          imagemUrl: item.imagem,
           categoria: item.idCategoriaProduto
             ? {
                 id: item.idCategoriaProduto,
                 nome: item.nomeCategoriaProduto || "Sem Categoria",
               }
             : undefined,
-        }))
+        }));
 
-        console.log("✅ Produtos mapeados:", produtosMapeados)
-        setProdutos(produtosMapeados)
+        console.log("✅ Produtos mapeados:", produtosMapeados);
+        setProdutos(produtosMapeados);
       } catch (err: any) {
-        console.error("❌ Erro ao carregar produtos:", err)
-        setError(err.message || "Erro ao carregar produtos")
+        console.error("❌ Erro ao carregar produtos:", err);
+        setError(err.message || "Erro ao carregar produtos");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchProdutos()
-  }, [])
+    fetchProdutos();
+  }, []);
 
   // Filtrar produtos ativos por busca
   const produtosFiltrados = useMemo(() => {
     const filtered = produtos
       .filter((p) => p.status === "ativo")
       .filter((p) => {
-        if (!searchQuery) return true
-        const query = searchQuery.toLowerCase()
+        if (!searchQuery) return true;
+        const query = searchQuery.toLowerCase();
         return (
           p.titulo.toLowerCase().includes(query) ||
           p.descricao?.toLowerCase().includes(query) ||
           p.categoria?.nome.toLowerCase().includes(query)
-        )
+        );
       })
-      .slice(0, 8) // Limitar a 8 produtos em destaque
+      .slice(0, 8); // Limitar a 8 produtos em destaque
 
-    console.log("🔍 Produtos filtrados:", filtered)
-    return filtered
-  }, [produtos, searchQuery])
+    console.log("🔍 Produtos filtrados:", filtered);
+    return filtered;
+  }, [produtos, searchQuery]);
 
   // Calcular avaliações fictícias baseadas no ID (para demonstração)
   const getProductRating = (id: number) => {
-    const ratings = [4.5, 4.8, 4.7, 4.9, 4.6, 4.3, 4.4, 4.2]
-    return ratings[id % ratings.length]
-  }
+    const ratings = [4.5, 4.8, 4.7, 4.9, 4.6, 4.3, 4.4, 4.2];
+    return ratings[id % ratings.length];
+  };
 
   const getProductReviews = (id: number) => {
-    const reviews = [128, 95, 203, 67, 145, 89, 156, 112]
-    return reviews[id % reviews.length]
-  }
+    const reviews = [128, 95, 203, 67, 145, 89, 156, 112];
+    return reviews[id % reviews.length];
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -210,18 +223,32 @@ export default function Layout1Page() {
 
             {/* Ações do Usuário */}
             <div className="flex items-center gap-4">
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
                 <User className="h-5 w-5" />
                 <span className="hidden md:block">Contato</span>
               </Button>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2"
+              >
                 <Heart className="h-5 w-5" />
                 <span className="hidden md:block">Favoritos</span>
               </Button>
-              <Button variant="ghost" size="sm" className="flex items-center gap-2 relative">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-2 relative"
+              >
                 <ShoppingCart className="h-5 w-5" />
                 <span className="hidden md:block">Carrinho</span>
-                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">0</Badge>
+                <Badge className="absolute -top-2 -right-2 bg-red-500 text-white text-xs">
+                  0
+                </Badge>
               </Button>
             </div>
           </div>
@@ -233,7 +260,11 @@ export default function Layout1Page() {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-center space-x-8 py-3">
             {categorias.map((categoria, index) => (
-              <Link key={index} href="http://localhost:3000/minha-loja/layout-1/produtos" className="hover:text-blue-200 transition-colors font-medium">
+              <Link
+                key={index}
+                href="http://localhost:3000/minha-loja/layout-1/produtos"
+                className="hover:text-blue-200 transition-colors font-medium"
+              >
                 {categoria}
               </Link>
             ))}
@@ -245,8 +276,13 @@ export default function Layout1Page() {
       <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-20">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-5xl font-bold mb-4">Coleção Verão 2024</h2>
-          <p className="text-xl mb-8 opacity-90">Descubra as últimas tendências da moda com até 50% de desconto</p>
-          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3">
+          <p className="text-xl mb-8 opacity-90">
+            Descubra as últimas tendências da moda com até 50% de desconto
+          </p>
+          <Button
+            size="lg"
+            className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-3"
+          >
             Ver Coleção
           </Button>
         </div>
@@ -261,21 +297,27 @@ export default function Layout1Page() {
                 <Truck className="h-8 w-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Frete Grátis</h3>
-              <p className="text-gray-600">Em compras acima de R$ 99 para todo o Brasil</p>
+              <p className="text-gray-600">
+                Em compras acima de R$ 99 para todo o Brasil
+              </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Compra Segura</h3>
-              <p className="text-gray-600">Seus dados protegidos com certificado SSL</p>
+              <p className="text-gray-600">
+                Seus dados protegidos com certificado SSL
+              </p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CreditCard className="h-8 w-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold mb-2">Parcelamento</h3>
-              <p className="text-gray-600">Em até 12x sem juros no cartão de crédito</p>
+              <p className="text-gray-600">
+                Em até 12x sem juros no cartão de crédito
+              </p>
             </div>
           </div>
         </div>
@@ -284,11 +326,13 @@ export default function Layout1Page() {
       {/* Produtos em Destaque */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Produtos em Destaque</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">
+            Produtos em Destaque
+          </h2>
 
           {/* Debug info */}
           <div className="mb-4 text-center text-sm text-gray-500">
-            {/* {!isLoading && `${produtos.length} produtos carregados | ${produtosFiltrados.length} produtos ativos`} */}
+            {/* TODO: {!isLoading && `${produtos.length} produtos carregados | ${produtosFiltrados.length} produtos ativos`} */}
           </div>
 
           {/* Loading State */}
@@ -314,8 +358,12 @@ export default function Layout1Page() {
           {/* Error State */}
           {error && (
             <div className="text-center py-12">
-              <p className="text-red-600 mb-4">Erro ao carregar produtos: {error}</p>
-              <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+              <p className="text-red-600 mb-4">
+                Erro ao carregar produtos: {error}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Tentar Novamente
+              </Button>
             </div>
           )}
 
@@ -323,10 +371,14 @@ export default function Layout1Page() {
           {!isLoading && !error && produtosFiltrados.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-600 text-lg mb-2">
-                {searchQuery ? "Nenhum produto encontrado para sua busca." : "Nenhum produto disponível no momento."}
+                {searchQuery
+                  ? "Nenhum produto encontrado para sua busca."
+                  : "Nenhum produto disponível no momento."}
               </p>
               {produtos.length > 0 && (
-                <p className="text-sm text-gray-500">({produtos.length} produtos carregados, mas nenhum ativo)</p>
+                <p className="text-sm text-gray-500">
+                  ({produtos.length} produtos carregados, mas nenhum ativo)
+                </p>
               )}
             </div>
           )}
@@ -335,25 +387,41 @@ export default function Layout1Page() {
           {!isLoading && !error && produtosFiltrados.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {produtosFiltrados.map((produto) => {
-                const rating = getProductRating(produto.id)
-                const reviews = getProductReviews(produto.id)
-                const temDesconto = produto.precoPromocional && produto.precoPromocional < produto.preco
+                const rating = getProductRating(produto.id);
+                const reviews = getProductReviews(produto.id);
+                const temDesconto =
+                  produto.precoPromocional &&
+                  produto.precoPromocional < produto.preco;
                 const desconto = temDesconto
-                  ? Math.round(((produto.preco - produto.precoPromocional!) / produto.preco) * 100)
-                  : 0
+                  ? Math.round(
+                      ((produto.preco - produto.precoPromocional!) /
+                        produto.preco) *
+                        100
+                    )
+                  : 0;
 
                 return (
-                  <Card key={produto.id} className="group hover:shadow-lg transition-shadow">
+                  <Card
+                    key={produto.id}
+                    className="group hover:shadow-lg transition-shadow"
+                  >
                     <CardContent className="p-0">
                       <div className="relative overflow-hidden bg-gray-100">
                         {produto.imagemUrl ? (
-                          <img
+                          <Image
                             src={produto.imagemUrl || "/placeholder.svg"}
                             alt={produto.titulo}
                             className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                            layout="responsive"
+                            width={500}
+                            height={300}
                             onError={(e) => {
-                              console.error("❌ Erro ao carregar imagem:", produto.imagemUrl)
-                              e.currentTarget.src = "/placeholder.svg?height=300&width=300"
+                              console.error(
+                                "❌ Erro ao carregar imagem:",
+                                produto.imagemUrl
+                              );
+                              e.currentTarget.src =
+                                "/placeholder.svg?height=300&width=300";
                             }}
                           />
                         ) : (
@@ -362,10 +430,14 @@ export default function Layout1Page() {
                           </div>
                         )}
                         {temDesconto && (
-                          <Badge className="absolute top-2 left-2 bg-red-500 text-white">-{desconto}%</Badge>
+                          <Badge className="absolute top-2 left-2 bg-red-500 text-white">
+                            -{desconto}%
+                          </Badge>
                         )}
                         {produto.quantidade === 0 && (
-                          <Badge className="absolute top-2 right-2 bg-gray-500 text-white">Esgotado</Badge>
+                          <Badge className="absolute top-2 right-2 bg-gray-500 text-white">
+                            Esgotado
+                          </Badge>
                         )}
                         <Button
                           size="sm"
@@ -379,22 +451,31 @@ export default function Layout1Page() {
                         <Badge variant="secondary" className="text-xs mb-2">
                           {produto.categoria?.nome || "Sem Categoria"}
                         </Badge>
-                        <h3 className="font-semibold text-lg mb-2 line-clamp-2">{produto.titulo}</h3>
+                        <h3 className="font-semibold text-lg mb-2 line-clamp-2">
+                          {produto.titulo}
+                        </h3>
                         <div className="flex items-center gap-1 mb-2">
                           {[...Array(5)].map((_, i) => (
                             <Star
                               key={i}
                               className={`h-4 w-4 ${
-                                i < Math.floor(rating) ? "text-yellow-400 fill-current" : "text-gray-300"
+                                i < Math.floor(rating)
+                                  ? "text-yellow-400 fill-current"
+                                  : "text-gray-300"
                               }`}
                             />
                           ))}
-                          <span className="text-sm text-gray-500 ml-1">({reviews})</span>
+                          <span className="text-sm text-gray-500 ml-1">
+                            ({reviews})
+                          </span>
                         </div>
                         <div className="flex items-center justify-between mb-3">
                           <div>
                             <span className="text-2xl font-bold text-green-600">
-                              R$ {(produto.precoPromocional || produto.preco).toFixed(2).replace(".", ",")}
+                              R${" "}
+                              {(produto.precoPromocional || produto.preco)
+                                .toFixed(2)
+                                .replace(".", ",")}
                             </span>
                             {temDesconto && (
                               <span className="text-sm text-gray-500 line-through ml-2">
@@ -403,13 +484,18 @@ export default function Layout1Page() {
                             )}
                           </div>
                         </div>
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700" disabled={produto.quantidade === 0}>
-                          {produto.quantidade === 0 ? "Esgotado" : "Adicionar ao Carrinho"}
+                        <Button
+                          className="w-full bg-blue-600 hover:bg-blue-700"
+                          disabled={produto.quantidade === 0}
+                        >
+                          {produto.quantidade === 0
+                            ? "Esgotado"
+                            : "Adicionar ao Carrinho"}
                         </Button>
                       </div>
                     </CardContent>
                   </Card>
-                )
+                );
               })}
             </div>
           )}
@@ -420,10 +506,17 @@ export default function Layout1Page() {
       <section className="bg-gray-900 text-white py-16">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Receba Nossas Ofertas</h2>
-          <p className="text-xl mb-8 opacity-90">Cadastre-se e seja o primeiro a saber sobre promoções exclusivas</p>
+          <p className="text-xl mb-8 opacity-90">
+            Cadastre-se e seja o primeiro a saber sobre promoções exclusivas
+          </p>
           <div className="max-w-md mx-auto flex gap-4">
-            <Input placeholder="Seu melhor email" className="flex-1 bg-white text-gray-900" />
-            <Button className="bg-blue-600 hover:bg-blue-700 px-6">Cadastrar</Button>
+            <Input
+              placeholder="Seu melhor email"
+              className="flex-1 bg-white text-gray-900"
+            />
+            <Button className="bg-blue-600 hover:bg-blue-700 px-6">
+              Cadastrar
+            </Button>
           </div>
         </div>
       </section>
@@ -434,7 +527,10 @@ export default function Layout1Page() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
               <h3 className="text-white text-xl font-bold mb-4">Minha Loja</h3>
-              <p className="mb-4">Sua loja de moda online com as melhores tendências e preços incríveis.</p>
+              <p className="mb-4">
+                Sua loja de moda online com as melhores tendências e preços
+                incríveis.
+              </p>
               <div className="flex gap-4">
                 <Facebook className="h-5 w-5 hover:text-blue-400 cursor-pointer" />
                 <Instagram className="h-5 w-5 hover:text-pink-400 cursor-pointer" />
@@ -515,5 +611,5 @@ export default function Layout1Page() {
         </div>
       </footer>
     </div>
-  )
+  );
 }

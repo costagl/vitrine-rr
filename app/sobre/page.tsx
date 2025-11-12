@@ -2,6 +2,7 @@ import Navbar from "@/components/navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Users, Target, Award, Heart } from "lucide-react";
+import Image from "next/image";
 
 export default function SobrePage() {
   return (
@@ -145,11 +146,14 @@ export default function SobrePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card>
               <CardContent className="p-6 text-center">
-                <img
+                <Image
                   // src="/placeholder.svg?height=150&width=150"
                   src="Screenshot_1.png"
                   alt="CEO"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
+                  layout="responsive"
+                  width={500}
+                  height={300}
                 />
                 <h3 className="text-xl font-semibold mb-1">Daniel Santos</h3>
                 <Badge variant="secondary" className="mb-3">
@@ -164,10 +168,13 @@ export default function SobrePage() {
 
             <Card>
               <CardContent className="p-6 text-center">
-                <img
+                <Image
                   src="Screenshot_2.png"
                   alt="CTO"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
+                  layout="responsive"
+                  width={500}
+                  height={300}
                 />
                 <h3 className="text-xl font-semibold mb-1">Gabriel Costa</h3>
                 <Badge variant="secondary" className="mb-3">
@@ -182,10 +189,13 @@ export default function SobrePage() {
 
             <Card>
               <CardContent className="p-6 text-center">
-                <img
+                <Image
                   src="Screenshot_3.png"
                   alt="Head de Produto"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
+                  layout="responsive"
+                  width={500}
+                  height={300}
                 />
                 <h3 className="text-xl font-semibold mb-1">Leonardo Silva</h3>
                 <Badge variant="secondary" className="mb-3">

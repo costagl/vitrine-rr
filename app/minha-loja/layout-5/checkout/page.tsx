@@ -1,17 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ArrowLeft, CreditCard, MapPin, Package, Check, Heart, Cake } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import Link from "next/link"
+import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  CreditCard,
+  MapPin,
+  Package,
+  Check,
+  Heart,
+  Cake,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function Layout5Checkout() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
 
   const cartItems = [
     {
@@ -30,11 +39,32 @@ export default function Layout5Checkout() {
       image: "/placeholder.svg?height=80&width=80&text=Ursinho",
       icon: "🧸",
     },
-  ]
+  ];
 
-  const subtotal = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0)
-  const shipping = 15.0
-  const total = subtotal + shipping
+  const [orderNumber, setOrderNumber] = useState<string>("");
+  const orderNumberRef = useRef<string>("");
+
+  useEffect(() => {
+    const generateOrderNumber = () => {
+      // Só gera o número da ordem se ainda não tiver sido gerado
+      if (!orderNumberRef.current) {
+        const randomOrderNumber = `DE-${Math.floor(Math.random() * 10000)}`;
+        orderNumberRef.current = randomOrderNumber; // Armazena o número da ordem em 'useRef'
+
+        // Atualiza o estado de forma assíncrona fora do useEffect
+        setOrderNumber(randomOrderNumber);
+      }
+    };
+
+    generateOrderNumber(); // Chama a função para gerar o número da ordem
+  }, []);
+
+  const subtotal = cartItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const shipping = 15.0;
+  const total = subtotal + shipping;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-blue-50">
@@ -70,7 +100,7 @@ export default function Layout5Checkout() {
               { num: 2, label: "Pagamento", icon: CreditCard },
               { num: 3, label: "Confirmação", icon: Package },
             ].map((s, index) => {
-              const Icon = s.icon
+              const Icon = s.icon;
               return (
                 <div key={s.num} className="flex items-center">
                   <div className="flex flex-col items-center">
@@ -84,21 +114,31 @@ export default function Layout5Checkout() {
                       }
                     `}
                     >
-                      {step > s.num ? <Check className="h-6 w-6" /> : <Icon className="h-6 w-6" />}
+                      {step > s.num ? (
+                        <Check className="h-6 w-6" />
+                      ) : (
+                        <Icon className="h-6 w-6" />
+                      )}
                     </div>
-                    <span className={`text-xs mt-2 font-medium ${step >= s.num ? "text-pink-500" : "text-gray-400"}`}>
+                    <span
+                      className={`text-xs mt-2 font-medium ${
+                        step >= s.num ? "text-pink-500" : "text-gray-400"
+                      }`}
+                    >
                       {s.label}
                     </span>
                   </div>
                   {index < 2 && (
                     <div
                       className={`w-20 h-1 mx-2 rounded-full transition-colors ${
-                        step > s.num ? "bg-gradient-to-r from-pink-400 to-purple-400" : "bg-gray-200"
+                        step > s.num
+                          ? "bg-gradient-to-r from-pink-400 to-purple-400"
+                          : "bg-gray-200"
                       }`}
                     />
                   )}
                 </div>
-              )
+              );
             })}
           </div>
         </div>
@@ -257,9 +297,14 @@ export default function Layout5Checkout() {
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value="credit" id="credit" />
-                          <Label htmlFor="credit" className="flex-1 cursor-pointer font-medium">
+                          <Label
+                            htmlFor="credit"
+                            className="flex-1 cursor-pointer font-medium"
+                          >
                             💳 Cartão de Crédito
-                            <span className="block text-xs text-gray-500 mt-1">Parcele em até 3x sem juros</span>
+                            <span className="block text-xs text-gray-500 mt-1">
+                              Parcele em até 3x sem juros
+                            </span>
                           </Label>
                         </div>
                       </CardContent>
@@ -269,9 +314,14 @@ export default function Layout5Checkout() {
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value="pix" id="pix" />
-                          <Label htmlFor="pix" className="flex-1 cursor-pointer font-medium">
+                          <Label
+                            htmlFor="pix"
+                            className="flex-1 cursor-pointer font-medium"
+                          >
                             📱 PIX
-                            <span className="block text-xs text-green-600 mt-1">5% de desconto no PIX!</span>
+                            <span className="block text-xs text-green-600 mt-1">
+                              5% de desconto no PIX!
+                            </span>
                           </Label>
                         </div>
                       </CardContent>
@@ -281,9 +331,14 @@ export default function Layout5Checkout() {
                       <CardContent className="p-4">
                         <div className="flex items-center space-x-3">
                           <RadioGroupItem value="boleto" id="boleto" />
-                          <Label htmlFor="boleto" className="flex-1 cursor-pointer font-medium">
+                          <Label
+                            htmlFor="boleto"
+                            className="flex-1 cursor-pointer font-medium"
+                          >
                             🧾 Boleto Bancário
-                            <span className="block text-xs text-gray-500 mt-1">Vencimento em 3 dias úteis</span>
+                            <span className="block text-xs text-gray-500 mt-1">
+                              Vencimento em 3 dias úteis
+                            </span>
                           </Label>
                         </div>
                       </CardContent>
@@ -371,13 +426,18 @@ export default function Layout5Checkout() {
                   </h2>
 
                   <p className="text-gray-600 mb-6 text-lg">
-                    Obrigada por comprar na Doce Encanto! 💕<br />
+                    Obrigada por comprar na Doce Encanto! 💕
+                    <br />
                     Seu pedido será preparado com muito carinho!
                   </p>
 
                   <div className="bg-pink-50 rounded-2xl p-6 mb-6 border-2 border-pink-200">
-                    <p className="text-sm text-gray-600 mb-2">Número do Pedido</p>
-                    <p className="text-2xl font-bold text-pink-500">#DE-{Math.floor(Math.random() * 10000)}</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Número do Pedido
+                    </p>
+                    <p className="text-2xl font-bold text-pink-500">
+                      {orderNumber}
+                    </p>
                   </div>
 
                   <div className="space-y-3 text-left bg-purple-50 rounded-2xl p-6 mb-6 border-2 border-purple-200">
@@ -399,7 +459,9 @@ export default function Layout5Checkout() {
                       <div className="text-2xl">💌</div>
                       <div>
                         <p className="font-medium">Acompanhamento</p>
-                        <p className="text-sm text-gray-600">Enviamos o código de rastreio por e-mail</p>
+                        <p className="text-sm text-gray-600">
+                          Enviamos o código de rastreio por e-mail
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -408,7 +470,9 @@ export default function Layout5Checkout() {
                     asChild
                     className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white rounded-full py-6 shadow-lg text-lg"
                   >
-                    <Link href="/minha-loja/layout-5">Continuar Comprando 🛍️</Link>
+                    <Link href="/minha-loja/layout-5">
+                      Continuar Comprando 🛍️
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
@@ -430,21 +494,33 @@ export default function Layout5Checkout() {
 
                 <div className="space-y-4 mb-6">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-4 p-3 bg-pink-50 rounded-2xl border border-pink-100">
+                    <div
+                      key={item.id}
+                      className="flex gap-4 p-3 bg-pink-50 rounded-2xl border border-pink-100"
+                    >
                       <div className="relative">
-                        <img
+                        <Image
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           className="w-16 h-16 rounded-xl object-cover border-2 border-white shadow-md"
+                          layout="responsive"
+                          width={500}
+                          height={300}
                         />
                         <div className="absolute -bottom-1 -right-1 text-xl bg-white rounded-full p-1 shadow-md">
                           {item.icon}
                         </div>
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium text-sm mb-1">{item.name}</h4>
-                        <p className="text-xs text-gray-500 mb-2">Qtd: {item.quantity}</p>
-                        <p className="font-bold text-pink-500">R$ {(item.price * item.quantity).toFixed(2)}</p>
+                        <h4 className="font-medium text-sm mb-1">
+                          {item.name}
+                        </h4>
+                        <p className="text-xs text-gray-500 mb-2">
+                          Qtd: {item.quantity}
+                        </p>
+                        <p className="font-bold text-pink-500">
+                          R$ {(item.price * item.quantity).toFixed(2)}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -455,11 +531,15 @@ export default function Layout5Checkout() {
                 <div className="space-y-3 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Subtotal</span>
-                    <span className="font-medium">R$ {subtotal.toFixed(2)}</span>
+                    <span className="font-medium">
+                      R$ {subtotal.toFixed(2)}
+                    </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Frete</span>
-                    <span className="font-medium">R$ {shipping.toFixed(2)}</span>
+                    <span className="font-medium">
+                      R$ {shipping.toFixed(2)}
+                    </span>
                   </div>
                   <Separator />
                   <div className="flex justify-between">
@@ -474,8 +554,12 @@ export default function Layout5Checkout() {
                   <div className="flex items-start gap-3">
                     <Heart className="h-5 w-5 text-pink-500 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-sm mb-1">Pagamento 100% Seguro</p>
-                      <p className="text-xs text-gray-600">Seus dados estão protegidos e criptografados</p>
+                      <p className="font-medium text-sm mb-1">
+                        Pagamento 100% Seguro
+                      </p>
+                      <p className="text-xs text-gray-600">
+                        Seus dados estão protegidos e criptografados
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -485,5 +569,5 @@ export default function Layout5Checkout() {
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,22 +1,38 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Separator } from "@/components/ui/separator"
-import { Badge } from "@/components/ui/badge"
-import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle, Minus, Plus, X } from "lucide-react"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import {
+  ArrowLeft,
+  CreditCard,
+  Truck,
+  Shield,
+  CheckCircle,
+  Minus,
+  Plus,
+  X,
+} from "lucide-react";
+import Image from "next/image";
 
 export default function Layout2CheckoutPage() {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(1);
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({
     "1": 1,
     "2": 1,
     "3": 1,
-  })
+  });
 
   const produtos = [
     {
@@ -43,26 +59,29 @@ export default function Layout2CheckoutPage() {
       cor: "Preto",
       tamanho: "44mm",
     },
-  ]
+  ];
 
-  const subtotal = produtos.reduce((acc, produto) => acc + produto.preco * quantities[produto.id], 0)
-  const frete = 0 // Frete grátis para eletrônicos
-  const total = subtotal + frete
+  const subtotal = produtos.reduce(
+    (acc, produto) => acc + produto.preco * quantities[produto.id],
+    0
+  );
+  const frete = 0; // Frete grátis para eletrônicos
+  const total = subtotal + frete;
 
   const updateQuantity = (id: string, change: number) => {
     setQuantities((prev) => ({
       ...prev,
       [id]: Math.max(1, prev[id] + change),
-    }))
-  }
+    }));
+  };
 
   const removeItem = (id: string) => {
     setQuantities((prev) => {
-      const newQuantities = { ...prev }
-      delete newQuantities[id]
-      return newQuantities
-    })
-  }
+      const newQuantities = { ...prev };
+      delete newQuantities[id];
+      return newQuantities;
+    });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -70,7 +89,10 @@ export default function Layout2CheckoutPage() {
       <header className="bg-white border-b border-gray-100">
         <div className="container mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
-            <Link href="/layout-2" className="flex items-center gap-3 text-gray-600 hover:text-black transition-colors">
+            <Link
+              href="/layout-2"
+              className="flex items-center gap-3 text-gray-600 hover:text-black transition-colors"
+            >
               <ArrowLeft className="h-5 w-5" />
               <span className="font-light">TECH STORE</span>
             </Link>
@@ -90,25 +112,57 @@ export default function Layout2CheckoutPage() {
             {/* Progress Minimalista */}
             <div className="flex items-center justify-center mb-12">
               <div className="flex items-center space-x-8">
-                <div className={`flex flex-col items-center ${step >= 1 ? "text-black" : "text-gray-300"}`}>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 1 ? "text-black" : "text-gray-300"
+                  }`}
+                >
                   <div
-                    className={`w-2 h-2 rounded-full mb-2 ${step >= 1 ? "bg-black" : "bg-gray-300"} transition-colors`}
+                    className={`w-2 h-2 rounded-full mb-2 ${
+                      step >= 1 ? "bg-black" : "bg-gray-300"
+                    } transition-colors`}
                   ></div>
-                  <span className="text-xs font-light tracking-wide">SHIPPING</span>
+                  <span className="text-xs font-light tracking-wide">
+                    SHIPPING
+                  </span>
                 </div>
-                <div className={`w-16 h-px ${step >= 2 ? "bg-black" : "bg-gray-200"} transition-colors`}></div>
-                <div className={`flex flex-col items-center ${step >= 2 ? "text-black" : "text-gray-300"}`}>
+                <div
+                  className={`w-16 h-px ${
+                    step >= 2 ? "bg-black" : "bg-gray-200"
+                  } transition-colors`}
+                ></div>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 2 ? "text-black" : "text-gray-300"
+                  }`}
+                >
                   <div
-                    className={`w-2 h-2 rounded-full mb-2 ${step >= 2 ? "bg-black" : "bg-gray-300"} transition-colors`}
+                    className={`w-2 h-2 rounded-full mb-2 ${
+                      step >= 2 ? "bg-black" : "bg-gray-300"
+                    } transition-colors`}
                   ></div>
-                  <span className="text-xs font-light tracking-wide">PAYMENT</span>
+                  <span className="text-xs font-light tracking-wide">
+                    PAYMENT
+                  </span>
                 </div>
-                <div className={`w-16 h-px ${step >= 3 ? "bg-black" : "bg-gray-200"} transition-colors`}></div>
-                <div className={`flex flex-col items-center ${step >= 3 ? "text-black" : "text-gray-300"}`}>
+                <div
+                  className={`w-16 h-px ${
+                    step >= 3 ? "bg-black" : "bg-gray-200"
+                  } transition-colors`}
+                ></div>
+                <div
+                  className={`flex flex-col items-center ${
+                    step >= 3 ? "text-black" : "text-gray-300"
+                  }`}
+                >
                   <div
-                    className={`w-2 h-2 rounded-full mb-2 ${step >= 3 ? "bg-black" : "bg-gray-300"} transition-colors`}
+                    className={`w-2 h-2 rounded-full mb-2 ${
+                      step >= 3 ? "bg-black" : "bg-gray-300"
+                    } transition-colors`}
                   ></div>
-                  <span className="text-xs font-light tracking-wide">CONFIRM</span>
+                  <span className="text-xs font-light tracking-wide">
+                    CONFIRM
+                  </span>
                 </div>
               </div>
             </div>
@@ -117,11 +171,16 @@ export default function Layout2CheckoutPage() {
             {step === 1 && (
               <div className="space-y-8">
                 <div>
-                  <h2 className="text-3xl font-light mb-8">Shipping Information</h2>
+                  <h2 className="text-3xl font-light mb-8">
+                    Shipping Information
+                  </h2>
                   <div className="space-y-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="firstName" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="firstName"
+                          className="text-sm font-light text-gray-600"
+                        >
                           First Name
                         </Label>
                         <Input
@@ -131,7 +190,10 @@ export default function Layout2CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="lastName" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="lastName"
+                          className="text-sm font-light text-gray-600"
+                        >
                           Last Name
                         </Label>
                         <Input
@@ -142,7 +204,10 @@ export default function Layout2CheckoutPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="email" className="text-sm font-light text-gray-600">
+                      <Label
+                        htmlFor="email"
+                        className="text-sm font-light text-gray-600"
+                      >
                         Email Address
                       </Label>
                       <Input
@@ -153,7 +218,10 @@ export default function Layout2CheckoutPage() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="address" className="text-sm font-light text-gray-600">
+                      <Label
+                        htmlFor="address"
+                        className="text-sm font-light text-gray-600"
+                      >
                         Address
                       </Label>
                       <Input
@@ -164,7 +232,10 @@ export default function Layout2CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
-                        <Label htmlFor="city" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="city"
+                          className="text-sm font-light text-gray-600"
+                        >
                           City
                         </Label>
                         <Input
@@ -174,7 +245,10 @@ export default function Layout2CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="state" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="state"
+                          className="text-sm font-light text-gray-600"
+                        >
                           State
                         </Label>
                         <Select>
@@ -189,7 +263,10 @@ export default function Layout2CheckoutPage() {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="zip" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="zip"
+                          className="text-sm font-light text-gray-600"
+                        >
                           ZIP Code
                         </Label>
                         <Input
@@ -223,7 +300,9 @@ export default function Layout2CheckoutPage() {
                     </div>
                     <div className="border border-gray-200 p-6 cursor-pointer hover:border-gray-400 transition-colors">
                       <div className="w-6 h-6 bg-green-600 rounded mb-3 flex items-center justify-center">
-                        <span className="text-white text-xs font-bold">PIX</span>
+                        <span className="text-white text-xs font-bold">
+                          PIX
+                        </span>
                       </div>
                       <p className="font-light">PIX</p>
                       <p className="text-xs text-gray-500">Instant payment</p>
@@ -237,7 +316,10 @@ export default function Layout2CheckoutPage() {
 
                   <div className="space-y-6">
                     <div>
-                      <Label htmlFor="cardNumber" className="text-sm font-light text-gray-600">
+                      <Label
+                        htmlFor="cardNumber"
+                        className="text-sm font-light text-gray-600"
+                      >
                         Card Number
                       </Label>
                       <Input
@@ -248,7 +330,10 @@ export default function Layout2CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-6">
                       <div>
-                        <Label htmlFor="expiry" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="expiry"
+                          className="text-sm font-light text-gray-600"
+                        >
                           Expiry Date
                         </Label>
                         <Input
@@ -258,7 +343,10 @@ export default function Layout2CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="cvv" className="text-sm font-light text-gray-600">
+                        <Label
+                          htmlFor="cvv"
+                          className="text-sm font-light text-gray-600"
+                        >
                           CVV
                         </Label>
                         <Input
@@ -269,7 +357,10 @@ export default function Layout2CheckoutPage() {
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="cardName" className="text-sm font-light text-gray-600">
+                      <Label
+                        htmlFor="cardName"
+                        className="text-sm font-light text-gray-600"
+                      >
                         Cardholder Name
                       </Label>
                       <Input
@@ -303,14 +394,21 @@ export default function Layout2CheckoutPage() {
               <div className="text-center py-12">
                 <CheckCircle className="h-16 w-16 text-black mx-auto mb-6" />
                 <h2 className="text-4xl font-light mb-4">Order Confirmed</h2>
-                <p className="text-gray-600 font-light mb-6">Your order #TEC-12345 has been placed successfully.</p>
-                <Badge className="bg-gray-100 text-gray-800 mb-8 font-light">Payment Processed</Badge>
+                <p className="text-gray-600 font-light mb-6">
+                  Your order #TEC-12345 has been placed successfully.
+                </p>
+                <Badge className="bg-gray-100 text-gray-800 mb-8 font-light">
+                  Payment Processed
+                </Badge>
                 <div className="space-y-2 text-sm text-gray-600 font-light mb-8">
                   <p>You will receive a confirmation email shortly.</p>
                   <p>Estimated delivery: 1-2 business days</p>
                 </div>
                 <div className="flex gap-4 max-w-md mx-auto">
-                  <Button variant="outline" className="flex-1 rounded-none font-light tracking-wide bg-transparent">
+                  <Button
+                    variant="outline"
+                    className="flex-1 rounded-none font-light tracking-wide bg-transparent"
+                  >
                     TRACK ORDER
                   </Button>
                   <Link href="/layout-2" className="flex-1">
@@ -326,23 +424,32 @@ export default function Layout2CheckoutPage() {
           {/* Order Summary */}
           <div className="lg:col-span-2">
             <div className="bg-white p-8 sticky top-4">
-              <h3 className="text-xl font-light mb-6 tracking-wide">Order Summary</h3>
+              <h3 className="text-xl font-light mb-6 tracking-wide">
+                Order Summary
+              </h3>
               <div className="space-y-6">
                 {produtos
                   .filter((produto) => quantities[produto.id])
                   .map((produto) => (
-                    <div key={produto.id} className="flex items-center gap-4 pb-6 border-b border-gray-100">
+                    <div
+                      key={produto.id}
+                      className="flex items-center gap-4 pb-6 border-b border-gray-100"
+                    >
                       <div className="relative">
-                        <img
+                        <Image
                           src={produto.imagem || "/placeholder.svg"}
                           alt={produto.nome}
                           className="w-20 h-20 object-cover bg-gray-50"
+                          layout="responsive"
+                          width={500}
+                          height={300}
                         />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-light">{produto.nome}</h4>
                         <p className="text-sm text-gray-500 font-light">
-                          {produto.cor} • {produto.memoria || produto.modelo || produto.tamanho}
+                          {produto.cor} •{" "}
+                          {produto.memoria || produto.modelo || produto.tamanho}
                         </p>
                         <div className="flex items-center gap-3 mt-2">
                           <Button
@@ -353,7 +460,9 @@ export default function Layout2CheckoutPage() {
                           >
                             <Minus className="h-3 w-3" />
                           </Button>
-                          <span className="text-sm font-light">{quantities[produto.id]}</span>
+                          <span className="text-sm font-light">
+                            {quantities[produto.id]}
+                          </span>
                           <Button
                             variant="ghost"
                             size="sm"
@@ -373,7 +482,10 @@ export default function Layout2CheckoutPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-light">R$ {(produto.preco * quantities[produto.id]).toFixed(2)}</p>
+                        <p className="font-light">
+                          R${" "}
+                          {(produto.preco * quantities[produto.id]).toFixed(2)}
+                        </p>
                       </div>
                     </div>
                   ))}
@@ -402,7 +514,9 @@ export default function Layout2CheckoutPage() {
                     <Shield className="h-4 w-4" />
                     <span>Secure Checkout</span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1 font-light">Your payment information is encrypted</p>
+                  <p className="text-xs text-gray-500 mt-1 font-light">
+                    Your payment information is encrypted
+                  </p>
                 </div>
               </div>
             </div>
@@ -410,5 +524,5 @@ export default function Layout2CheckoutPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }
