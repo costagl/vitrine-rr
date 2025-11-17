@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import Navbar from "@/components/navbar"
-import Image from 'next/image'
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/navbar";
+import Image from "next/image";
 import {
   Search,
   Filter,
@@ -14,10 +14,10 @@ import {
   MapPin,
   Users,
 } from "lucide-react";
+import { CategoryService } from "@/services/category-service";
+import type { CategoryStore } from "@/types/category";
 
 // CONTROLE DE SIMULAÇÃO
-const ENABLE_SIMULATION = false;
-
 interface Store {
   id: string;
   nome: string;
@@ -35,226 +35,38 @@ interface Store {
   criadaEm: string;
 }
 
-const categorias = [
-  "Todas as Categorias",
-  "Roupas e Moda",
-  "Eletrônicos",
-  "Beleza e Cuidados Pessoais",
-  "Casa e Decoração",
-  "Esportes e Lazer",
-  "Brinquedos e Jogos",
-  "Alimentos e Bebidas",
-  "Livros",
-  "Papelaria e Escritório",
-  "Pet Shop",
-  "Saúde e Bem-Estar",
-];
-
-// Dados simulados de lojas
-const lojasMock: Store[] = [
-  {
-    id: "1",
-    nome: "Moda Elegante",
-    categoria: "Roupas e Moda",
-    subdomain: "moda-elegante",
-    descricao:
-      "Roupas femininas e masculinas com estilo e qualidade. Tendências da moda nacional e internacional.",
-    rating: 4.8,
-    totalAvaliacoes: 127,
-    cidade: "São Paulo",
-    estado: "SP",
-    totalProdutos: 245,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-01-15",
-  },
-  {
-    id: "2",
-    nome: "TechWorld",
-    categoria: "Eletrônicos",
-    subdomain: "techworld",
-    descricao:
-      "Os melhores produtos eletrônicos com preços competitivos. Smartphones, notebooks, acessórios e muito mais.",
-    rating: 4.6,
-    totalAvaliacoes: 89,
-    cidade: "Rio de Janeiro",
-    estado: "RJ",
-    totalProdutos: 156,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-02-20",
-  },
-  {
-    id: "3",
-    nome: "Beleza Natural",
-    categoria: "Beleza e Cuidados Pessoais",
-    subdomain: "beleza-natural",
-    descricao:
-      "Produtos de beleza e cuidados pessoais com ingredientes naturais. Cosméticos, perfumes e tratamentos.",
-    rating: 4.9,
-    totalAvaliacoes: 203,
-    cidade: "Belo Horizonte",
-    estado: "MG",
-    totalProdutos: 189,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-03-10",
-  },
-  {
-    id: "4",
-    nome: "Casa & Estilo",
-    categoria: "Casa e Decoração",
-    subdomain: "casa-estilo",
-    descricao:
-      "Móveis, decoração e utensílios para deixar sua casa ainda mais bonita e funcional.",
-    rating: 4.5,
-    totalAvaliacoes: 76,
-    cidade: "Curitiba",
-    estado: "PR",
-    totalProdutos: 312,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-01-28",
-  },
-  {
-    id: "5",
-    nome: "Esporte Total",
-    categoria: "Esportes e Lazer",
-    subdomain: "esporte-total",
-    descricao:
-      "Equipamentos esportivos, roupas fitness e acessórios para todos os tipos de esporte e atividade física.",
-    rating: 4.7,
-    totalAvaliacoes: 154,
-    cidade: "Porto Alegre",
-    estado: "RS",
-    totalProdutos: 278,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-02-14",
-  },
-  {
-    id: "6",
-    nome: "Mundo dos Brinquedos",
-    categoria: "Brinquedos e Jogos",
-    subdomain: "mundo-brinquedos",
-    descricao:
-      "Brinquedos educativos, jogos e diversão para crianças de todas as idades. Qualidade e segurança garantidas.",
-    rating: 4.8,
-    totalAvaliacoes: 92,
-    cidade: "Salvador",
-    estado: "BA",
-    totalProdutos: 167,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-03-05",
-  },
-  {
-    id: "7",
-    nome: "Sabores & Delícias",
-    categoria: "Alimentos e Bebidas",
-    subdomain: "sabores-delicias",
-    descricao:
-      "Produtos gourmet, bebidas especiais e alimentos selecionados para os paladares mais exigentes.",
-    rating: 4.6,
-    totalAvaliacoes: 118,
-    cidade: "Fortaleza",
-    estado: "CE",
-    totalProdutos: 134,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-01-22",
-  },
-  {
-    id: "8",
-    nome: "Livraria Conhecimento",
-    categoria: "Livros",
-    subdomain: "livraria-conhecimento",
-    descricao:
-      "Livros de todos os gêneros, literatura nacional e internacional, livros técnicos e educacionais.",
-    rating: 4.9,
-    totalAvaliacoes: 167,
-    cidade: "Brasília",
-    estado: "DF",
-    totalProdutos: 892,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-02-08",
-  },
-  {
-    id: "9",
-    nome: "Papelaria Criativa",
-    categoria: "Papelaria e Escritório",
-    subdomain: "papelaria-criativa",
-    descricao:
-      "Material escolar, produtos de escritório e artigos criativos para estudantes e profissionais.",
-    rating: 4.4,
-    totalAvaliacoes: 83,
-    cidade: "Recife",
-    estado: "PE",
-    totalProdutos: 456,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-03-12",
-  },
-  {
-    id: "10",
-    nome: "Pet Amigo",
-    categoria: "Pet Shop",
-    subdomain: "pet-amigo",
-    descricao:
-      "Tudo para seu pet: ração, brinquedos, acessórios e produtos de higiene para cães, gatos e outros animais.",
-    rating: 4.7,
-    totalAvaliacoes: 145,
-    cidade: "Goiânia",
-    estado: "GO",
-    totalProdutos: 223,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-01-30",
-  },
-  {
-    id: "11",
-    nome: "Vida Saudável",
-    categoria: "Saúde e Bem-Estar",
-    subdomain: "vida-saudavel",
-    descricao:
-      "Suplementos, produtos naturais e equipamentos para uma vida mais saudável e equilibrada.",
-    rating: 4.5,
-    totalAvaliacoes: 98,
-    cidade: "Florianópolis",
-    estado: "SC",
-    totalProdutos: 187,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-02-25",
-  },
-  {
-    id: "12",
-    nome: "Fashion Kids",
-    categoria: "Roupas e Moda",
-    subdomain: "fashion-kids",
-    descricao:
-      "Moda infantil com estilo e conforto. Roupas para bebês, crianças e adolescentes.",
-    rating: 4.8,
-    totalAvaliacoes: 112,
-    cidade: "Campinas",
-    estado: "SP",
-    totalProdutos: 198,
-    imagemCapa: "/placeholder.svg?height=200&width=300",
-    isActive: true,
-    criadaEm: "2023-03-01",
-  },
-];
-
 export default function CatalogoPage() {
-  const [lojas, setLojas] = useState<Store[]>(ENABLE_SIMULATION ? lojasMock : []);
-  const [lojasFiltradas, setLojasFiltradas] = useState<Store[]>(ENABLE_SIMULATION ? lojasMock : []);
+  const [lojas, setLojas] = useState<Store[]>([]);
+  const [lojasFiltradas, setLojasFiltradas] = useState<Store[]>([]);
   const [categoriaFiltro, setCategoriaFiltro] = useState("Todas as Categorias");
   const [termoBusca, setTermoBusca] = useState("");
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
-useEffect(() => {
-  if (!ENABLE_SIMULATION) {
+  // Buscar categorias da API ao montar o componente
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categorias: CategoryStore[] =
+          await CategoryService.listarCategorias(); // Espera a resposta da API
+        const formattedCategories = categorias.map((category) => ({
+          value: category.id.toString(),
+          label: category.titulo,
+        }));
+        setCategoryOptions(formattedCategories); // Atualiza o estado com os dados formatados
+      } catch (error) {
+        console.error("Erro ao buscar categorias:", error);
+      }
+    };
+
+    fetchCategories(); // Chama a função para buscar as categorias
+  }, []);
+
+  // TODO: Padronizar fetch
+  // Buscar lojas da API ao montar o componente
+  useEffect(() => {
     fetch("https://localhost:7083/lojas", {
       method: "GET",
       headers: {
@@ -274,32 +86,33 @@ useEffect(() => {
           categoria: loja.categoriaLoja,
           subdomain: loja.subdominio,
           logotipo: loja.logotipo,
-          descricao: "Descrição não disponível",
+          descricao: loja.descricao || "Descrição não disponível",
           rating: loja.avaliacao || 5,
-          totalAvaliacoes: 5,
-          cidade: "Resende",
-          estado: "RJ",
-          totalProdutos: 20,
-          imagemCapa: "/placeholder.svg?height=200&width=300",
-          isActive: true,
-          criadaEm: "2023-01-01",
+          totalAvaliacoes: loja.totalAvaliacoes || 5,
+          cidade: loja.cidade || "Resende",
+          estado: loja.estado || "RJ",
+          totalProdutos: loja.totalProdutos || 20,
+          imagemCapa: loja.logotipo || "/placeholder.svg?height=200&width=300",
+          ativo: loja.ativo || true,
+          criadaEm: loja.dataCriacao || "2025-01-01",
         }));
 
-        setLojas(lojasData); // Set lojas data only once after fetch
+        setLojas(lojasData);
       })
       .catch((error) => {
-        console.error("Erro ao listar lojas:", error); // Trata erros
+        console.error("Erro ao listar lojas:", error);
       });
-  }
-}, []); // Dependência vazia para rodar apenas uma vez ao montar o componente
+  }, []);
 
- useEffect(() => {
+  useEffect(() => {
     const filtrarLojas = async () => {
       let resultado = lojas;
 
       // Filtrar por categoria
       if (categoriaFiltro !== "Todas as Categorias") {
-        resultado = resultado.filter((loja) => loja.categoria === categoriaFiltro);
+        resultado = resultado.filter(
+          (loja) => loja.categoria === categoriaFiltro
+        );
       }
 
       // Filtrar por termo de busca
@@ -325,14 +138,6 @@ useEffect(() => {
 
   const abrirLoja = (subdomain: string) => {
     const lojaUrl = `https://${subdomain}.vitrine.com.br`;
-
-    if (ENABLE_SIMULATION) {
-      // Modo simulação - mostra alert
-      alert(`Abrindo loja: ${lojaUrl}`);
-    } else {
-      // Modo real - apenas abre a URL
-      window.open(lojaUrl, "_blank");
-    }
   };
 
   const renderStars = (rating: number) => {
@@ -359,19 +164,6 @@ useEffect(() => {
             Descubra lojas incríveis e encontre exatamente o que você procura
           </p>
         </div>
-
-        {/* Indicador de Simulação */}
-        {ENABLE_SIMULATION && (
-          <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded-lg mb-6">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium">
-                Modo Simulação Ativo - Os links das lojas mostrarão alertas em
-                vez de abrir as páginas reais
-              </span>
-            </div>
-          </div>
-        )}
 
         {/* Barra de Busca e Filtros */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
@@ -406,17 +198,17 @@ useEffect(() => {
               Filtrar por categoria:
             </p>
             <div className="flex flex-wrap gap-2">
-              {categorias.map((categoria) => (
+              {categoryOptions.map((categoria) => (
                 <Button
-                  key={categoria}
+                  key={categoria.value}
                   variant={
-                    categoriaFiltro === categoria ? "default" : "outline"
+                    categoriaFiltro === categoria.label ? "default" : "outline"
                   }
                   size="sm"
-                  onClick={() => setCategoriaFiltro(categoria)}
+                  onClick={() => setCategoriaFiltro(categoria.label)}
                   className="text-xs"
                 >
-                  {categoria}
+                  {categoria.label}
                 </Button>
               ))}
             </div>
@@ -436,7 +228,7 @@ useEffect(() => {
         </div>
 
         {/* Grid de Lojas */}
-        {!ENABLE_SIMULATION && lojasFiltradas.length > 0 ? (
+        {lojasFiltradas.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {lojasFiltradas.map((loja) => (
               <div
@@ -449,7 +241,7 @@ useEffect(() => {
                     src={loja.logotipo || "/placeholder.svg"}
                     alt={loja.nome}
                     className="w-full h-48 object-cover"
-                    layout="responsive" 
+                    layout="responsive"
                     width={500}
                     height={300}
                   />
@@ -488,8 +280,8 @@ useEffect(() => {
                       <span>{loja.totalProdutos} produtos</span>
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500">
-                      <span>{loja.rating}</span>
-                      <span>({loja.totalAvaliacoes} avaliações)</span>
+                      <Star className="h-4 w-4" />
+                      <span>&nbsp;{loja.totalAvaliacoes} avaliações</span>
                     </div>
                   </div>
 
@@ -535,44 +327,6 @@ useEffect(() => {
             >
               Limpar Filtros
             </Button>
-          </div>
-        )}
-
-        {/* Estatísticas do Catálogo */}
-        {ENABLE_SIMULATION && (
-          <div className="mt-12 bg-white p-6 rounded-lg shadow-md">
-            <h2 className="text-xl font-semibold mb-4">
-              Estatísticas do Catálogo
-            </h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {lojas.length}
-                </p>
-                <p className="text-sm text-gray-500">Total de Lojas</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {categorias.length - 1}
-                </p>
-                <p className="text-sm text-gray-500">Categorias</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {lojas.reduce((total, loja) => total + loja.totalProdutos, 0)}
-                </p>
-                <p className="text-sm text-gray-500">Total de Produtos</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-primary">
-                  {(
-                    lojas.reduce((total, loja) => total + loja.rating, 0) /
-                    lojas.length
-                  ).toFixed(1)}
-                </p>
-                <p className="text-sm text-gray-500">Avaliação Média</p>
-              </div>
-            </div>
           </div>
         )}
       </div>

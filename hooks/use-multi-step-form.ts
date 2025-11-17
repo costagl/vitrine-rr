@@ -117,7 +117,7 @@ export function useMultiStepForm() {
         dataNascimento: formatDateToDDMMYYYY(formData.dataNascimento),
         nomeLoja: formData.nomeLoja,
         subdominio: formData.subdominio,
-        IdCategoriaLoja: formData.categoriaLoja,
+        idCategoriaLoja: formData.categoriaLoja,
         email: formData.email,
         senha: formData.senha,
         confirmarSenha: formData.confirmarSenha,

@@ -63,7 +63,7 @@ export default function MinhaLojaPage() {
           <div>
             <h1 className="text-3xl font-bold">Minha Loja</h1>
             {user?.loja && (
-              <p className="text-gray-600 mt-1">Bem-vindo à {user.loja.nome}</p>
+              <p className="text-gray-600 mt-1">Bem-vindo à {user.loja.nomeLoja}</p>
             )}
           </div>
 
@@ -98,7 +98,7 @@ export default function MinhaLojaPage() {
                     Nome da Loja
                   </p>
                   <p className="text-lg font-semibold text-gray-900">
-                    {user.loja.nome}
+                    {user.loja.nomeLoja}
                   </p>
                 </div>
 

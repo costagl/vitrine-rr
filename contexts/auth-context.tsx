@@ -11,16 +11,22 @@ import { AuthService } from "@/services/auth-service";
 import { getApiUrl } from "@/config/api-url";
 import type { LoginResponse } from "@/types/api";
 
-// Definindo o tipo para o usuário
 interface User {
   id: string;
   nome: string;
   email: string;
+  cpfCnpj: string;          
+  telefone?: string;        
+  dataNascimento?: string;  
   loja?: {
     id: string;
-    nome: string;
-    categoria: string;
+    nomeLoja: string;       
+    idCategoria: number;
+    categoria: string;    
     subdominio: string;
+    descricao?: string;     
+    avaliacao?: number;     
+    logo?: string;          
   };
 }
 
@@ -96,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const healthUrl = getApiUrl("usuario/health");
 
-        const resposta = await fetch(healthUrl, {
+        const response = await fetch(healthUrl, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -104,10 +110,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           signal: AbortSignal.timeout(5000),
         });
 
-        if (resposta.ok) {
+        if (response.ok) {
           console.log("✅ API funcionando!");
         } else {
-          console.log("❌ API respondeu com erro:", resposta.status);
+          console.log("❌ API respondeu com erro:", response.status);
         }
       } catch (error) {
         console.log("❌ Erro ao conectar com a API:", (error as Error).message);
@@ -117,13 +123,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     testarAPI();
   }, []);
 
+  // Função de login
   const login = (
     newToken: string,
     newRefreshToken: string | undefined,
     userData: LoginResponse["user"]
   ) => {
-    manageLocalStorage("set", "token", newToken);
-    manageLocalStorage("set", "user", userData);
+    manageLocalStorage("set", "token", newToken); // Armazena o token no localStorage
+    manageLocalStorage("set", "user", userData); // Armazena os dados do usuário no localStorage
 
     if (newRefreshToken) {
       manageLocalStorage("set", "refreshToken", newRefreshToken);
