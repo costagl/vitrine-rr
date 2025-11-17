@@ -21,7 +21,7 @@ export const API_ENDPOINTS = {
     VERIFY_EMAIL: "/usuario/verificar-email",
     FORGOT_PASSWORD: "/usuario/esqueci-senha",
     RESET_PASSWORD: "/usuario/redefinir-senha",
-    
+    VALIDATE_CPF_CNPJ: "/usuario/validar-cpf-cnpj",
   },
   USER: {
     PROFILE: "/usuario/perfil",
@@ -43,11 +43,14 @@ export const API_ENDPOINTS = {
   PRODUTO: {
     CADASTRAR: "/produto/cadastrar",
     LISTAR: "/produto/listar",
-    LISTAR_CATEGORIA: "/produto/listar-categoria",
     LISTAR_POR_ID: (id: string) => `/produto/listar/${id}`,
     ALTERAR: (id: string) => `/produto/alterar/${id}`,
     EXCLUIR: (id: string) => `/produto/excluir/${id}`,
   },
+  CATEGORIA: {
+    LISTAR_LOJA: "/categoria/loja",
+    LISTAR_PRODUTO: "/categoria/produto"
+  }
 } as const
 
 // Re-exporta funções úteis

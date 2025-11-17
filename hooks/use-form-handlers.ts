@@ -1,6 +1,6 @@
 import type React from "react"
 import type { FormData, FormErrors } from "@/types/form"
-import { formatCPF, formatCNPJ, formatPhoneNumber } from "@/utils/formatters"
+import { formatCPFOrCNPJ, formatPhoneNumber } from "@/utils/formatters"
 // import { generateSubdomainFromStoreName } from "@/utils/subdomain-utils"
 
 export function useFormHandlers(
@@ -26,18 +26,11 @@ export function useFormHandlers(
     // }
   }
 
-  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCPF(e.target.value)
-    setFormData((prev) => ({ ...prev, cpf: formattedValue }))
-    setErrors((prev) => ({ ...prev, cpf: "" }))
+  const handleCPFOrCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formattedValue = formatCPFOrCNPJ(e.target.value)
+    setFormData((prev) => ({ ...prev, cpf_cnpj: formattedValue }))
+    setErrors((prev) => ({ ...prev, cpf_cnpj: "" }))
   }
-
-  const handleCNPJChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formattedValue = formatCNPJ(e.target.value)
-    setFormData((prev) => ({ ...prev, cnpj: formattedValue }))
-    setErrors((prev) => ({ ...prev, cnpj: "" }))
-  }
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatPhoneNumber(e.target.value)
     setFormData((prev) => ({ ...prev, celular: formattedValue }))
@@ -51,8 +44,7 @@ export function useFormHandlers(
 
   return {
     handleChange,
-    handleCPFChange,
-    handleCNPJChange,
+    handleCPFOrCNPJChange,
     handlePhoneChange,
     handleSelectChange,
   }

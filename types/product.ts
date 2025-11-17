@@ -1,5 +1,3 @@
-// Tipos para produtos baseados na model do backend
-
 export interface Product {
   id: number
   titulo: string

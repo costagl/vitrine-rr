@@ -8,20 +8,20 @@ export function StepPersonalInfo({
   errors,
   attempted,
   onChange,
-  onCPFChange,
+  onCPFOrCNPJChange,
   onPhoneChange,
 }: StepProps) {
   return (
     <div className="w-full flex-shrink-0 p-6">
       <form className="space-y-4">
         <FormInput
-          id="cpf"
-          name="cpf"
-          label="CPF"
+          id="cpf_cnpj"
+          name="cpf_cnpj"
+          label="CPF ou CNPJ"
           placeholder="000.000.000-00"
-          value={formData.cpf}
-          onChange={onCPFChange}
-          error={errors.cpf}
+          value={formData.cpf_cnpj}
+          onChange={onCPFOrCNPJChange}
+          error={errors.cpf_cnpj}
           attempted={attempted}
           required
         />

@@ -16,11 +16,10 @@ import { RegisterRequest } from "@/types/api";
 import { ApiError } from "@/utils/api-client";
 
 const initialFormData: FormData = {
-  cpf: "",
+  cpf_cnpj: "",
   nome: "",
   celular: "",
   dataNascimento: "",
-  cnpj: "",
   nomeLoja: "",
   subdominio: "",
   categoriaLoja: "",
@@ -49,7 +48,7 @@ export function useMultiStepForm() {
     let stepErrors: FormErrors = {};
 
     if (step === 1) {
-      stepErrors = validateSlide1(formData);
+      stepErrors = await validateSlide1(formData);
     } else if (step === 2) {
       stepErrors = await validateSlide2(formData);
     } else if (step === 3) {
@@ -112,11 +111,10 @@ export function useMultiStepForm() {
 
     try {
       const registerData: RegisterRequest = {
-        cpf: formData.cpf.replace(/\D/g, ""),
+        cpf_cnpj: formData.cpf_cnpj.replace(/\D/g, ""),
         nome: formData.nome,
         telefone: formData.celular.replace(/\D/g, ""),
         dataNascimento: formatDateToDDMMYYYY(formData.dataNascimento),
-        cnpj: formData.cnpj ? formData.cnpj.replace(/\D/g, "") : undefined,
         nomeLoja: formData.nomeLoja,
         subdominio: formData.subdominio,
         IdCategoriaLoja: formData.categoriaLoja,
@@ -131,13 +129,13 @@ export function useMultiStepForm() {
       toast({
         title: "Cadastro realizado com sucesso!",
         description: "Você será redirecionado para a página de login.",
-        duration: 5000,
+        duration: 3000,
       });
 
       resetForm();
       setTimeout(() => {
         router.push("/login");
-      }, 300);
+      }, 50);
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
 

@@ -1,23 +1,31 @@
-import { apiClient } from "@/utils/api-client"
-import { API_ENDPOINTS } from "@/config/api"
-import type { Category } from "@/types/category"
+import { apiClient } from "@/utils/api-client";
+import { API_ENDPOINTS } from "@/config/api";
+import type { CategoryStore } from "@/types/category";
 
-class CategoryService {
-  async listarCategorias(): Promise<Category[]> {
+export class CategoryService {
+  static async listarCategorias() {
     try {
-      const response = await apiClient.get<Category[]>(API_ENDPOINTS.PRODUTO.LISTAR_CATEGORIA)
-      
-      if (!response || !Array.isArray(response)) {
-        console.error("Resposta inválida da API:", response)
-        throw new Error("Resposta inválida da API")
+      // Faz a requisição para listar as categorias
+      const response = await apiClient.get<CategoryStore>(
+        API_ENDPOINTS.CATEGORIA.LISTAR_LOJA
+      );
+
+      // Verifica se a resposta tem a propriedade `data` e se ela é um array
+      if (!response.data || !Array.isArray(response.data)) {
+        console.error("Resposta inválida da API:", response.data);
+        throw new Error("Resposta inválida da API");
       }
 
-      return response
+      const formattedCategories: CategoryStore[] = response.data.map((category) => ({
+      id: category.id,
+      titulo: category.titulo,
+      imagem: category.imagem,
+    }));
+
+      return formattedCategories;
     } catch (error) {
-      console.error("Erro ao listar categorias:", error)
-      throw error
+      console.error("Erro ao listar categorias:", error);
+      throw error;
     }
   }
 }
-
-export const categoryService = new CategoryService()

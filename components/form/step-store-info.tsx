@@ -1,54 +1,47 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import type { StepProps } from "@/types/form"
-import { FormInput } from "./form-input"
-import { FormSelect } from "./form-select"
-import { SubdomainInput } from "./subdomain-input"
+import { useEffect, useState } from "react";
+import type { StepProps } from "@/types/form";
+import { FormInput } from "./form-input";
+import { FormSelect } from "./form-select";
+import { SubdomainInput } from "./subdomain-input";
+import { CategoryService } from "@/services/category-service";
+import type { CategoryStore } from "@/types/category";
+import { categories } from "@/data/categories";
 
-interface Categoria {
-  id: number
-  titulo: string
-}
 
-export function StepStoreInfo({ formData, errors, attempted, onChange, onSelectChange, onCNPJChange }: StepProps) {
-  const [categoryOptions, setCategoryOptions] = useState<{ value: string; label: string }[]>([])
+export function StepStoreInfo({
+  formData,
+  errors,
+  attempted,
+  onChange,
+  onSelectChange,
+}: StepProps) {
+  const [categoryOptions, setCategoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
   useEffect(() => {
+    // Função assíncrona dentro do useEffect
     const fetchCategories = async () => {
       try {
-        const response = await fetch("https://localhost:7083/produto/listar-categoria-loja")
-        const data: Categoria[] = await response.json()
-
-        const formattedCategories = data.map((category) => ({
+        const categorias: CategoryStore[] = await CategoryService.listarCategorias(); // Espera a resposta da API
+        const formattedCategories = categorias.map((category) => ({
           value: category.id.toString(),
           label: category.titulo,
-        }))
-        
-        setCategoryOptions(formattedCategories)
+        }));
+        setCategoryOptions(formattedCategories);  // Atualiza o estado com os dados formatados
       } catch (error) {
-        console.error("Erro ao buscar categorias:", error)
+        console.error("Erro ao buscar categorias:", error);
       }
-    }
+    };
 
-    fetchCategories()
-  }, [])
+    fetchCategories();  // Chama a função para buscar as categorias
+  }, []);
 
-  // console.log("categorias: ", categoryOptions)
   return (
     <div className="w-full flex-shrink-0 p-6">
       <form className="grid grid-cols-1 gap-4">
-        <FormInput
-          id="cnpj"
-          name="cnpj"
-          label="CNPJ (opcional)"
-          placeholder="00.000.000/0001-00"
-          value={formData.cnpj}
-          onChange={onCNPJChange}
-          error={errors.cnpj}
-          attempted={attempted}
-        />
-
         <FormInput
           id="nomeLoja"
           name="nomeLoja"
@@ -84,5 +77,5 @@ export function StepStoreInfo({ formData, errors, attempted, onChange, onSelectC
         />
       </form>
     </div>
-  )
+  );
 }

@@ -25,7 +25,7 @@ export default function MultiStepForm() {
     handleSubmit,
   } = useMultiStepForm()
 
-  const { handleChange, handleCPFChange, handleCNPJChange, handlePhoneChange, handleSelectChange } = useFormHandlers(
+  const { handleChange, handleCPFOrCNPJChange, handlePhoneChange, handleSelectChange } = useFormHandlers(
     formData,
     setFormData,
     setErrors,
@@ -63,8 +63,7 @@ export default function MultiStepForm() {
     attempted,
     onChange: handleChange,
     onSelectChange: handleSelectChange,
-    onCPFChange: handleCPFChange,
-    onCNPJChange: handleCNPJChange,
+    onCPFOrCNPJChange: handleCPFOrCNPJChange,
     onPhoneChange: handlePhoneChange,
   }
 

@@ -1,11 +1,10 @@
 import type React from "react"
 
 export interface FormData {
-  cpf: string
+  cpf_cnpj: string
   nome: string
   celular: string
   dataNascimento: string
-  cnpj: string
   nomeLoja: string
   subdominio: string
   categoriaLoja: string
@@ -24,8 +23,7 @@ export interface StepProps {
   attempted: boolean
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onSelectChange: (value: string, field: string) => void
-  onCPFChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  onCNPJChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  onCPFOrCNPJChange: (e: React.ChangeEvent<HTMLInputElement>) => void
   onPhoneChange: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 

@@ -1,3 +1,5 @@
+import { CategoryService } from "@/services/category-service"
+
 // Lista de categorias
 export const categories = [
   { id: 21, nome: "Eletrônicos" },

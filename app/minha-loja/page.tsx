@@ -18,10 +18,13 @@ export default function MinhaLojaPage() {
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
-    // Redirecionar para login se não estiver autenticado
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
+    const timeout = setTimeout(() => {
+      if (!isAuthenticated) {
+        router.push("/login");
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
   }, [isAuthenticated, router]);
 
   // TODO:

@@ -29,11 +29,10 @@ export interface LoginResponse {
 }
 
 export interface RegisterRequest {
-  cpf: string
+  cpf_cnpj: string
   nome: string
   telefone: string
   dataNascimento: string
-  cnpj?: string
   nomeLoja: string
   subdominio: string
   IdCategoriaLoja: string

@@ -1,17 +1,21 @@
 import type { FormData, FormErrors } from "@/types/form"
 import { validateSubdomain } from "@/utils/subdomain-utils"
 import { StoreService } from "@/services/store-service"
+import { AuthService } from "@/services/auth-service"  
 import { isPasswordValid } from "@/components/form/password-validation"
 
-export const validateSlide1 = (formData: FormData): FormErrors => {
+export const validateSlide1 = async (formData: FormData): Promise<FormErrors> => {
   const errors: FormErrors = {}
 
-  if (!formData.cpf) {
-    errors.cpf = "CPF é obrigatório"
-  } else if (formData.cpf.replace(/\D/g, "").length !== 11) {
-    errors.cpf = "CPF deve ter 11 dígitos"
+  if (!formData.cpf_cnpj) {
+    errors.cpf_cnpj = "CPF/CNPJ é obrigatório"
   }
 
+  const response = await AuthService.validateCpfCnpj(formData.cpf_cnpj);
+  if (!response.isValid) {
+    errors.cpf_cnpj = response.message || "CPF inválido";
+  }
+  
   if (!formData.nome) {
     errors.nome = "Nome é obrigatório"
   }
@@ -36,7 +40,6 @@ export const validateSlide2 = async (formData: FormData): Promise<FormErrors> =>
     nomeLoja: formData.nomeLoja,
     subdominio: formData.subdominio,
     categoriaLoja: formData.categoriaLoja,
-    cnpj: formData.cnpj,
   })
 
   if (!formData.nomeLoja) {
@@ -82,10 +85,6 @@ export const validateSlide2 = async (formData: FormData): Promise<FormErrors> =>
 
   if (!formData.categoriaLoja) {
     errors.categoriaLoja = "Categoria de loja é obrigatória"
-  }
-
-  if (formData.cnpj && formData.cnpj.replace(/\D/g, "").length !== 14) {
-    errors.cnpj = "CNPJ deve ter 14 dígitos"
   }
 
   console.log("📋 Resultado final da validação do slide 2:", {

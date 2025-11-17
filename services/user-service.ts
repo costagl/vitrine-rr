@@ -5,7 +5,7 @@ export interface UserProfile {
   id: string
   nome: string
   email: string
-  cpf: string
+  cpf_cnpj: string
   telefone: string
   dataNascimento: string
   createdAt: string

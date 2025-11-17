@@ -43,6 +43,14 @@ export class AuthService {
     await apiClient.post(API_ENDPOINTS.AUTH.RESET_PASSWORD, { token, newPassword })
   }
 
+  static async validateCpfCnpj(cpf_cnpj: string): Promise<{ isValid: boolean; message?: string }> {
+    const response = await apiClient.post<{ isValid: boolean; message?: string }>(
+      API_ENDPOINTS.AUTH.VALIDATE_CPF_CNPJ,
+      { cpf_cnpj }
+    );
+    return response.data!;
+  }
+
   static async checkAuthStatus(): Promise<boolean> {
     try {
       await apiClient.get("/status")

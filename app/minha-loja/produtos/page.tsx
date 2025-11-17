@@ -68,15 +68,23 @@ export default function ProductsManagementPage() {
 
   // Redirecionamento caso não esteja autenticado
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login")
-    }
-  }, [isAuthenticated, router])
+    const timeout = setTimeout(() => {
+      if (!isAuthenticated) {
+        router.push("/login");
+      }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
+  }, [isAuthenticated, router]);
 
   useEffect(() => {
+    const timeout = setTimeout(() => {
     if (!authTokenLoading && !token) {
       router.push("/login")
     }
+    }, 2000);
+
+    return () => clearTimeout(timeout);
   }, [token, authTokenLoading, router])
 
   // Funções para CRUD

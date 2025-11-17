@@ -7,7 +7,6 @@ export interface Store {
   nome: string;
   categoria: string;
   subdomain: string;
-  cnpj?: string;
   description?: string;
   isActive: boolean;
   createdAt: string;
@@ -174,16 +173,16 @@ export class StoreService {
       console.log(`📦 idTema: ${idTema}, idLayout: ${idLayout}`);
 
       let layouts: { [key: string]: string } = {
-        "1002": "layout-1",
-        "1003": "layout-2",
-        "1004": "layout-3",
-        "1005": "layout-4",
+        "1": "layout-1",
+        "2": "layout-2",
+        "3": "layout-3",
+        "4": "layout-4",
       };
       let temas: { [key: string]: string } = {
-        "1002": "tema-1",
-        "1003": "tema-2",
-        "1004": "tema-3",
-        "1005": "tema-4",
+        "1": "tema-1",
+        "2": "tema-2",
+        "3": "tema-3",
+        "4": "tema-4",
       };
 
       console.log("🔧 Layouts definidos:", layouts);
