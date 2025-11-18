@@ -195,7 +195,7 @@ export class StoreService {
         `✅ Layout Selecionado: ${layoutSelecionado}, Tema Selecionado: ${temaSelecionado}`
       );
 
-      let lojaUrl = `http://localhost:3000/minha-loja/${layoutSelecionado}`;
+      let lojaUrl = `http://localhost:3000/loja/${layoutSelecionado}`;
       console.log("🔗 Redirecionando para a URL:", lojaUrl);
 
       window.open(lojaUrl, "_blank");

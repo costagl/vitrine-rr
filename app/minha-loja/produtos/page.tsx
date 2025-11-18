@@ -165,7 +165,7 @@ export default function ProductsManagementPage() {
                 <Package className="h-8 w-8" />
                 Gerenciar Produtos
               </h1>
-              <p className="text-gray-600 mt-1">{user?.loja?.nome && `Loja: ${user.loja.nome}`}</p>
+              <p className="text-gray-600 mt-1">{user?.loja?.nomeLoja && `Loja: ${user.loja.nomeLoja}`}</p>
             </div>
           </div>
           <Button

@@ -133,9 +133,10 @@ export function useMultiStepForm() {
       });
 
       resetForm();
-      setTimeout(() => {
-        router.push("/login");
-      }, 50);
+      // setTimeout(() => {
+      //   router.push("/login");
+      // }, 50);
+      router.push("/login");
     } catch (error) {
       console.error("Erro ao cadastrar:", error);
 

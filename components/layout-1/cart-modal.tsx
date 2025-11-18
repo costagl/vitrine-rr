@@ -220,7 +220,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
 
               <SheetFooter className="flex-col gap-2 sm:flex-col">
                 <Link
-                  href="/minha-loja/layout-1/checkout"
+                  href="/loja/layout-1/checkout"
                   className="w-full"
                   onClick={closeCart}
                 >

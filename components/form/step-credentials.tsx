@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type { StepProps } from "@/types/form"
-import { FormInput } from "./form-input"
-import { PasswordValidation } from "./password-validation"
+import type { StepProps } from "@/types/form";
+import { FormInput } from "./form-input";
+import { PasswordValidation } from "./password-validation";
 
 export function StepCredentials({ formData, errors, attempted, onChange }: StepProps) {
   return (
@@ -47,8 +47,10 @@ export function StepCredentials({ formData, errors, attempted, onChange }: StepP
           required
         />
 
-        <PasswordValidation password={formData.senha} showValidation={true} />
+        {formData.senha.length > 0 && (
+          <PasswordValidation password={formData.senha} showValidation={true} />
+        )}
       </form>
     </div>
-  )
+  );
 }
