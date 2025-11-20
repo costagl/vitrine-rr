@@ -1,60 +1,96 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, X } from "lucide-react"
-import type { ProductSearchParams } from "@/types/product"
-import { useDebounce } from "@/hooks/use-debounce"
-import { categories } from "@/data/categories"
+import { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Search, X } from "lucide-react";
+import type { ProductSearchParams } from "@/types/product";
+import { CategoryProduct } from "@/types/category";
+import { useDebounce } from "@/hooks/use-debounce";
+import {
+  getProductCategoriesById,
+  getCategoryTitleById,
+} from "@/hooks/use-categories";
 
 interface ProductSearchProps {
-  searchParams: ProductSearchParams
-  onSearchChange: (params: ProductSearchParams) => void
+  searchParams: ProductSearchParams;
+  onSearchChange: (params: ProductSearchParams) => void;
 }
 
-export function ProductSearch({ searchParams, onSearchChange }: ProductSearchProps) {
-  const [searchTerm, setSearchTerm] = useState(searchParams.busca || "")
-  const debouncedSearchTerm = useDebounce(searchTerm, 500)
+export function ProductSearch({
+  searchParams,
+  onSearchChange,
+}: ProductSearchProps) {
+  const [searchTerm, setSearchTerm] = useState(searchParams.busca || "");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  // Atualizar busca quando o termo digitado for alterado (com debounce)
+  useEffect(() => {
+    if (debouncedSearchTerm !== searchParams.busca) {
+      onSearchChange({ busca: debouncedSearchTerm });
+    }
+  }, [debouncedSearchTerm, onSearchChange, searchParams.busca]);
+
+  // Carregar categorias de produtos
+  const [categories, setCategories] = useState<CategoryProduct[]>([]);
+  const [categoryTitles, setCategoryTitles] = useState<{ [key: string]: string }>({});
+  const [loadingCategories, setLoadingCategories] = useState(true);
 
   useEffect(() => {
-    // Only trigger search if the term has actually changed
-    if (debouncedSearchTerm !== searchParams.busca) {
-      onSearchChange({ busca: debouncedSearchTerm })
-    }
-  }, [debouncedSearchTerm, onSearchChange, searchParams.busca])
+    const fetchCategories = async () => {
+      const fetchedCategories = await getProductCategoriesById("product-search");
+      setCategories(fetchedCategories);
 
+      // Carregar títulos das categorias
+      const titles: { [key: string]: string } = {};
+      for (const category of fetchedCategories) {
+        titles[category.id] = category.titulo;
+      }
+      setCategoryTitles(titles);
+      setLoadingCategories(false);
+    };
+
+    fetchCategories();
+  }, []);
+
+  // Manipuladores de mudança nos filtros
   const handleCategoryChange = (value: string) => {
-    onSearchChange({ idCategoriaProduto: value === "all" ? undefined : Number.parseInt(value) })
-  }
+    onSearchChange({
+      idCategoriaProduto: value === "all" ? undefined : value,
+    });
+  };
 
+  // Manipulador de mudança no filtro de ativo/inativo
   const handleActiveChange = (value: string) => {
     const activeMap: Record<string, number | null> = {
       todos: null,
       ativos: 1,
       inativos: 0,
-    }
+    };
 
-    onSearchChange({ ativo: activeMap[value] })
-  }
+    onSearchChange({ ativo: activeMap[value] });
+  };
 
+  // Limpar campo de busca
   const handleClearSearch = () => {
-    setSearchTerm("")
-    onSearchChange({ busca: "" })
-  }
+    setSearchTerm("");
+    onSearchChange({ busca: "" });
+  };
 
+  // Obter valor atual do filtro de ativo/inativo
   const getActiveValue = () => {
-    if (searchParams.ativo === 1) return "ativos"
-    if (searchParams.ativo === 0) return "inativos"
-    return "todos"
-  }
-
-  const getCategoryName = (id: number) => {
-    const category = categories.find((cat) => cat.id === id)
-    return category?.nome || "Categoria não encontrada"
-  }
+    if (searchParams.ativo === 1) return "ativos";
+    if (searchParams.ativo === 0) return "inativos";
+    return "todos";
+  };
 
   return (
     <Card className="mb-6">
@@ -82,17 +118,21 @@ export function ProductSearch({ searchParams, onSearchChange }: ProductSearchPro
           </div>
 
           {/* Filtro por categoria */}
-          <Select value={searchParams.idCategoriaProduto?.toString() || "all"} onValueChange={handleCategoryChange}>
+          <Select
+            value={searchParams.idCategoriaProduto?.toString() || "all"}
+            onValueChange={handleCategoryChange}
+          >
             <SelectTrigger>
               <SelectValue placeholder="Filtrar por categoria" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas as categorias</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category.id} value={category.id.toString()}>
-                  {category.nome}
-                </SelectItem>
-              ))}
+              {!loadingCategories &&
+                categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.titulo}
+                  </SelectItem>
+                ))}
             </SelectContent>
           </Select>
 
@@ -118,8 +158,8 @@ export function ProductSearch({ searchParams, onSearchChange }: ProductSearchPro
                 variant="ghost"
                 size="sm"
                 onClick={() => {
-                  setSearchTerm("")
-                  onSearchChange({ busca: "" })
+                  setSearchTerm("");
+                  onSearchChange({ busca: "" });
                 }}
                 className="h-4 w-4 p-0 ml-1"
               >
@@ -130,11 +170,14 @@ export function ProductSearch({ searchParams, onSearchChange }: ProductSearchPro
 
           {searchParams.idCategoriaProduto && (
             <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-              Categoria: {getCategoryName(searchParams.idCategoriaProduto)}
+              {/* Usando o título da categoria carregado */}
+              Categoria: {categoryTitles[searchParams.idCategoriaProduto] || "Carregando..."}
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onSearchChange({ idCategoriaProduto: undefined })}
+                onClick={() =>
+                  onSearchChange({ idCategoriaProduto: undefined })
+                }
                 className="h-4 w-4 p-0 ml-1"
               >
                 <X className="h-3 w-3" />
@@ -158,5 +201,5 @@ export function ProductSearch({ searchParams, onSearchChange }: ProductSearchPro
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

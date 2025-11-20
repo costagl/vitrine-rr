@@ -76,6 +76,7 @@ export default function LoginPage() {
         expiresIn: 3600,
         user: {
           id: "1",
+          cpfCnpj: "123.456.789-00",
           nome: "Gabriel da Silva",
           email: formData.email,
           loja: {
@@ -100,7 +101,7 @@ export default function LoginPage() {
         description: rememberMe
           ? "Você será lembrado na próxima visita."
           : "Você será redirecionado para a página inicial.",
-        duration: 5000,
+        duration: 3000,
       });
 
       resetForm();
@@ -130,7 +131,7 @@ export default function LoginPage() {
           description: rememberMe
             ? "Você será lembrado na próxima visita."
             : "Você será redirecionado para a página inicial.",
-          duration: 5000,
+          duration: 3000,
         });
 
         resetForm();

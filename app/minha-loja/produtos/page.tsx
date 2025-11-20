@@ -27,7 +27,7 @@ export default function ProductsManagementPage() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
   const [searchParams, setSearchParams] = useState<ProductSearchParams>({
     busca: "",
-    idCategoriaProduto: undefined,
+    idCategoriaProduto: "",
     ativo: null,
   })
 

@@ -47,7 +47,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Função para gerenciar localStorage de maneira centralizada
-const manageLocalStorage = (action: "get" | "set" | "remove", key: string, value?: any) => {
+export const manageLocalStorage = (action: "get" | "set" | "remove", key: string, value?: any) => {
   switch (action) {
     case "get":
       return localStorage.getItem(key);

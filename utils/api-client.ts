@@ -54,7 +54,6 @@ class ApiClient {
 
     if (!response.ok) {
       console.error(`❌ Resposta HTTP não OK [${response.status}]:`, data)
-      console.log(localStorage.getItem("token"))
 
       if (response.status === 401) {
         console.error("🚫 Erro 401: Token inválido ou expirado")

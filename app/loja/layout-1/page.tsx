@@ -42,7 +42,7 @@ interface ApiProduct {
   altura?: number;
   largura?: number;
   profundidade?: number;
-  idCategoriaProduto?: number;
+  idCategoriaProduto: string;
   nomeCategoriaProduto?: string | null;
 }
 
@@ -56,8 +56,8 @@ interface Product {
   status: string;
   imagemUrl?: string;
   categoria?: {
-    id: number;
-    nome: string;
+    id: string;
+    titulo: string;
   };
 }
 
@@ -125,7 +125,7 @@ export default function Layout1Page() {
           categoria: item.idCategoriaProduto
             ? {
                 id: item.idCategoriaProduto,
-                nome: item.nomeCategoriaProduto || "Sem Categoria",
+                titulo: item.nomeCategoriaProduto || "Sem Categoria",
               }
             : undefined,
         }));
@@ -153,7 +153,7 @@ export default function Layout1Page() {
         return (
           p.titulo.toLowerCase().includes(query) ||
           p.descricao?.toLowerCase().includes(query) ||
-          p.categoria?.nome.toLowerCase().includes(query)
+          p.categoria?.titulo.toLowerCase().includes(query)
         );
       })
       .slice(0, 8); // Limitar a 8 produtos em destaque
@@ -449,7 +449,7 @@ export default function Layout1Page() {
                       </div>
                       <div className="p-4">
                         <Badge variant="secondary" className="text-xs mb-2">
-                          {produto.categoria?.nome || "Sem Categoria"}
+                          {produto.categoria?.titulo || "Sem Categoria"}
                         </Badge>
                         <h3 className="font-semibold text-lg mb-2 line-clamp-2">
                           {produto.titulo}

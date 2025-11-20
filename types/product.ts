@@ -13,15 +13,17 @@ export interface Product {
   altura: number
   largura: number
   profundidade: number
-  idCategoriaProduto: number
+  idCategoriaProduto: string
   // Campos de navegação
   categoriaProduto?: {
-    id: number
-    nome: string
+    id: string
+    titulo: string
   }
-  loja?: {
+  loja: {
     id: number
     nome: string
+    imagem: string // TODO: Alterar tipo
+    idCategoriaLoja: string
   }
 }
 
@@ -39,7 +41,7 @@ export interface CreateProductRequest {
   altura: number
   largura: number
   profundidade: number
-  idCategoriaProduto: number
+  idCategoriaProduto: string
   formDataToSend?: FormData
 }
 
@@ -56,7 +58,7 @@ export interface UpdateProductRequest {
   altura?: number
   largura?: number
   profundidade?: number
-  idCategoriaProduto?: number
+  idCategoriaProduto: string
 }
 
 export interface ProductResponse {
@@ -85,16 +87,8 @@ export interface ProductSearchParams {
   pagina?: number
   limite?: number
   busca?: string
-  idCategoriaProduto?: number
+  idCategoriaProduto?: string
   ativo?: number | null // 0, 1 ou null
-}
-
-// Tipo para categorias de produto
-export interface ProductCategory {
-  id: number
-  nome: string
-  descricao?: string
-  ativo: number
 }
 
 // Tipo para erros da API

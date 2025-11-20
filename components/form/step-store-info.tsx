@@ -7,8 +7,6 @@ import { FormSelect } from "./form-select";
 import { SubdomainInput } from "./subdomain-input";
 import { CategoryService } from "@/services/category-service";
 import type { CategoryStore } from "@/types/category";
-import { categories } from "@/data/categories";
-
 
 export function StepStoreInfo({
   formData,
@@ -25,18 +23,19 @@ export function StepStoreInfo({
     // Função assíncrona dentro do useEffect
     const fetchCategories = async () => {
       try {
-        const categorias: CategoryStore[] = await CategoryService.listarCategorias(); // Espera a resposta da API
+        const categorias: CategoryStore[] =
+          await CategoryService.listarCategoriasLoja(); // Espera a resposta da API
         const formattedCategories = categorias.map((category) => ({
           value: category.id.toString(),
           label: category.titulo,
         }));
-        setCategoryOptions(formattedCategories);  // Atualiza o estado com os dados formatados
+        setCategoryOptions(formattedCategories); // Atualiza o estado com os dados formatados
       } catch (error) {
         console.error("Erro ao buscar categorias:", error);
       }
     };
 
-    fetchCategories();  // Chama a função para buscar as categorias
+    fetchCategories(); // Chama a função para buscar as categorias
   }, []);
 
   return (

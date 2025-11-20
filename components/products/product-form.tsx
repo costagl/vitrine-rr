@@ -16,8 +16,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Product, CreateProductRequest } from "@/types/product";
-import { categories } from "@/data/categories";
+import { getProductCategoriesById } from "@/hooks/use-categories";
 import { useAuth } from "@/contexts/auth-context";
+import type { CategoryProduct } from "@/types/category";
 
 interface ProductFormProps {
   product?: Product | null;
@@ -48,7 +49,7 @@ export function ProductForm({
     altura: 0,
     largura: 0,
     profundidade: 0,
-    idCategoriaProduto: 0,
+    idCategoriaProduto: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,8 +80,20 @@ export function ProductForm({
         setFormData(updatedFormData);
       }, 0);
     }
-
   }, [product]);
+
+  const [categories, setCategories] = useState<CategoryProduct[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const fetchedCategories = await getProductCategoriesById("product-form");
+      setCategories(fetchedCategories);
+      setLoadingCategories(false);
+    };
+
+    fetchCategories();
+  }, []);
 
   const generateSKU = () => {
     const timestamp = Date.now().toString().slice(-6);
@@ -157,7 +170,7 @@ export function ProductForm({
       newErrors.profundidade = "Profundidade não pode ser negativa";
     }
 
-    if (formData.idCategoriaProduto === 0) {
+    if (formData.idCategoriaProduto === "") {
       newErrors.idCategoriaProduto = "Categoria é obrigatória";
     }
 
@@ -312,11 +325,15 @@ export function ProductForm({
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.nome}
-                  </SelectItem>
-                ))}
+                {!loadingCategories &&
+                  categories.map((category) => (
+                    <SelectItem
+                      key={category.id}
+                      value={category.id.toString()}
+                    >
+                      {category.titulo}
+                    </SelectItem>
+                  ))}
               </SelectContent>
             </Select>
             {errors.idCategoriaProduto && (
@@ -342,7 +359,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.valorUnitario}
+                // value={formData.valorUnitario}
                 onChange={(e) =>
                   handleChange(
                     "valorUnitario",
@@ -391,7 +408,7 @@ export function ProductForm({
                 id="estoque"
                 type="number"
                 min="0"
-                value={formData.estoque}
+                // value={formData.estoque}
                 onChange={(e) =>
                   handleChange("estoque", Number.parseInt(e.target.value) || 0)
                 }
@@ -421,7 +438,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.peso}
+                // value={formData.peso}
                 onChange={(e) =>
                   handleChange("peso", Number.parseFloat(e.target.value) || 0)
                 }
@@ -441,7 +458,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.altura}
+                // value={formData.altura}
                 onChange={(e) =>
                   handleChange("altura", Number.parseFloat(e.target.value) || 0)
                 }
@@ -461,7 +478,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.largura}
+                // value={formData.largura}
                 onChange={(e) =>
                   handleChange(
                     "largura",
@@ -484,7 +501,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                value={formData.profundidade}
+                // value={formData.profundidade}
                 onChange={(e) =>
                   handleChange(
                     "profundidade",

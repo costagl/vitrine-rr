@@ -1,13 +1,13 @@
 export interface CategoryStore {
-  id: number
+  id: string
   titulo: string
   imagem: string // TODO: Alterar tipo
 }
 
 export interface CategoryProduct {
-  id: number
+  id: string
   titulo: string
   imagem: string // TODO: Alterar tipo
-  idCategoriaLoja?: number
+  idCategoriaLoja: string
 }
 

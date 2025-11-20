@@ -1,50 +1,39 @@
-import useSWR from "swr"
-import { toast } from "sonner"
-import { apiClient } from "@/utils/api-client"
-import { API_ENDPOINTS } from "@/config/api"
-import type { ProductCategory } from "@/types/product"
+import { CategoryService } from "@/services/category-service";
+import { manageLocalStorage } from "@/contexts/auth-context";
+import type { LoginResponse } from "@/types/api";
+import type { CategoryProduct, CategoryStore } from "@/types/category";
 
-interface CategoryResponse {
-  id: number
-  titulo: string
-  imagem: string
-  produto: any[]
+export async function getProductCategoriesById(teste : string): Promise<CategoryProduct[]> {
+  const userDataString = manageLocalStorage("get", "user");
+
+  console.log(teste);
+  let userData: LoginResponse["user"] | null = null;
+  let categories: CategoryProduct[] = [];
+
+  if (userDataString) {
+    userData = JSON.parse(userDataString);
+  }
+
+  if (userData && userData.loja) {
+    const idCategoriaLoja = userData.loja.idCategoria;
+    
+    categories = await CategoryService.listarCategoriasProduto(idCategoriaLoja);
+    
+  } else {
+    console.error("Usuário não autenticado ou dados da loja não encontrados.");
+  }
+  return categories;
 }
 
-export function useCategories() {
-  const { data, error, isLoading, mutate } = useSWR<ProductCategory[]>(
-    "categories",
-    async () => {
-      try {
-        const response = await apiClient.get<CategoryResponse[]>(API_ENDPOINTS.PRODUTO.LISTAR_CATEGORIA)
-        console.log("📦 Resposta da API de categorias:", response)
-        
-        // Mapear a resposta para o formato esperado
-        const categories = response.data?.map(cat => ({
-          id: cat.id,
-          nome: cat.titulo,
-          ativo: 1
-        })) || []
-        
-        return categories
-      } catch (error) {
-        console.error("❌ Erro ao buscar categorias:", error)
-        toast.error("Erro ao carregar categorias")
-        throw error
-      }
-    },
-    {
-      revalidateOnFocus: false,
-      dedupingInterval: 5000,
-      shouldRetryOnError: true,
-      errorRetryCount: 3,
-    }
-  )
+export async function getStoreCategories(): Promise<CategoryStore[]> {
+  let categories: CategoryStore[] = [];
+  categories = await CategoryService.listarCategoriasLoja();
+  return categories;
+}
 
-  return {
-    categories: data || [],
-    isLoadingCategories: isLoading,
-    error,
-    mutate,
-  }
+export async function getCategoryTitleById(id: string): Promise<string> {
+  const categories = await getProductCategoriesById("use-categories");
+
+  const category = categories.find((category) => category.id === id);
+  return category ? category.titulo : "Categoria não encontrada";
 }

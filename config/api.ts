@@ -49,7 +49,7 @@ export const API_ENDPOINTS = {
   },
   CATEGORIA: {
     LISTAR_LOJA: "/categoria/loja",
-    LISTAR_PRODUTO: "/categoria/produto"
+    LISTAR_PRODUTO: (id: string) => `/categoria/produtos/${id}`,
   }
 } as const
 

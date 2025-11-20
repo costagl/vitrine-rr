@@ -50,7 +50,7 @@ export default function CatalogoPage() {
     const fetchCategories = async () => {
       try {
         const categorias: CategoryStore[] =
-          await CategoryService.listarCategorias(); // Espera a resposta da API
+          await CategoryService.listarCategoriasLoja(); // Espera a resposta da API
         const formattedCategories = categorias.map((category) => ({
           value: category.id.toString(),
           label: category.titulo,
@@ -137,7 +137,9 @@ export default function CatalogoPage() {
   }, [categoriaFiltro, termoBusca, lojas, lojasFiltradas]);
 
   const abrirLoja = (subdomain: string) => {
-    const lojaUrl = `https://${subdomain}.vitrine.com.br`;
+    // TODO: Ajustar em produção
+    // const lojaUrl = `https://${subdomain}.vitrine.com.br`;
+    const lojaUrl = `https://localhost:3000/loja/${subdomain}`;
   };
 
   const renderStars = (rating: number) => {

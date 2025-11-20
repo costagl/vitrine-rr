@@ -5,8 +5,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Edit, Trash2, Eye, EyeOff, Package, Tag } from "lucide-react";
 import type { Product } from "@/types/product";
-import { getCategoryNameById } from "@/data/categories";
+import { getCategoryTitleById } from "@/hooks/use-categories";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface ProductListProps {
   products: Product[];
@@ -46,6 +47,27 @@ export function ProductList({
       </div>
     );
   }
+
+  // Estado para armazenar os títulos das categorias
+  const [categoryTitles, setCategoryTitles] = useState<{
+    [key: string]: string;
+  }>({});
+
+  useEffect(() => {
+    // Busca e armazena os títulos das categorias ao carregar os produtos
+    const fetchCategoryTitles = async () => {
+      const titles: { [key: string]: string } = {};
+
+      for (const product of products) {
+        const title = await getCategoryTitleById(product.idCategoriaProduto);
+        titles[product.idCategoriaProduto] = title;
+      }
+
+      setCategoryTitles(titles);
+    };
+
+    fetchCategoryTitles();
+  }, [products]); // Recarrega quando a lista de produtos mudar
 
   return (
     <div className="space-y-4">
@@ -107,7 +129,8 @@ export function ProductList({
                       <div className="flex items-center gap-1">
                         <Tag className="h-3 w-3" />
                         <span>
-                          {getCategoryNameById(product.idCategoriaProduto)}
+                          {categoryTitles[product.idCategoriaProduto] ||
+                            "Carregando..."}
                         </span>
                       </div>
 

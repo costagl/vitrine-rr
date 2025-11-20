@@ -25,7 +25,7 @@ export interface LoginResponse {
     loja?: {
       id: string;
       nomeLoja: string;
-      idCategoria: number;
+      idCategoria: string;
       categoria: string;
       subdominio: string;
       descricao?: string;

@@ -21,7 +21,7 @@ import {
   Weight,
 } from "lucide-react";
 import type { Product } from "@/types/product";
-import { getCategoryNameById } from "@/data/categories";
+import { getCategoryTitleById } from "@/hooks/use-categories";
 import Image from "next/image";
 
 interface ProductDetailModalProps {
@@ -90,7 +90,7 @@ export function ProductDetailModal({
               <h3 className="text-xl font-semibold">{product.titulo}</h3>
               <p className="text-gray-500 text-sm">SKU: {product.sku}</p>
               <p className="text-gray-500 text-sm">
-                {getCategoryNameById(product.idCategoriaProduto)}
+                {getCategoryTitleById(product.loja.idCategoriaLoja)}
               </p>
             </div>
 
