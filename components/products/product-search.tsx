@@ -46,7 +46,7 @@ export function ProductSearch({
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const fetchedCategories = await getProductCategoriesById("product-search");
+      const fetchedCategories = await getProductCategoriesById();
       setCategories(fetchedCategories);
 
       // Carregar títulos das categorias

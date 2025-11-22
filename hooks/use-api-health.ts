@@ -20,13 +20,13 @@ const getInitialStatus = (): ApiHealthStatus => ({
 })
 
 export function useApiHealth() {
-  // ALTERAÇÃO: Uso de função de inicialização síncrona (lazy initial state).
+
+  // Usar a função auxiliar para o estado inicial
   const [status, setStatus] = useState<ApiHealthStatus>(getInitialStatus)
 
-  // ALTERAÇÃO: Adicionado parâmetro 'isInitialCheck' para controlar o setStatus.
+  // Usar useCallback para memoizar a função de verificação
   const checkApiHealth = useCallback(async (isInitialCheck = false) => {
-    // Evita o setStatus(isLoading: true) se for o check inicial, 
-    // pois o estado já começou como true.
+
     if (!isInitialCheck) {
         setStatus((prev) => ({ ...prev, isLoading: true, error: null }))
     }
@@ -61,13 +61,13 @@ export function useApiHealth() {
   }, [])
 
   useEffect(() => {
-    // A chamada inicial é feita de forma assíncrona, sem fazer setState diretamente dentro do useEffect
+    // Verificação inicial e configuração do intervalo
     const initializeApiCheck = async () => {
       await checkApiHealth(true)
     }
     initializeApiCheck()
 
-    const interval = setInterval(() => checkApiHealth(false), 30000)
+    const interval = setInterval(() => checkApiHealth(false), 60000)
 
     return () => clearInterval(interval)
   }, [checkApiHealth])

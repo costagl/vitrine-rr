@@ -67,7 +67,7 @@ export default function LoginPage() {
     const isDevLogin = formData.email === "Dev1@email.com" && formData.senha === "Dev1@email.com";
 
     if (isDevLogin == true) {
-      console.log("🔒 Login de desenvolvimento detectado.");
+      // console.log("🔒 Login de desenvolvimento detectado.");
 
       // Simulação de resposta de login para o desenvolvimento
       const simulatedResponse = {
@@ -148,7 +148,7 @@ export default function LoginPage() {
           });
         } else {
           toast({
-            title: "Erro inesperado",
+            title: "Erro ao entrar",
             description: (error as Error).message,
             variant: "destructive",
             duration: 5000,

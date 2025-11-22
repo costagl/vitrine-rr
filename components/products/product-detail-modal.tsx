@@ -21,7 +21,6 @@ import {
   Weight,
 } from "lucide-react";
 import type { Product } from "@/types/product";
-import { getCategoryTitleById } from "@/hooks/use-categories";
 import Image from "next/image";
 
 interface ProductDetailModalProps {
@@ -49,6 +48,10 @@ export function ProductDetailModal({
     }).format(value);
   };
 
+  console.log(product);
+  console.log(product);
+  console.log(product);
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -90,7 +93,7 @@ export function ProductDetailModal({
               <h3 className="text-xl font-semibold">{product.titulo}</h3>
               <p className="text-gray-500 text-sm">SKU: {product.sku}</p>
               <p className="text-gray-500 text-sm">
-                {getCategoryTitleById(product.loja.idCategoriaLoja)}
+                {product.idCategoriaLoja}
               </p>
             </div>
 

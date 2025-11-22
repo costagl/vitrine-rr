@@ -58,7 +58,7 @@ export class ProductService {
    * @returns Lista de produtos
    */
   static async listarProdutos(): Promise<Product[]> {
-    console.log("🔍 ProductService: Listando produtos")
+    // console.log("🔍 ProductService: Listando produtos")
 
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {
@@ -90,7 +90,7 @@ export class ProductService {
       throw error
     }
   }
-
+  
   /**
    * Busca um produto específico pelo ID
    * @param id ID do produto
@@ -122,7 +122,6 @@ export class ProductService {
    * @returns Produto atualizado
    */
   static async alterarProduto(id: string, data: UpdateProductRequest): Promise<Product> {
-    console.log(`📝 ProductService: Alterando produto ${id} com dados:`, data)
 
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     if (!token) {

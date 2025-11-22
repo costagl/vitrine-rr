@@ -5,6 +5,7 @@ import type { ApiResponse } from "@/types/api"
 class ApiClient {
   private timeout: number
   private defaultHeaders: Record<string, string>
+  private authToken: string | null = null
 
   constructor() {
     this.timeout = API_CONFIG.TIMEOUT
@@ -14,17 +15,26 @@ class ApiClient {
     if (process.env.NODE_ENV === "development") {
       console.log(`🔗 API Client configurado para: ${getApiBaseUrl()}`)
     }
+
+    // Inicialize o token apenas no cliente, se necessário
+    if (typeof window !== "undefined") {
+      this.authToken = localStorage.getItem("token")
+    }
   }
 
   private getAuthToken(): string | null {
+    // Garantir que o token seja acessado apenas no lado do cliente
     if (typeof window === "undefined") return null
 
-    try {
-      return localStorage.getItem("token") || null
-    } catch (error) {
-      console.error("❌ Erro ao acessar localStorage:", error)
-      return null
+    if (!this.authToken) {
+      try {
+        this.authToken = localStorage.getItem("token")
+      } catch (error) {
+        console.error("❌ Erro ao acessar localStorage:", error)
+      }
     }
+
+    return this.authToken
   }
 
   private getHeaders(customHeaders: Record<string, string> = {}): Record<string, string> {
@@ -33,8 +43,6 @@ class ApiClient {
 
     if (token) {
       headers.Authorization = `Bearer ${token}`
-    } else {
-      console.warn("⚠️ Nenhum token encontrado no localStorage")
     }
 
     return headers
@@ -56,11 +64,13 @@ class ApiClient {
       console.error(`❌ Resposta HTTP não OK [${response.status}]:`, data)
 
       if (response.status === 401) {
-        console.error("🚫 Erro 401: Token inválido ou expirado")
+        // TODO:
+        // console.error("🚫 Erro 401: Token inválido ou expirado")
         // localStorage.removeItem("token")
         // localStorage.removeItem("refreshToken")
         // localStorage.removeItem("user")
-        throw new Error("Token inválido ou expirado. Faça login novamente.")
+        // throw new Error("Token inválido ou expirado. Faça login novamente.")
+        throw new Error(data?.message || `Erro HTTP ${response.status}`)
       }
 
       throw new Error(data?.message || `Erro HTTP ${response.status}`)
@@ -106,6 +116,7 @@ class ApiClient {
   }
 
   async get<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    console.log("GET", endpoint, options)
     return this.makeRequest<T>("GET", endpoint, null, options)
   }
 
@@ -115,13 +126,16 @@ class ApiClient {
   }
 
   async put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
+    console.log("PUT", endpoint, data, options)
     return this.makeRequest<T>("PUT", endpoint, data, options)
   }
 
   async delete<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    console.log("DELETE", endpoint, options)
     return this.makeRequest<T>("DELETE", endpoint, null, options)
   }
 }
+
 
 // Classe de erro personalizada para a API
 class ApiError extends Error {

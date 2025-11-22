@@ -31,23 +31,6 @@ export function ProductList({
     }).format(value);
   };
 
-  if (products.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <div className="text-gray-400 mb-4">
-          <Package className="mx-auto h-12 w-12" />
-        </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Nenhum produto encontrado
-        </h3>
-        <p className="text-gray-500">
-          Comece adicionando produtos à sua loja ou ajuste os filtros de
-          pesquisa.
-        </p>
-      </div>
-    );
-  }
-
   // Estado para armazenar os títulos das categorias
   const [categoryTitles, setCategoryTitles] = useState<{
     [key: string]: string;
@@ -69,6 +52,23 @@ export function ProductList({
     fetchCategoryTitles();
   }, [products]); // Recarrega quando a lista de produtos mudar
 
+  if (products.length === 0) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-gray-400 mb-4">
+          <Package className="mx-auto h-12 w-12" />
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">
+          Nenhum produto encontrado
+        </h3>
+        <p className="text-gray-500">
+          Comece adicionando produtos à sua loja ou ajuste os filtros de
+          pesquisa.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       {products.map((product) => (
@@ -81,9 +81,9 @@ export function ProductList({
                   src={product.imagem || "/placeholder.svg?height=80&width=80"}
                   alt={product.titulo}
                   className="h-20 w-20 object-cover rounded-md border"
-                  layout="responsive"
-                  width={500}
-                  height={300}
+                  width={500} // Defina a largura diretamente
+                  height={300} // Defina a altura diretamente
+                  sizes="(max-width: 640px) 80px, 500px" // Defina um valor adequado para o "sizes"
                 />
               </div>
 

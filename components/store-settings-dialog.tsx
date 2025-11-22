@@ -166,10 +166,11 @@ export function StoreSettingsDialog({
   };
 
   const handleSave = () => {
-    console.log("Salvando configurações:", {
-      layout: selectedLayout,
-      theme: selectedTheme,
-    });
+    // console.log("Salvando configurações:", 
+    //   {
+    //   layout: selectedLayout,
+    //   theme: selectedTheme,
+    // });
 
     setTimeout(() => {
       onOpenChange(false);

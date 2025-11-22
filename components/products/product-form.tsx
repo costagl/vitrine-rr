@@ -1,7 +1,6 @@
 "use client";
 
-import type React from "react";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,13 +14,15 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Product, CreateProductRequest } from "@/types/product";
-import { getProductCategoriesById } from "@/hooks/use-categories";
 import { useAuth } from "@/contexts/auth-context";
+import { getProductCategoriesById } from "@/hooks/use-categories";
+import type { CreateProductRequest } from "@/types/product";
 import type { CategoryProduct } from "@/types/category";
 
+const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB em bytes
+
 interface ProductFormProps {
-  product?: Product | null;
+  product?: CreateProductRequest | null;
   onSave: (product: CreateProductRequest) => void;
   onCancel: () => void;
   isLoading?: boolean;
@@ -35,7 +36,9 @@ export function ProductForm({
 }: ProductFormProps) {
   const { user, isAuthenticated } = useAuth();
 
+  // Estado do formulário
   const [formData, setFormData] = useState<CreateProductRequest>({
+    id: 0,
     titulo: "",
     idLoja: user?.loja?.id ? Number.parseInt(user.loja.id) : 0,
     valorUnitario: 0,
@@ -52,14 +55,14 @@ export function ProductForm({
     idCategoriaProduto: "",
   });
 
+  // Estado para erros de validação
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Usando useRef para armazenar o valor anterior de `product`
-  const prevProductRef = useRef<Product | null>(product);
-
+  // Preencher o formulário se o produto for fornecido (edição)
   useEffect(() => {
-    if (product && prevProductRef.current?.titulo !== product.titulo) {
-      const updatedFormData = {
+    if (product) {
+      setFormData({
+        id: product.id,
         titulo: product.titulo,
         idLoja: product.idLoja,
         valorUnitario: product.valorUnitario,
@@ -74,20 +77,17 @@ export function ProductForm({
         largura: product.largura,
         profundidade: product.profundidade,
         idCategoriaProduto: product.idCategoriaProduto,
-      };
-
-      setTimeout(() => {
-        setFormData(updatedFormData);
-      }, 0);
+      });
     }
   }, [product]);
 
   const [categories, setCategories] = useState<CategoryProduct[]>([]);
   const [loadingCategories, setLoadingCategories] = useState(true);
 
+  // Carregar categorias de produtos ao montar o componente
   useEffect(() => {
     const fetchCategories = async () => {
-      const fetchedCategories = await getProductCategoriesById("product-form");
+      const fetchedCategories = await getProductCategoriesById();
       setCategories(fetchedCategories);
       setLoadingCategories(false);
     };
@@ -95,12 +95,7 @@ export function ProductForm({
     fetchCategories();
   }, []);
 
-  const generateSKU = () => {
-    const timestamp = Date.now().toString().slice(-6);
-    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
-    return `SKU${timestamp}${random}`;
-  };
-
+  // Função para validar o formulário
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -110,19 +105,9 @@ export function ProductForm({
       return newErrors;
     }
 
-    // Verificar se o token está presente
-    const token =
-      typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    if (!token) {
-      newErrors.auth =
-        "Token de autenticação não encontrado. Faça login novamente.";
-      return newErrors;
-    }
-
+    // Validar campos do formulário
     if (!formData.titulo.trim()) {
       newErrors.titulo = "Título é obrigatório";
-    } else if (formData.titulo.length > 255) {
-      newErrors.titulo = "Título deve ter no máximo 255 caracteres";
     }
 
     if (!formData.descricao.trim()) {
@@ -133,21 +118,12 @@ export function ProductForm({
       newErrors.valorUnitario = "Valor unitário deve ser maior que zero";
     }
 
-    //TODO:
-    // if (formData.valorPromocional && formData.valorPromocional >= formData.valorUnitario) {
-    //   newErrors.valorPromocional = "Valor promocional deve ser menor que o valor unitário"
-    // }
-
     if (!formData.sku.trim()) {
       newErrors.sku = "SKU é obrigatório";
-    } else if (formData.sku.length > 100) {
-      newErrors.sku = "SKU deve ter no máximo 100 caracteres";
     }
 
     if (!formData.imagem.trim()) {
-      newErrors.imagem = "URL da imagem é obrigatória";
-    } else if (formData.imagem.length > 255) {
-      newErrors.imagem = "URL da imagem deve ter no máximo 255 caracteres";
+      newErrors.imagem = "Imagem é obrigatório";
     }
 
     if (formData.estoque < 0) {
@@ -178,30 +154,7 @@ export function ProductForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    console.log("📝 Tentando salvar produto:", formData);
-
-    // Verificar se o token está presente no localStorage
-    const token = localStorage.getItem("token");
-    console.log("🔐 Token presente:", !!token);
-    if (token) {
-    } else {
-      console.error("🚫 Token não encontrado no localStorage");
-      setErrors({
-        auth: "Token de autenticação não encontrado. Faça login novamente.",
-      });
-      return;
-    }
-
-    if (validateForm()) {
-      onSave(formData);
-    } else {
-      console.log("❌ Validação falhou:", errors);
-    }
-  };
-
+  // Função para atualizar campos do formulário
   const handleChange = (field: keyof CreateProductRequest, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -209,17 +162,75 @@ export function ProductForm({
     }
   };
 
-  // Mostrar erro de autenticação se houver
-  if (errors.auth) {
-    return (
-      <div className="text-center py-8">
-        <div className="text-red-500 mb-4">{errors.auth}</div>
-        <Button onClick={() => (window.location.href = "/login")}>
-          Fazer Login
-        </Button>
-      </div>
-    );
-  }
+  // Função para gerar SKU automático
+  const generateSKU = () => {
+    const timestamp = Date.now().toString().slice(-6);
+    const random = Math.random().toString(36).substring(2, 5).toUpperCase();
+    return `SKU${timestamp}${random}`;
+  };
+
+  // Função para enviar a imagem para o ImgBB
+  // Função para enviar a imagem para o ImgBB
+  const handleImageUpload = async (file: File) => {
+    if (file.size > MAX_IMAGE_SIZE) {
+      setErrors((prev) => ({
+        ...prev,
+        imagem: "A imagem deve ter no máximo 30MB",
+      }));
+      return;
+    }
+
+    const formDataImgBB = new FormData();
+    formDataImgBB.append("image", file);
+
+    try {
+      const response = await fetch(
+        `https://api.imgbb.com/1/upload?key=1451d4d045251d16eb45c9c8247382bc`,
+        {
+          method: "POST",
+          body: formDataImgBB,
+        }
+      );
+      const data = await response.json();
+
+      if (data.success) {
+        // Atualize o estado com a URL da imagem (use o campo `image.url` da resposta)
+        setFormData((prev) => ({
+          ...prev,
+          imagem: data.data.image.url, // A URL da imagem carregada
+        }));
+        setErrors((prev) => ({ ...prev, imagem: "" })); // Limpar erro, caso tenha
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          imagem: "Falha ao enviar a imagem para o ImgBB",
+        }));
+      }
+    } catch (error) {
+      console.error("Erro ao enviar a imagem:", error);
+      setErrors((prev) => ({
+        ...prev,
+        imagem: "Erro ao enviar a imagem. Tente novamente.",
+      }));
+    }
+  };
+
+  // Função para tratar a mudança na imagem
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files ? e.target.files[0] : null;
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  // Função de envio do formulário
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      onSave(formData);
+    }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -290,18 +301,26 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imagem">URL da Imagem *</Label>
-            <Input
+            <Label htmlFor="imagem">Carregar Imagem *</Label>
+            <input
               id="imagem"
-              value={formData.imagem}
-              onChange={(e) => handleChange("imagem", e.target.value)}
-              placeholder="https://exemplo.com/imagem.jpg"
-              className={errors.imagem ? "border-red-500" : ""}
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
               disabled={isLoading}
-              maxLength={255}
             />
             {errors.imagem && (
               <p className="text-red-500 text-sm">{errors.imagem}</p>
+            )}
+            {formData.imagem && !errors.imagem && (
+              <div>
+                <img
+                  src={formData.imagem}
+                  alt="Imagem do produto"
+                  width="100"
+                />
+                <p>{formData.imagem}</p>
+              </div>
             )}
           </div>
 
@@ -313,15 +332,17 @@ export function ProductForm({
                   ? formData.idCategoriaProduto.toString()
                   : ""
               }
-              onValueChange={(value) =>
-                handleChange("idCategoriaProduto", Number.parseInt(value))
-              }
+              onValueChange={(value) => {
+                const parsedValue = Number.parseInt(value);
+                if (!isNaN(parsedValue)) {
+                  handleChange("idCategoriaProduto", parsedValue);
+                }
+              }}
               disabled={isLoading}
             >
               <SelectTrigger
                 className={errors.idCategoriaProduto ? "border-red-500" : ""}
               >
-                {/* Este SelectValue exibe o placeholder quando não há valor selecionado */}
                 <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -336,6 +357,7 @@ export function ProductForm({
                   ))}
               </SelectContent>
             </Select>
+
             {errors.idCategoriaProduto && (
               <p className="text-red-500 text-sm">
                 {errors.idCategoriaProduto}
@@ -359,12 +381,9 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                // value={formData.valorUnitario}
+                value={formData.valorUnitario}
                 onChange={(e) =>
-                  handleChange(
-                    "valorUnitario",
-                    Number.parseFloat(e.target.value) || 0
-                  )
+                  handleChange("valorUnitario", Number(e.target.value) || 0)
                 }
                 placeholder="0,00"
                 className={errors.valorUnitario ? "border-red-500" : ""}
@@ -408,10 +427,8 @@ export function ProductForm({
                 id="estoque"
                 type="number"
                 min="0"
-                // value={formData.estoque}
-                onChange={(e) =>
-                  handleChange("estoque", Number.parseInt(e.target.value) || 0)
-                }
+                value={formData.estoque}
+                onChange={(e) => handleChange("estoque", e.target.value)}
                 placeholder="0"
                 className={errors.estoque ? "border-red-500" : ""}
                 disabled={isLoading}
@@ -438,7 +455,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                // value={formData.peso}
+                value={formData.peso}
                 onChange={(e) =>
                   handleChange("peso", Number.parseFloat(e.target.value) || 0)
                 }
@@ -458,7 +475,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                // value={formData.altura}
+                value={formData.altura}
                 onChange={(e) =>
                   handleChange("altura", Number.parseFloat(e.target.value) || 0)
                 }
@@ -478,7 +495,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                // value={formData.largura}
+                value={formData.largura}
                 onChange={(e) =>
                   handleChange(
                     "largura",
@@ -501,7 +518,7 @@ export function ProductForm({
                 type="number"
                 step="0.01"
                 min="0"
-                // value={formData.profundidade}
+                value={formData.profundidade}
                 onChange={(e) =>
                   handleChange(
                     "profundidade",
@@ -543,11 +560,7 @@ export function ProductForm({
       {/* Botões */}
       <div className="flex gap-4 pt-4">
         <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading
-            ? "Salvando..."
-            : product
-            ? "Atualizar Produto"
-            : "Adicionar Produto"}
+          {isLoading ? "Salvando..." : "Adicionar Produto"}
         </Button>
         <Button
           type="button"

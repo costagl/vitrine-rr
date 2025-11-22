@@ -21,7 +21,7 @@ interface User {
   loja?: {
     id: string;
     nomeLoja: string;       
-    idCategoria: number;
+    idCategoria: string;
     categoria: string;    
     subdominio: string;
     descricao?: string;     
@@ -88,7 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           manageLocalStorage("remove", "user");
         }
       } else {
-        console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
+        // console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
       }
 
       setLoading(false);
@@ -98,29 +98,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loadUserData();
 
     // Testar conectividade com a API usando a configuração centralizada
-    const testarAPI = async () => {
-      try {
-        const healthUrl = getApiUrl("usuario/health");
+    // const testarAPI = async () => {
+    //   try {
+    //     const healthUrl = getApiUrl("usuario/health");
 
-        const response = await fetch(healthUrl, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          signal: AbortSignal.timeout(5000),
-        });
+    //     const response = await fetch(healthUrl, {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //       },
+    //       signal: AbortSignal.timeout(5000),
+    //     });
 
-        if (response.ok) {
-          console.log("✅ API funcionando!");
-        } else {
-          console.log("❌ API respondeu com erro:", response.status);
-        }
-      } catch (error) {
-        console.log("❌ Erro ao conectar com a API:", (error as Error).message);
-      }
-    };
+    //     if (response.ok) {
+    //       console.log("✅ API funcionando!");
+    //     } else {
+    //       console.log("❌ API respondeu com erro:", response.status);
+    //     }
+    //   } catch (error) {
+    //     console.log("❌ Erro ao conectar com a API:", (error as Error).message);
+    //   }
+    // };
 
-    testarAPI();
+    // testarAPI();
   }, []);
 
   // Função de login

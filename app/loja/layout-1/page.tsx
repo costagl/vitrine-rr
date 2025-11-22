@@ -108,7 +108,7 @@ export default function Layout1Page() {
         }
 
         const data: ApiProduct[] = await response.json();
-        console.log("✅ Produtos da API:", data);
+        // console.log("✅ Produtos da API:", data);
 
         // Mapear os campos da API para o formato esperado pelo frontend
         const produtosMapeados: Product[] = (
@@ -130,7 +130,7 @@ export default function Layout1Page() {
             : undefined,
         }));
 
-        console.log("✅ Produtos mapeados:", produtosMapeados);
+        // console.log("✅ Produtos mapeados:", produtosMapeados);
         setProdutos(produtosMapeados);
       } catch (err: any) {
         console.error("❌ Erro ao carregar produtos:", err);
@@ -158,7 +158,7 @@ export default function Layout1Page() {
       })
       .slice(0, 8); // Limitar a 8 produtos em destaque
 
-    console.log("🔍 Produtos filtrados:", filtered);
+    // console.log("🔍 Produtos filtrados:", filtered);
     return filtered;
   }, [produtos, searchQuery]);
 

@@ -3,10 +3,9 @@ import { manageLocalStorage } from "@/contexts/auth-context";
 import type { LoginResponse } from "@/types/api";
 import type { CategoryProduct, CategoryStore } from "@/types/category";
 
-export async function getProductCategoriesById(teste : string): Promise<CategoryProduct[]> {
+export async function getProductCategoriesById(): Promise<CategoryProduct[]> {
   const userDataString = manageLocalStorage("get", "user");
 
-  console.log(teste);
   let userData: LoginResponse["user"] | null = null;
   let categories: CategoryProduct[] = [];
 
@@ -32,7 +31,7 @@ export async function getStoreCategories(): Promise<CategoryStore[]> {
 }
 
 export async function getCategoryTitleById(id: string): Promise<string> {
-  const categories = await getProductCategoriesById("use-categories");
+  const categories = await getProductCategoriesById();
 
   const category = categories.find((category) => category.id === id);
   return category ? category.titulo : "Categoria não encontrada";
