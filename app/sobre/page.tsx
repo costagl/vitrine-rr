@@ -151,7 +151,6 @@ export default function SobrePage() {
                   src="Screenshot_1.png"
                   alt="CEO"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
-                  layout="responsive"
                   width={500}
                   height={300}
                 />
@@ -172,7 +171,6 @@ export default function SobrePage() {
                   src="Screenshot_2.png"
                   alt="CTO"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
-                  layout="responsive"
                   width={500}
                   height={300}
                 />
@@ -193,7 +191,6 @@ export default function SobrePage() {
                   src="Screenshot_3.png"
                   alt="Head de Produto"
                   className="w-24 h-24 rounded-full mx-auto mb-4"
-                  layout="responsive"
                   width={500}
                   height={300}
                 />

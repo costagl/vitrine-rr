@@ -34,7 +34,6 @@ export default function Banner() {
                   src="/search-rafiki.png"
                   alt="Plataforma de loja online"
                   className="rounded-md w-full h-auto"
-                  layout="responsive" 
                   width={500}
                   height={300}
                 />

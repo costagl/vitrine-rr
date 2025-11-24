@@ -8,6 +8,7 @@ export interface CartItem {
   categoria: string
   estoque: number
   quantidade: number
+  removed?: boolean
 }
 
 export interface Cart {

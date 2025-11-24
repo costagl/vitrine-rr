@@ -268,7 +268,6 @@ export default function Layout3Page() {
                       src={produto.imagem || "/placeholder.svg"}
                       alt={produto.nome}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                      layout="responsive"
                       width={500}
                       height={300}
                     />

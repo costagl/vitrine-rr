@@ -169,7 +169,6 @@ export default function Layout2Page() {
                   src="/placeholder.svg?height=500&width=500"
                   alt="Produto em destaque"
                   className="w-4/5 h-4/5 object-contain"
-                  layout="responsive"
                   width={500}
                   height={300}
                 />
@@ -228,7 +227,6 @@ export default function Layout2Page() {
                       src={produto.imagem || "/placeholder.svg"}
                       alt={produto.nome}
                       className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
-                      layout="responsive"
                       width={500}
                       height={300}
                     />

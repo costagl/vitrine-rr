@@ -166,11 +166,6 @@ export function StoreSettingsDialog({
   };
 
   const handleSave = () => {
-    // console.log("Salvando configurações:", 
-    //   {
-    //   layout: selectedLayout,
-    //   theme: selectedTheme,
-    // });
 
     setTimeout(() => {
       onOpenChange(false);
@@ -278,7 +273,6 @@ export function StoreSettingsDialog({
                             src={layout.image || "/placeholder.svg"}
                             alt={layout.name}
                             className="w-full h-48 object-cover rounded-t-lg"
-                            layout="responsive"
                             width={500}
                             height={300}
                           />

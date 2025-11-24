@@ -522,7 +522,6 @@ export default function Layout3CheckoutPage() {
                             src={produto.imagem || "/placeholder.svg"}
                             alt={produto.nome}
                             className="w-16 h-16 object-cover rounded-lg border-2 border-purple-100"
-                            layout="responsive"
                             width={500}
                             height={300}
                           />

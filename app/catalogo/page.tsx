@@ -17,7 +17,6 @@ import {
 import { CategoryService } from "@/services/category-service";
 import type { CategoryStore } from "@/types/category";
 
-// CONTROLE DE SIMULAÇÃO
 interface Store {
   id: string;
   nome: string;
@@ -33,6 +32,8 @@ interface Store {
   imagemCapa: string;
   isActive: boolean;
   criadaEm: string;
+  tituloTema: string;
+  tituloLayout: string;
 }
 
 export default function CatalogoPage() {
@@ -95,7 +96,10 @@ export default function CatalogoPage() {
           imagemCapa: loja.logotipo || "/placeholder.svg?height=200&width=300",
           ativo: loja.ativo || true,
           criadaEm: loja.dataCriacao || "2025-01-01",
+          tituloTema: loja.tituloTema || "tema-4",
+          tituloLayout: loja.tituloLayout || "layout-4",
         }));
+        console.log("Lojas carregadas da API:", lojasData);
 
         setLojas(lojasData);
       })
@@ -136,10 +140,9 @@ export default function CatalogoPage() {
     filtrarLojas(); // Chama a função assíncrona para filtrar as lojas
   }, [categoriaFiltro, termoBusca, lojas, lojasFiltradas]);
 
-  const abrirLoja = (subdomain: string) => {
-    // TODO: Ajustar em produção
-    // const lojaUrl = `https://${subdomain}.vitrine.com.br`;
-    const lojaUrl = `https://localhost:3000/loja/${subdomain}`;
+  const abrirLoja = async (tituloLayout: string) => {
+    const storeUrl = `http://localhost:3000/loja/${tituloLayout}`;
+    window.open(storeUrl, "_blank");
   };
 
   const renderStars = (rating: number) => {
@@ -243,7 +246,6 @@ export default function CatalogoPage() {
                     src={loja.logotipo || "/placeholder.svg"}
                     alt={loja.nome}
                     className="w-full h-48 object-cover"
-                    layout="responsive"
                     width={500}
                     height={300}
                   />
@@ -297,7 +299,7 @@ export default function CatalogoPage() {
 
                   {/* Botão de Visitar */}
                   <Button
-                    onClick={() => abrirLoja(loja.subdomain)}
+                    onClick={() => abrirLoja(loja.tituloLayout)}
                     className="w-full flex items-center justify-center gap-2"
                     size="sm"
                   >

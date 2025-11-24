@@ -27,20 +27,6 @@ export default function MinhaLojaPage() {
     return () => clearTimeout(timeout);
   }, [isAuthenticated, router]);
 
-  // TODO:
-  // Função para gerar subdomínio válido a partir do nome da loja
-  // const generateSubdomain = (nomeLoja: string) => {
-  //   return nomeLoja
-  //     .toLowerCase()
-  //     .normalize("NFD")
-  //     .replace(/[\u0300-\u036f]/g, "") // Remove acentos
-  //     .replace(/[^a-z0-9\s-]/g, "") // Remove caracteres especiais
-  //     .replace(/\s+/g, "-") // Substitui espaços por hífens
-  //     .replace(/-+/g, "-") // Remove hífens duplicados
-  //     .replace(/^-|-$/g, "") // Remove hífens no início e fim
-  // }
-
-  // Função para copiar URL da loja
   const copyStoreUrl = () => {
     if (user?.loja) {
       const subdomain = user.loja.subdominio;
@@ -63,7 +49,9 @@ export default function MinhaLojaPage() {
           <div>
             <h1 className="text-3xl font-bold">Minha Loja</h1>
             {user?.loja && (
-              <p className="text-gray-600 mt-1">Bem-vindo à {user.loja.nomeLoja}</p>
+              <p className="text-gray-600 mt-1">
+                Bem-vindo à {user.loja.nomeLoja}
+              </p>
             )}
           </div>
 
@@ -260,6 +248,7 @@ export default function MinhaLojaPage() {
                 <Button
                   variant="outline"
                   className="w-full justify-start bg-transparent"
+                  onClick={() => router.push("/minha-loja/pedidos")} // Usando a função aqui
                 >
                   <ExternalLink className="h-4 w-4 mr-2" />
                   Ver Pedidos

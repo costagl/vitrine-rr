@@ -384,7 +384,6 @@ export default function Layout4Page() {
                     src={product.image || "/placeholder.svg"}
                     alt={product.name}
                     className="w-full h-64 object-cover group-hover:scale-110 transition duration-500"
-                    layout="responsive"
                     width={500}
                     height={300}
                   />
@@ -537,7 +536,6 @@ export default function Layout4Page() {
                       src={testimonial.image || "/placeholder.svg"}
                       alt={testimonial.name}
                       className="w-16 h-16 rounded-full object-cover"
-                      layout="responsive"
                       width={500}
                       height={300}
                     />

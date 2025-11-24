@@ -503,7 +503,6 @@ export default function Layout5Checkout() {
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           className="w-16 h-16 rounded-xl object-cover border-2 border-white shadow-md"
-                          layout="responsive"
                           width={500}
                           height={300}
                         />

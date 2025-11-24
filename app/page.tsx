@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/navbar";
 import Banner from "@/components/banner";
+import VLibras from "@/components/vlibras";
 
 export default function HomePage() {
   return (
@@ -9,7 +10,6 @@ export default function HomePage() {
       <Navbar />
       <main className="flex-1">
         <Banner />
-
         {/* Seção de Destaques */}
         <section className="py-16 px-4 md:px-6 lg:px-8 bg-gray-50">
           <div className="container mx-auto">
@@ -144,11 +144,6 @@ export default function HomePage() {
                 Links Rápidos
               </h4>
               <ul className="space-y-2">
-                <li>
-                  <Link href="#" className="hover:text-white transition-colors">
-                    Minha Loja
-                  </Link>
-                </li>
                 <li>
                   <Link href="#" className="hover:text-white transition-colors">
                     Planos

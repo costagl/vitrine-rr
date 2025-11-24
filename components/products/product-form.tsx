@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +20,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { getProductCategoriesById } from "@/hooks/use-categories";
 import type { CreateProductRequest } from "@/types/product";
 import type { CategoryProduct } from "@/types/category";
+import Image from "next/image";
 
 const MAX_IMAGE_SIZE = 30 * 1024 * 1024; // 30MB em bytes
 
@@ -60,25 +63,29 @@ export function ProductForm({
 
   // Preencher o formulário se o produto for fornecido (edição)
   useEffect(() => {
-    if (product) {
-      setFormData({
-        id: product.id,
-        titulo: product.titulo,
-        idLoja: product.idLoja,
-        valorUnitario: product.valorUnitario,
-        valorPromocional: product.valorPromocional,
-        estoque: product.estoque,
-        sku: product.sku,
-        imagem: product.imagem,
-        ativo: product.ativo,
-        peso: product.peso,
-        descricao: product.descricao,
-        altura: product.altura,
-        largura: product.largura,
-        profundidade: product.profundidade,
-        idCategoriaProduto: product.idCategoriaProduto,
-      });
-    }
+    const updateFormData = async () => {
+      if (product) {
+        setFormData({
+          id: product.id,
+          titulo: product.titulo,
+          idLoja: product.idLoja,
+          valorUnitario: product.valorUnitario,
+          valorPromocional: product.valorPromocional,
+          estoque: product.estoque,
+          sku: product.sku,
+          imagem: product.imagem,
+          ativo: product.ativo,
+          peso: product.peso,
+          descricao: product.descricao,
+          altura: product.altura,
+          largura: product.largura,
+          profundidade: product.profundidade,
+          idCategoriaProduto: product.idCategoriaProduto,
+        });
+      }
+    };
+
+    updateFormData();
   }, [product]);
 
   const [categories, setCategories] = useState<CategoryProduct[]>([]);
@@ -169,7 +176,6 @@ export function ProductForm({
     return `SKU${timestamp}${random}`;
   };
 
-  // Função para enviar a imagem para o ImgBB
   // Função para enviar a imagem para o ImgBB
   const handleImageUpload = async (file: File) => {
     if (file.size > MAX_IMAGE_SIZE) {
@@ -301,27 +307,47 @@ export function ProductForm({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="imagem">Carregar Imagem *</Label>
-            <input
-              id="imagem"
-              type="file"
-              accept="image/*"
-              onChange={handleImageChange}
-              disabled={isLoading}
-            />
-            {errors.imagem && (
-              <p className="text-red-500 text-sm">{errors.imagem}</p>
-            )}
-            {formData.imagem && !errors.imagem && (
-              <div>
-                <img
-                  src={formData.imagem}
-                  alt="Imagem do produto"
-                  width="100"
+            <Label htmlFor="imagem">Imagem do Produto *</Label>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Input
+                  id="imagem"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  disabled={isLoading}
+                  className={errors.imagem ? "border-red-500" : ""}
                 />
-                <p>{formData.imagem}</p>
               </div>
-            )}
+
+              {errors.imagem && (
+                <p className="text-red-500 text-sm">{errors.imagem}</p>
+              )}
+
+              {formData.imagem && !errors.imagem && (
+                <div className="rounded-lg border border-border bg-muted/50 p-4">
+                  <div className="flex items-start gap-4">
+                    <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-md border border-border">
+                      <Image
+                        src={formData.imagem || "/placeholder.svg"}
+                        alt="Preview do produto"
+                        className="h-full w-full object-cover"
+                        width={500}
+                        height={500}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground mb-1">
+                        Imagem carregada com sucesso
+                      </p>
+                      <p className="text-xs text-muted-foreground break-all line-clamp-2">
+                        {formData.imagem}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -566,7 +592,7 @@ export function ProductForm({
           type="button"
           variant="outline"
           onClick={onCancel}
-          className="flex-1"
+          className="flex-1 bg-transparent"
           disabled={isLoading}
         >
           Cancelar

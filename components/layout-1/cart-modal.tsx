@@ -106,9 +106,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                             "/placeholder.svg?height=80&width=80"
                           }
                           alt={item.titulo}
-                          fill
                           className="object-cover"
-                          layout="responsive"
                           width={500}
                           height={300}
                         />
@@ -220,7 +218,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
 
               <SheetFooter className="flex-col gap-2 sm:flex-col">
                 <Link
-                  href="/loja/layout-1/checkout"
+                  href="/loja/checkout"
                   className="w-full"
                   onClick={closeCart}
                 >

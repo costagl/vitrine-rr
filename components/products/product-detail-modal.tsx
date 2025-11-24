@@ -80,7 +80,6 @@ export function ProductDetailModal({
                 src={product.imagem || "/placeholder.svg?height=300&width=300"}
                 alt={product.titulo}
                 className="w-full h-full object-cover"
-                layout="responsive"
                 width={500}
                 height={300}
               />

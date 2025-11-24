@@ -410,7 +410,6 @@ export default function Layout4CheckoutPage() {
                           src={item.image || "/placeholder.svg"}
                           alt={item.name}
                           className="w-20 h-20 object-cover rounded-lg"
-                          layout="responsive"
                           width={500}
                           height={300}
                         />

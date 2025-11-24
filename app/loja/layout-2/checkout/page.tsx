@@ -440,7 +440,6 @@ export default function Layout2CheckoutPage() {
                           src={produto.imagem || "/placeholder.svg"}
                           alt={produto.nome}
                           className="w-20 h-20 object-cover bg-gray-50"
-                          layout="responsive"
                           width={500}
                           height={300}
                         />

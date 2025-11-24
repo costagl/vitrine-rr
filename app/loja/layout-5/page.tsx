@@ -361,7 +361,6 @@ export default function Layout5() {
                       src={product.image || "/placeholder.svg"}
                       alt={product.name}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                      layout="responsive"
                       width={500}
                       height={300}
                     />

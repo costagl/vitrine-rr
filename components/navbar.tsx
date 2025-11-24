@@ -12,7 +12,6 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
 
   const menuItems = [
-    { label: "Minha Loja", href: "/minha-loja" },
     { label: "Planos", href: "/planos" },
     { label: "Catálogo de Lojas", href: "/catalogo" },
     { label: "Sobre Nós", href: "/sobre" },
