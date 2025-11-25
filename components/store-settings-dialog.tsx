@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import axios from "axios";
 
 interface StoreSettingsDialogProps {
   open: boolean;
@@ -45,131 +46,110 @@ interface ThemeOption {
   preview: string[];
 }
 
-const layouts: LayoutOption[] = [
-  {
-    id: "layout-1",
-    name: "E-commerce Clássico",
-    description: "Layout tradicional focado em conversão e vendas",
-    image: "/placeholder.jpg",
-    category: "Vendas",
-  },
-  {
-    id: "layout-2",
-    name: "Tech Minimalista",
-    description: "Design clean e moderno para produtos tecnológicos",
-    image: "/placeholder.jpg",
-    category: "Tecnologia",
-  },
-  {
-    id: "layout-3",
-    name: "Arte Criativa",
-    description: "Layout vibrante para produtos artísticos e criativos",
-    image: "/placeholder.jpg",
-    category: "Arte",
-  },
-  {
-    id: "layout-4",
-    name: "PetShop Divertido",
-    description: "Layout alegre e acolhedor para produtos pet",
-    image: "/placeholder.svg?height=200&width=300&text=PetShop",
-    category: "Pets",
-  },
-  {
-    id: "layout-5",
-    name: "Biscuit & Bolos",
-    description: "Design fofo para peças de biscuit e bolos cenográficos",
-    image: "/placeholder.svg?height=200&width=300&text=Biscuit",
-    category: "Artesanato",
-  },
-  {
-    id: "layout-6",
-    name: "Moda Premium",
-    description: "Layout sofisticado para moda e acessórios",
-    image: "/placeholder.svg?height=200&width=300&text=Moda+Premium",
-    category: "Moda",
-  },
-];
-
-const themes: ThemeOption[] = [
-  {
-    id: "blue",
-    name: "Azul Profissional",
-    primary: "#2563eb",
-    secondary: "#64748b",
-    accent: "#0ea5e9",
-    preview: ["#2563eb", "#64748b", "#0ea5e9", "#f1f5f9"],
-  },
-  {
-    id: "purple",
-    name: "Roxo Moderno",
-    primary: "#4400FF",
-    secondary: "#8b5cf6",
-    accent: "#a855f7",
-    preview: ["#4400FF", "#8b5cf6", "#a855f7", "#f3f4f6"],
-  },
-  {
-    id: "green",
-    name: "Verde Natural",
-    primary: "#059669",
-    secondary: "#10b981",
-    accent: "#34d399",
-    preview: ["#059669", "#10b981", "#34d399", "#f0fdf4"],
-  },
-  {
-    id: "orange",
-    name: "Laranja Energético",
-    primary: "#ea580c",
-    secondary: "#f97316",
-    accent: "#fb923c",
-    preview: ["#ea580c", "#f97316", "#fb923c", "#fff7ed"],
-  },
-  {
-    id: "pink",
-    name: "Rosa Criativo",
-    primary: "#db2777",
-    secondary: "#ec4899",
-    accent: "#f472b6",
-    preview: ["#db2777", "#ec4899", "#f472b6", "#fdf2f8"],
-  },
-  {
-    id: "teal",
-    name: "Azul Turquesa",
-    primary: "#0d9488",
-    secondary: "#14b8a6",
-    accent: "#2dd4bf",
-    preview: ["#0d9488", "#14b8a6", "#2dd4bf", "#f0fdfa"],
-  },
-];
-
 const LAYOUTS_PER_PAGE = 3;
 
 export function StoreSettingsDialog({
   open,
   onOpenChange,
 }: StoreSettingsDialogProps) {
-  const [selectedLayout, setSelectedLayout] = useState<string>("layout-1");
-  const [selectedTheme, setSelectedTheme] = useState<string>("purple");
+  const [selectedLayout, setSelectedLayout] = useState<string>("");
+  const [selectedTheme, setSelectedTheme] = useState<string>("");
   const [activeTab, setActiveTab] = useState<"layout" | "theme">("layout");
   const [currentPage, setCurrentPage] = useState(0);
 
+  // Estados para armazenar os dados dos layouts e temas
+  const [layouts, setLayouts] = useState<LayoutOption[]>([]);
+  const [themes, setThemes] = useState<ThemeOption[]>([]);
+
+  // Total de páginas baseado no número de layouts por página
   const totalPages = Math.ceil(layouts.length / LAYOUTS_PER_PAGE);
   const startIndex = currentPage * LAYOUTS_PER_PAGE;
   const endIndex = startIndex + LAYOUTS_PER_PAGE;
   const currentLayouts = layouts.slice(startIndex, endIndex);
 
+  // Carregar layouts e temas da API e recuperar o layout/tema selecionado
+  useEffect(() => {
+    const fetchLayoutsAndThemes = async () => {
+      try {
+        const response = await axios.get("https://localhost:7083/loja/listar-layouts-temas");
+        const { layouts, temas } = response.data;
+
+        // Atualizando os estados com os dados recebidos
+        setLayouts(
+          layouts.map((layout: any) => ({
+            id: layout.id.toString(),
+            name: layout.titulo,
+            description: layout.descricao,
+            image: layout.imagemUrl || "/placeholder.jpg",
+            category: layout.loja.length ? layout.loja[0]?.category || "Outros" : "Outros",
+          }))
+        );
+
+        setThemes(
+          temas.map((theme: any) => ({
+            id: theme.id.toString(),
+            name: theme.titulo,
+            primary: theme.corPrimaria,
+            secondary: theme.corSecundaria,
+            accent: theme.realce,
+            preview: [theme.corPrimaria, theme.corSecundaria, theme.realce, "#f0f0f0"],
+          }))
+        );
+      } catch (error) {
+        console.error("Erro ao buscar layouts e temas", error);
+      }
+    };
+
+    fetchLayoutsAndThemes();
+
+    // Recuperar dados da loja do localStorage
+    const userDataString = localStorage.getItem("user");
+    const userData = userDataString ? JSON.parse(userDataString) : null;
+
+    // Se os dados do usuário estiverem disponíveis no localStorage
+    if (userData && userData.loja) {
+      // Definir o layout e tema selecionados com base nos dados da loja
+      setSelectedLayout(userData.loja.idLayout || "");
+      setSelectedTheme(userData.loja.idTema || "");
+    }
+  }, []);
+
+  // Função para navegar para a página anterior
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(0, prev - 1));
   };
 
+  // Função para navegar para a próxima página
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
   };
 
-  const handleSave = () => {
+  // Função de salvar e fazer a requisição para o backend
+  const handleSave = async () => {
+    // Recuperando o ID da loja do localStorage
+    const userDataString = localStorage.getItem("user");
+    const userData = userDataString ? JSON.parse(userDataString) : null;
 
-    setTimeout(() => {
-      onOpenChange(false);
-    }, 1000);
+    if (userData && userData.loja && userData.loja.id) {
+      const lojaId = userData.loja.id;
+
+      // Montando o payload para enviar ao backend
+      const payload = {
+        NovoLayoutId: selectedLayout || 0,
+        NovoTemaId: selectedTheme || 0,
+      };
+
+      try {
+        const response = await axios.put(
+          `https://localhost:7083/loja/alterar-layout-tema/${lojaId}`,
+          payload
+        );
+        console.log(response.data); // Pode mostrar o que o backend retornou
+        onOpenChange(false); // Fecha o modal após salvar
+      } catch (error) {
+        console.error("Erro ao salvar layout e tema", error);
+      }
+    }
   };
 
   return (
@@ -270,7 +250,7 @@ export function StoreSettingsDialog({
                       <CardContent className="p-0">
                         <div className="relative">
                           <Image
-                            src={layout.image || "/placeholder.svg"}
+                            src={layout.image || "/placeholder.jpg"}
                             alt={layout.name}
                             className="w-full h-48 object-cover rounded-t-lg"
                             width={500}

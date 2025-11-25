@@ -15,7 +15,6 @@ import {
   Users,
 } from "lucide-react";
 import { CategoryService } from "@/services/category-service";
-import type { CategoryStore } from "@/types/category";
 
 interface Store {
   id: string;
@@ -50,8 +49,7 @@ export default function CatalogoPage() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categorias: CategoryStore[] =
-          await CategoryService.listarCategoriasLoja(); // Espera a resposta da API
+        const categorias = await CategoryService.listarCategoriasLoja(); // Espera a resposta da API
         const formattedCategories = categorias.map((category) => ({
           value: category.id.toString(),
           label: category.titulo,
@@ -62,13 +60,12 @@ export default function CatalogoPage() {
       }
     };
 
-    fetchCategories(); // Chama a função para buscar as categorias
+    fetchCategories();
   }, []);
 
-  // TODO: Padronizar fetch
   // Buscar lojas da API ao montar o componente
   useEffect(() => {
-    fetch("https://localhost:7083/lojas", {
+    fetch("https://localhost:7083/loja", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -96,11 +93,9 @@ export default function CatalogoPage() {
           imagemCapa: loja.logotipo || "/placeholder.svg?height=200&width=300",
           ativo: loja.ativo || true,
           criadaEm: loja.dataCriacao || "2025-01-01",
-          tituloTema: loja.tituloTema || "tema-4",
-          tituloLayout: loja.tituloLayout || "layout-4",
+          tituloTema: loja.tituloTema || "tema-1",
+          tituloLayout: loja.tituloLayout || "layout-1",
         }));
-        console.log("Lojas carregadas da API:", lojasData);
-
         setLojas(lojasData);
       })
       .catch((error) => {
@@ -130,8 +125,6 @@ export default function CatalogoPage() {
         );
       }
 
-      // Atualizar o estado se o resultado for diferente do estado anterior
-      // Verificar com JSON.stringify para evitar renderizações desnecessárias
       if (JSON.stringify(lojasFiltradas) !== JSON.stringify(resultado)) {
         setLojasFiltradas(resultado);
       }
@@ -140,8 +133,13 @@ export default function CatalogoPage() {
     filtrarLojas(); // Chama a função assíncrona para filtrar as lojas
   }, [categoriaFiltro, termoBusca, lojas, lojasFiltradas]);
 
-  const abrirLoja = async (tituloLayout: string) => {
-    const storeUrl = `http://localhost:3000/loja/${tituloLayout}`;
+  // Função para abrir a loja com o layout correto
+  const abrirLoja = async (
+    tituloLayout: string,
+    subdominio: string,
+    idLoja: string
+  ) => {
+    const storeUrl = `http://localhost:3000/loja/${tituloLayout}/?subdominio=${subdominio}`;
     window.open(storeUrl, "_blank");
   };
 
@@ -297,9 +295,9 @@ export default function CatalogoPage() {
                     </p>
                   </div>
 
-                  {/* Botão de Visitar */}
+                  {/* Botão de Visitar Loja */}
                   <Button
-                    onClick={() => abrirLoja(loja.tituloLayout)}
+                    onClick={() => abrirLoja(loja.tituloLayout, loja.subdomain, loja.id)}
                     className="w-full flex items-center justify-center gap-2"
                     size="sm"
                   >

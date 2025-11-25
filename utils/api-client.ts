@@ -94,7 +94,7 @@ class ApiClient {
     const controller = this.createAbortController()
     const fullUrl = `${getApiBaseUrl()}${endpoint}`
 
-    console.log(`🔍 ${method}: ${fullUrl}`)
+    // console.log(`🔍 Fazendo Requisição ${method}: ${fullUrl}`)
 
     try {
       const headers = this.getHeaders()
@@ -107,7 +107,7 @@ class ApiClient {
         ...options,
       })
 
-      console.log(`✅ ${method} Response [${response.status}]: ${fullUrl}`)
+      console.log(`✅ Sucedido ${method} Response [${response.status}]: ${fullUrl}`)
       return this.handleResponse<T>(response)
     } catch (error) {
       console.error(`❌ ${method} Error: ${fullUrl}`, error)
@@ -121,12 +121,14 @@ class ApiClient {
   }
 
   async post<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
-    console.log("POST", endpoint, data, options)
+    // console.log("POST", endpoint, data, options)
+    console.log("POST", endpoint, options)
     return this.makeRequest<T>("POST", endpoint, data, options)
   }
 
   async put<T>(endpoint: string, data?: any, options?: RequestInit): Promise<ApiResponse<T>> {
-    console.log("PUT", endpoint, data, options)
+    // console.log("PUT", endpoint, data, options)
+    console.log("PUT", endpoint, options)
     return this.makeRequest<T>("PUT", endpoint, data, options)
   }
 

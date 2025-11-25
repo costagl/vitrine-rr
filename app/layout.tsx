@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { AuthProvider } from "@/contexts/auth-context"
 import { CartProvider } from "@/contexts/cart-context"
-import VLibras from "@/components/vlibras" // Importando o componente VLibras
+import VLibras from "@/components/vlibras"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +34,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
           <AuthProvider>
             <CartProvider>
-              <VLibras forceOnload /> {/* Adicionando o VLibras para estar disponível em todas as páginas */}
+              <VLibras forceOnload />
               {children}
               <Toaster />
             </CartProvider>

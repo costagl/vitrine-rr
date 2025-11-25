@@ -108,7 +108,7 @@ export default function SobrePage() {
         </div>
 
         {/* Estatísticas */}
-        <Card className="mb-12">
+        {/* <Card className="mb-12">
           <CardContent className="p-8">
             <h2 className="text-3xl font-bold text-center mb-8">
               Nossos Números
@@ -138,7 +138,7 @@ export default function SobrePage() {
               </div>
             </div>
           </CardContent>
-        </Card>
+        </Card> */}
 
         {/* Equipe */}
         <div className="mb-12">

@@ -239,7 +239,7 @@ export default function MinhaLojaPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <Link href="/minha-loja/produtos">
+                <Link href="/minha-loja/gerenciamento-produtos">
                   <Button className="w-full justify-start">
                     <Store className="h-4 w-4 mr-2" />
                     Gerenciar Produtos

@@ -174,7 +174,7 @@ export default function ProdutosLayout1Page() {
         <Card className="max-w-md w-full">
           <CardContent className="pt-6 text-center">
             <p className="text-red-600 mb-4">{error}</p>
-            <Link href="/minha-loja/layout-1">
+            <Link href="/loja/layout-1">
               <Button>Voltar para Loja</Button>
             </Link>
           </CardContent>
@@ -189,7 +189,7 @@ export default function ProdutosLayout1Page() {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link href="/minha-loja/layout-1">
+              <Link href="/loja/layout-1">
                 <Button variant="ghost" size="sm">
                   <ChevronLeft className="h-4 w-4 mr-1" />
                   Voltar
@@ -223,7 +223,7 @@ export default function ProdutosLayout1Page() {
             Início
           </Link>
           <span className="mx-2">/</span>
-          <Link href="/minha-loja/layout-1" className="hover:text-gray-900">
+          <Link href="/loja/layout-1" className="hover:text-gray-900">
             Minha Loja
           </Link>
           <span className="mx-2">/</span>

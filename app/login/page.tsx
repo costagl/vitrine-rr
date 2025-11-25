@@ -24,6 +24,7 @@ import Navbar from "@/components/navbar";
 import { AuthService } from "@/services/auth-service";
 import type { LoginRequest } from "@/types/api";
 import { ApiError } from "@/utils/api-client";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const { toast } = useToast();
@@ -64,40 +65,26 @@ export default function LoginPage() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const isDevLogin = formData.email === "Dev1@email.com" && formData.senha === "Dev1@email.com";
-
-    if (isDevLogin == true) {
-      // console.log("🔒 Login de desenvolvimento detectado.");
-
-      // Simulação de resposta de login para o desenvolvimento
-      const simulatedResponse = {
-        token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6Ikpva8O1byBvZSBXZWJzY29tIiwiaWF0IjoxNTE2MjM5MDIyfQ.Cn0h9UN28EjBaDSjbsMYHYHG_vtF4pa7sHUE5qXuyD0",
-        refreshToken: "refresh-token-simulado",
-        expiresIn: 3600,
-        user: {
-          id: "1",
-          cpfCnpj: "123.456.789-00",
-          nome: "Gabriel da Silva",
-          email: formData.email,
-          loja: {
-            id: "101",
-            nome: "Loja Exemplo",
-            categoria: "Vestuário",
-            subdominio: "lojaexemplo"
-          }
-        },
+    try {
+      // Organiza os dados de login do formulário
+      const credentials: LoginRequest = {
+        email: formData.email,
+        senha: formData.senha,
+        rememberMe: rememberMe,
       };
+
+      const response = await AuthService.login(credentials); // Realiza o Login
 
       // Salvar email se "Lembrar de mim" estiver marcado
       if (rememberMe) {
         saveEmailIfRemembered(formData.email);
       }
 
-      // Atualiza contexto de autenticação com os dados simulados
-      login(simulatedResponse.token, simulatedResponse.refreshToken, simulatedResponse.user);
+      // Atualiza contexto de autenticação
+      login(response.token, response.refreshToken, response.user);
 
       toast({
-        title: "Login de desenvolvimento realizado com sucesso!",
+        title: "Login realizado com sucesso!",
         description: rememberMe
           ? "Você será lembrado na próxima visita."
           : "Você será redirecionado para a página inicial.",
@@ -106,58 +93,34 @@ export default function LoginPage() {
 
       resetForm();
       setTimeout(() => router.push("/"), 0);
-    }
-    else {
-      try {
-        // Organiza os dados de login do formulário
-        const credentials: LoginRequest = {
-          email: formData.email,
-          senha: formData.senha,
-          rememberMe: rememberMe,
-        };
+    } catch (error) {
+      console.error("Erro ao fazer login:", error);
 
-        const response = await AuthService.login(credentials); // Realiza o Login
-
-        // Salvar email se "Lembrar de mim" estiver marcado
-        if (rememberMe) {
-          saveEmailIfRemembered(formData.email);
-        }
-
-        // Atualiza contexto de autenticação
-        login(response.token, response.refreshToken, response.user);
-
+      if (error instanceof ApiError) {
         toast({
-          title: "Login realizado com sucesso!",
-          description: rememberMe
-            ? "Você será lembrado na próxima visita."
-            : "Você será redirecionado para a página inicial.",
-          duration: 3000,
+          title: "Erro ao entrar",
+          description: error.message,
+          variant: "destructive",
+          duration: 5000,
         });
-
-        resetForm();
-        setTimeout(() => router.push("/"), 0);
-      } catch (error) {
-        console.error("Erro ao fazer login:", error);
-
-        if (error instanceof ApiError) {
-          toast({
-            title: "Erro ao entrar",
-            description: error.message,
-            variant: "destructive",
-            duration: 5000,
-          });
-        } else {
-          toast({
-            title: "Erro ao entrar",
-            description: (error as Error).message,
-            variant: "destructive",
-            duration: 5000,
-          });
-        }
-      } finally {
-        setIsSubmitting(false);
+      } else {
+        toast({
+          title: "Erro ao entrar",
+          description: (error as Error).message,
+          variant: "destructive",
+          duration: 5000,
+        });
       }
+    } finally {
+      setIsSubmitting(false);
     }
+  };
+
+  // Comportamento de mostrar/esconder Senha
+  const [showSenha, setShowSenha] = useState(false);
+
+  const toggleSenhaVisibility = () => {
+    setShowSenha(!showSenha);
   };
 
   return (
@@ -173,6 +136,7 @@ export default function LoginPage() {
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={handleSubmit}>
+              {/* Email */}
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -185,6 +149,7 @@ export default function LoginPage() {
                   required
                 />
               </div>
+              {/* Senha */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="senha">Senha</Label>
@@ -195,15 +160,26 @@ export default function LoginPage() {
                     Esqueceu a senha?
                   </Link>
                 </div>
-                <Input
-                  id="senha"
-                  name="senha"
-                  type="password"
-                  placeholder="Digite sua senha"
-                  value={formData.senha}
-                  onChange={handleChange}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="senha"
+                    name="senha"
+                    type={showSenha ? "text" : "password"}
+                    placeholder="Digite sua senha"
+                    value={formData.senha}
+                    onChange={handleChange}
+                    required
+                    className="pr-10"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 opacity-75 hover:opacity-100 text-gray-500 cursor-pointer"
+                    onClick={toggleSenhaVisibility}
+                    aria-label="Mostrar/Esconder Senha"
+                  >
+                    {showSenha ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
               </div>
 
               {/* Checkbox Lembrar de mim */}

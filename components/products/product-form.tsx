@@ -60,6 +60,7 @@ export function ProductForm({
 
   // Estado para erros de validação
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isImageLoading, setIsImageLoading] = useState(false); // Novo estado para controle de carregamento da imagem
 
   // Preencher o formulário se o produto for fornecido (edição)
   useEffect(() => {
@@ -130,7 +131,7 @@ export function ProductForm({
     }
 
     if (!formData.imagem.trim()) {
-      newErrors.imagem = "Imagem é obrigatório";
+      newErrors.imagem = "Imagem é obrigatória";
     }
 
     if (formData.estoque < 0) {
@@ -190,6 +191,7 @@ export function ProductForm({
     formDataImgBB.append("image", file);
 
     try {
+      setIsImageLoading(true); // Definir o estado para carregando a imagem
       const response = await fetch(
         `https://api.imgbb.com/1/upload?key=1451d4d045251d16eb45c9c8247382bc`,
         {
@@ -200,7 +202,7 @@ export function ProductForm({
       const data = await response.json();
 
       if (data.success) {
-        // Atualize o estado com a URL da imagem (use o campo `image.url` da resposta)
+        // Atualize o estado com a URL da imagem
         setFormData((prev) => ({
           ...prev,
           imagem: data.data.image.url, // A URL da imagem carregada
@@ -218,6 +220,8 @@ export function ProductForm({
         ...prev,
         imagem: "Erro ao enviar a imagem. Tente novamente.",
       }));
+    } finally {
+      setIsImageLoading(false); // Definir o estado como não carregando após a operação
     }
   };
 
@@ -230,11 +234,29 @@ export function ProductForm({
   };
 
   // Função de envio do formulário
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Verificar se a imagem foi carregada com sucesso
+    if (isImageLoading) {
+      setErrors((prev) => ({
+        ...prev,
+        imagem:
+          "A imagem ainda está sendo carregada. Tente novamente em instantes.",
+      }));
+      return;
+    }
+
     if (validateForm()) {
-      onSave(formData);
+      // Esperar até que a URL da imagem tenha sido definida antes de chamar o onSave
+      if (formData.imagem.trim()) {
+        onSave(formData);
+      } else {
+        setErrors((prev) => ({
+          ...prev,
+          imagem: "A imagem é obrigatória.",
+        }));
+      }
     }
   };
 
@@ -585,15 +607,19 @@ export function ProductForm({
 
       {/* Botões */}
       <div className="flex gap-4 pt-4">
-        <Button type="submit" className="flex-1" disabled={isLoading}>
-          {isLoading ? "Salvando..." : "Adicionar Produto"}
+        <Button
+          type="submit"
+          className="flex-1"
+          disabled={isLoading || isImageLoading}
+        >
+          {isLoading || isImageLoading ? "Salvando..." : "Adicionar Produto"}
         </Button>
         <Button
           type="button"
           variant="outline"
           onClick={onCancel}
           className="flex-1 bg-transparent"
-          disabled={isLoading}
+          disabled={isLoading || isImageLoading}
         >
           Cancelar
         </Button>

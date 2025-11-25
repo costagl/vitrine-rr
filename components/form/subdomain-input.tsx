@@ -15,11 +15,27 @@ interface SubdomainInputProps {
   storeName: string
 }
 
-export function SubdomainInput({ id, name, label, value, onChange, error, attempted, storeName }: SubdomainInputProps) {
+export function SubdomainInput({
+  id,
+  name,
+  label,
+  value,
+  onChange,
+  error,
+  attempted,
+  storeName,
+}: SubdomainInputProps) {
   const hasError = error && attempted
 
+  // Função de validação
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onChange(e)
+    const regex = /^[a-z]+$/; // Aceita apenas letras minúsculas sem espaços ou caracteres especiais
+    const inputValue = e.target.value;
+
+    // Verifica se o valor atende à expressão regular ou está vazio
+    if (regex.test(inputValue) || inputValue === "") {
+      onChange(e); // Chama onChange apenas se o valor for válido
+    }
   }
 
   return (

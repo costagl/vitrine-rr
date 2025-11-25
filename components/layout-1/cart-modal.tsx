@@ -64,16 +64,8 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
               <ShoppingBag className="h-5 w-5" />
               Carrinho de Compras
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onOpenChange(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
           </SheetTitle>
         </SheetHeader>
-
         {cart.items.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-center py-12">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
@@ -85,6 +77,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
             <p className="text-muted-foreground text-center mb-4">
               Adicione produtos ao carrinho para continuar comprando
             </p>
+            {/* Botão "Continuar Comprando" fecha o carrinho */}
             <Button onClick={closeCart}>Continuar Comprando</Button>
           </div>
         ) : (
@@ -105,7 +98,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                             item.imagemUrl ||
                             "/placeholder.svg?height=80&width=80"
                           }
-                          alt={item.titulo}
+                          alt={item.titulo || "Imagem do produto"}
                           className="object-cover"
                           width={500}
                           height={300}

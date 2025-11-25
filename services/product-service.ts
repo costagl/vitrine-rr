@@ -81,7 +81,7 @@ export class ProductService {
       }
 
       const data = await response.json()
-      console.log("✅ ProductService: Produtos listados com sucesso:", data)
+      // console.log("✅ ProductService: Produtos listados com sucesso:", data)
 
       // A API retorna diretamente um array de produtos
       return Array.isArray(data) ? data : []

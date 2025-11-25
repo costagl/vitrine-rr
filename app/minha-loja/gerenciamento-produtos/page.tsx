@@ -1,22 +1,22 @@
 "use client"
 
-import { useState, useEffect, useMemo } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import Navbar from "@/components/navbar"
-import { ProductForm } from "@/components/products/product-form"
-import { ProductList } from "@/components/products/product-list"
-import { ProductSearch } from "@/components/products/product-search"
-import { ProductStats } from "@/components/products/product-stats"
-import { ProductDetailModal } from "@/components/products/product-detail-modal"
-import { Plus, Package, ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/use-products"
-import { useAuthToken } from "@/hooks/use-auth-token"
-import type { Product, CreateProductRequest, ProductSearchParams } from "@/types/product"
+import { useState, useEffect, useMemo } from "react" // Importação de hooks do React: useState, useEffect e useMemo, que permitem controlar o estado, realizar efeitos colaterais e memorizar valores respectivamente.
+import { useRouter } from "next/navigation" // Hook do Next.js para controle de navegação entre páginas.
+import { useAuth } from "@/contexts/auth-context" // Hook customizado para acessar o contexto de autenticação do usuário.
+import { Button } from "@/components/ui/button" // Componente de botão reutilizável da UI.
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card" // Componentes reutilizáveis para exibir informações em formato de cartão.
+import { Badge } from "@/components/ui/badge" // Componente de badge para exibir contadores ou status.
+import Navbar from "@/components/navbar" // Componente de navegação (barra superior).
+import { ProductForm } from "@/components/products/product-form" // Componente de formulário para adicionar ou editar produtos.
+import { ProductList } from "@/components/products/product-list" // Componente para listar os produtos.
+import { ProductSearch } from "@/components/products/product-search" // Componente de pesquisa para filtrar produtos.
+import { ProductStats } from "@/components/products/product-stats" // Componente para exibir estatísticas dos produtos.
+import { ProductDetailModal } from "@/components/products/product-detail-modal" // Componente de modal para exibir detalhes do produto selecionado.
+import { Plus, Package, ArrowLeft } from "lucide-react" // Ícones utilizados na interface, fornecidos pelo pacote lucide-react.
+import Link from "next/link" // Componente de link do Next.js para navegação sem recarregar a página.
+import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/use-products" // Hooks customizados para realizar operações CRUD nos produtos (listar, criar, editar, excluir).
+import { useAuthToken } from "@/hooks/use-auth-token" // Hook customizado para acessar o token de autenticação.
+import type { Product, CreateProductRequest, ProductSearchParams } from "@/types/product" // Tipagens relacionadas aos produtos, incluindo a estrutura do produto, dados de criação e parâmetros de pesquisa.
 
 export default function ProductsManagementPage() {
   const { isAuthenticated, user } = useAuth()
@@ -87,7 +87,6 @@ export default function ProductsManagementPage() {
     return () => clearTimeout(timeout);
   }, [token, authTokenLoading, router])
 
-  // Funções para CRUD
   const handleAddProduct = () => {
     setEditingProduct(null)
     setShowForm(true)
