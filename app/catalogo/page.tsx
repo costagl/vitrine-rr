@@ -139,7 +139,7 @@ export default function CatalogoPage() {
     subdominio: string,
     idLoja: string
   ) => {
-    const storeUrl = `http://localhost:3000/loja/${tituloLayout}/?subdominio=${subdominio}`;
+    const storeUrl = `http://localhost:3000/loja/${tituloLayout}/?subdominio=${subdominio}&idLoja=${idLoja}`;
     window.open(storeUrl, "_blank");
   };
 

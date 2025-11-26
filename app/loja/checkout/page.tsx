@@ -1,101 +1,134 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { MapPin, User, ShoppingBag, CreditCard, CheckCircle2 } from "lucide-react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Separator } from "@/components/ui/separator"
-
-interface Endereco {
-  logradouro: string
-  numero: string
-  complemento: string
-  bairro: string
-  cidade: string
-  estado: string
-  cep: string
-}
+import type React from "react";
+import { useState, useEffect } from "react";
+import {
+  MapPin,
+  User,
+  ShoppingBag,
+  CreditCard,
+  CheckCircle2,
+} from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { useCart } from "@/contexts/cart-context";
+import { CalcularFrete } from "@/hooks/use-frete";
+import axios from "axios";
 
 interface ItemPedido {
-  idProduto: number
-  quantidade: number
-  precoUnitario: number
-  precoTotal: number
+  idProduto: number;
+  tituloProduto: string;
+  quantidade: number;
+  precoUnitario: number;
+  precoTotal: number;
 }
 
 interface Pedido {
-  idLoja: number
-  idEnderecoEntrega: number
-  freteValor: number
+  idLoja: string;
+  idEnderecoEntrega: number;
+  freteValor: number;
 }
 
-interface ClienteEnderecoPedidoVM {
-  cpf: string
-  nomeCompleto: string
-  email: string
-  telefone: string
-  enderecosEntrega: Endereco[]
-  pedidos: Pedido[]
-  itensPedido: ItemPedido[]
+export interface ClienteEnderecoPedidoVM {
+  cpf: string;
+  nomeCompleto: string;
+  email: string;
+  telefone: string;
+  enderecoEntrega: {
+    logradouro: string;
+    numero: string;
+    complemento: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    cep: string;
+  };
+  pedidos: Pedido[];
+  itensPedido: ItemPedido[];
 }
 
 const Checkout = () => {
+  const [idLojaUrl, setIdLoja] = useState<string>();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idLoja = urlParams.get("idLoja");
+    const subdominio = urlParams.get("subdominio");
+
+    const savedCart = localStorage.getItem(`cartData_${subdominio}`);
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      setFormData((prevData) => ({
+        ...prevData,
+        itensPedido: parsedCart.items.map((item: any) => ({
+          idProduto: parseInt(item.id),
+          tituloProduto: item.titulo,
+          quantidade: item.quantidade,
+          precoUnitario: item.valorUnitario,
+          precoTotal: item.valorUnitario * item.quantidade,
+        })),
+      }));
+    }
+  }, []);
+  const { cart } = useCart();
   const [formData, setFormData] = useState<ClienteEnderecoPedidoVM>({
     cpf: "",
     nomeCompleto: "",
     email: "",
     telefone: "",
-    enderecosEntrega: [
-      {
-        logradouro: "",
-        numero: "",
-        complemento: "",
-        bairro: "",
-        cidade: "",
-        estado: "",
-        cep: "",
-      },
-    ],
+    enderecoEntrega: {
+      logradouro: "",
+      numero: "",
+      complemento: "",
+      bairro: "",
+      cidade: "",
+      estado: "",
+      cep: "",
+    },
     pedidos: [
       {
-        idLoja: 4,
+        idLoja: idLojaUrl || "0",
         idEnderecoEntrega: 1,
-        freteValor: 20.0,
+        freteValor: 0,
       },
     ],
-    itensPedido: [
-      {
-        idProduto: 3,
-        quantidade: 2,
-        precoUnitario: 50.0,
-        precoTotal: 100.0,
-      },
-    ],
-  })
+    itensPedido: cart.items.map((item) => ({
+      idProduto: parseInt(item.id),
+      tituloProduto: item.titulo,
+      quantidade: item.quantidade,
+      precoUnitario: item.valorUnitario,
+      precoTotal: item.valorUnitario * item.quantidade,
+    })),
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
+    const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleEnderecoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    const updatedEndereco = { ...formData.enderecosEntrega[0], [name]: value }
+    const { name, value } = e.target;
+    const updatedEndereco = { ...formData.enderecoEntrega, [name]: value };
     setFormData({
       ...formData,
-      enderecosEntrega: [updatedEndereco],
-    })
-  }
+      enderecoEntrega: updatedEndereco,
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
       const response = await fetch("https://localhost:7083/pedido/cadastrar", {
@@ -104,27 +137,100 @@ const Checkout = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
-      const data = await response.json()
-      console.log(data.message)
-      console.log(data.error)
+      const data = await response.json();
+      console.log(data.message);
+      console.log(data.error);
 
       if (!response.ok) {
-        throw new Error("Erro ao cadastrar o pedido")
+        throw new Error("Erro ao cadastrar o pedido");
       }
-    } catch (error) {
-      alert(error.message)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        alert(error.message);
+      } else {
+        alert("Erro desconhecido");
+      }
     }
-  }
+  };
+
+  // Lógica de Frete
+  const [cep, setCep] = useState("");
+  const [frete, setFrete] = useState(0);
+
+  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCep(e.target.value);
+  };
+
+  // const handleFreteCheck = async () => {
+  //   const produtos = formData.itensPedido.map((item) => ({
+  //     id: item.idProduto.toString(),
+  //     width: 0,
+  //     height: 0,
+  //     length: 0,
+  //     weight: 0,
+  //     insurance_value: 0,
+  //     quantity: item.quantidade,
+  //   }));
+  //   const resultadoFrete = await CalcularFrete(cep, produtos);
+
+  //   if (resultadoFrete) {
+  //     setFrete(resultadoFrete.valorFrete);
+  //   }
+  // };
+
+  const handleFreteCheck = async () => {
+    const TokenMelhorEnvio =
+      "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5NTYiLCJqdGkiOiJlNTgwYjExNmYwZWM1MmYzZTM3YjI4OGMzYTRkZGI1MmJiMzhiNzUxMTZjMTJhOTVjMmQzNGI0OTM1ZmY1MDE1MWYzZGJmZjM1ZTliY2Y3ZiIsImlhdCI6MTc2NDE0NDUzMi40MTY2MjIsIm5iZiI6MTc2NDE0NDUzMi40MTY2MjQsImV4cCI6MTc5NTY4MDUzMi40MDgyMTIsInN1YiI6ImEwNmI3NzVjLTVjYmMtNDAwNS1hMDcxLWM2MWFlNjRkNDJkNyIsInNjb3BlcyI6WyJzaGlwcGluZy1jYWxjdWxhdGUiLCJzaGlwcGluZy10cmFja2luZyJdfQ.p8MFP6TxqVHUchsjiyM-Juxe-TG5iRDsP41TQMn60fj1gQPtV54k_pDoK3Z2V5w6rHV11NRbacQveK-CCsGLkJRSmuJ70csKkHmFgkwAAUotI-8jZaUaz7_yFQM9mj4YWHrHwwARJfSchKBIp8QDlctZHbjUNKO_bWVs2WQuGaYg4uuPcMNyQwe8bb41aV6tlDhmYU0jDgrmyrrHr9hKZt3UyFgFLPdfa4BxaaaSTbDLjXoYWsbOtcUOM2ea8BxHIqzBhBDvUaAgbyyTcZZ0fg2uAC5y19CPc27g8dXYKxKm8oTrhC6VfzSRJP8nGfoq-deeNCXVkMDGYN2oQH3eK1mhZffZiCHUCN8MhMpqXr4tvS4hCd9onDnrKr3OH6zcgcW8KYccNQHs7u2AVh6K0HdkZDSw2l8A2QlsE7V69AmY0gLlRKUzxehSUW0mZefGYhqv7xJy_gVSK7p4JzGQsyCDdp7RCER905cpWhYMKXo1Pl4wwtkM1OKL1_GTu_F_9Gp5Tx73KRzeJhSTWUYLTr441DDxIexuEjBuXlUwZyGf4zf_Or_RErYogSjF2IZHd4jwEwGbS5yfIBDcwmGZHLMOiirOMncBkKt3_pZnrW3i0g8WFkxCnU7IUodpNJbD0dVV4psiyD-B9aMcryhW5RxakKSxBUl-ou3yijYhkks";
+
+    const postData = {
+      from: {
+        postal_code: "06660740",
+      },
+      to: {
+        postal_code: cep,
+      },
+      products: formData.itensPedido.map((item) => ({
+        id: item.idProduto.toString(),
+        width: 0,
+        height: 0,
+        length: 0,
+        weight: 0,
+        insurance_value: 0,
+        quantity: item.quantidade,
+      })),
+    };
+
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Bearer ${TokenMelhorEnvio}`,
+      "Content-Type": "application/json",
+      "User-Agent": "Vitrine (glameiramc@gmail.com)",
+    };
+
+    try {
+      const response = await axios.post("/frete/melhorenvio", postData, {
+        headers,
+      });
+      console.log("Dados enviados com sucesso:", response.data[0]);
+      setFrete(parseFloat(response.data[0].price));
+    } catch (error) {
+      console.error("Erro ao enviar dados:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-muted/30 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header with progress indicator */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Finalizar Pedido</h1>
-          <p className="text-muted-foreground">Complete as informações abaixo para finalizar sua compra</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Finalizar Pedido
+          </h1>
+          <p className="text-muted-foreground">
+            Complete as informações abaixo para finalizar sua compra
+          </p>
 
           <div className="flex items-center gap-2 mt-6">
             <div className="flex items-center gap-2">
@@ -232,7 +338,9 @@ const Checkout = () => {
                     </div>
                     <div>
                       <CardTitle>Endereço de Entrega</CardTitle>
-                      <CardDescription>Para onde enviaremos seu pedido</CardDescription>
+                      <CardDescription>
+                        Para onde enviaremos seu pedido
+                      </CardDescription>
                     </div>
                   </div>
                 </CardHeader>
@@ -244,7 +352,7 @@ const Checkout = () => {
                         type="text"
                         id="logradouro"
                         name="logradouro"
-                        value={formData.enderecosEntrega[0].logradouro}
+                        value={formData.enderecoEntrega.logradouro}
                         onChange={handleEnderecoChange}
                         required
                         placeholder="Rua, Avenida, etc."
@@ -256,7 +364,7 @@ const Checkout = () => {
                         type="text"
                         id="numero"
                         name="numero"
-                        value={formData.enderecosEntrega[0].numero}
+                        value={formData.enderecoEntrega.numero}
                         onChange={handleEnderecoChange}
                         required
                         placeholder="123"
@@ -271,7 +379,7 @@ const Checkout = () => {
                         type="text"
                         id="complemento"
                         name="complemento"
-                        value={formData.enderecosEntrega[0].complemento}
+                        value={formData.enderecoEntrega.complemento}
                         onChange={handleEnderecoChange}
                         placeholder="Apto, Bloco, etc."
                       />
@@ -282,7 +390,7 @@ const Checkout = () => {
                         type="text"
                         id="bairro"
                         name="bairro"
-                        value={formData.enderecosEntrega[0].bairro}
+                        value={formData.enderecoEntrega.bairro}
                         onChange={handleEnderecoChange}
                         required
                         placeholder="Nome do bairro"
@@ -293,23 +401,42 @@ const Checkout = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="cep">CEP</Label>
-                      <Input
-                        type="text"
-                        id="cep"
-                        name="cep"
-                        value={formData.enderecosEntrega[0].cep}
-                        onChange={handleEnderecoChange}
-                        required
-                        placeholder="00000-000"
-                      />
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="text"
+                          id="cep"
+                          name="cep"
+                          value={cep}
+                          onChange={handleCepChange}
+                          required
+                          placeholder="00000-000"
+                        />
+                        <Button
+                          type="button"
+                          onClick={handleFreteCheck}
+                          size="sm"
+                        >
+                          Verificar Frete
+                        </Button>
+                      </div>
+                      {frete > 0 && (
+                        <div className="mt-4">
+                          <p className="font-medium text-lg">Valor do Frete:</p>
+                          <p className="text-xl text-primary">
+                            {/* R$ {frete.toFixed(2)} */}
+                            R$ {frete}
+                          </p>
+                        </div>
+                      )}
                     </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="cidade">Cidade</Label>
                       <Input
                         type="text"
                         id="cidade"
                         name="cidade"
-                        value={formData.enderecosEntrega[0].cidade}
+                        value={formData.enderecoEntrega.cidade}
                         onChange={handleEnderecoChange}
                         required
                         placeholder="Sua cidade"
@@ -321,7 +448,7 @@ const Checkout = () => {
                         type="text"
                         id="estado"
                         name="estado"
-                        value={formData.enderecosEntrega[0].estado}
+                        value={formData.enderecoEntrega.estado}
                         onChange={handleEnderecoChange}
                         required
                         placeholder="UF"
@@ -350,10 +477,14 @@ const Checkout = () => {
                     {formData.itensPedido.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
                         <div>
-                          <p className="font-medium">Produto {item.idProduto}</p>
-                          <p className="text-muted-foreground">Qtd: {item.quantidade}</p>
+                          <p className="font-medium">{item.tituloProduto}</p>
+                          <p className="text-muted-foreground">
+                            Quantidade: {item.quantidade}
+                          </p>
                         </div>
-                        <p className="font-medium">R$ {item.precoTotal.toFixed(2)}</p>
+                        <p className="font-medium">
+                          R$ {item.precoTotal.toFixed(2)}
+                        </p>
                       </div>
                     ))}
                   </div>
@@ -365,12 +496,18 @@ const Checkout = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
                       <span className="font-medium">
-                        R$ {formData.itensPedido.reduce((acc, item) => acc + item.precoTotal, 0).toFixed(2)}
+                        R${" "}
+                        {formData.itensPedido
+                          .reduce((acc, item) => acc + item.precoTotal, 0)
+                          .toFixed(2)}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Frete</span>
-                      <span className="font-medium">R$ {formData.pedidos[0].freteValor.toFixed(2)}</span>
+                      <span className="font-medium">
+                        {/* R$ {formData.pedidos[0].freteValor.toFixed(2)} */}
+                        R$ {frete}
+                      </span>
                     </div>
                   </div>
 
@@ -381,17 +518,21 @@ const Checkout = () => {
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-bold text-primary">
                       R${" "}
-                      {(
-                        formData.itensPedido.reduce((acc, item) => acc + item.precoTotal, 0) +
-                        formData.pedidos[0].freteValor
-                      ).toFixed(2)}
+                      {
+                        formData.itensPedido.reduce(
+                          (acc, item) => acc + item.precoTotal,
+                          0
+                        ) + frete
+                      }
                     </span>
                   </div>
 
                   {/* Security badge */}
                   <div className="bg-muted/50 rounded-lg p-3 flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-green-600" />
-                    <span className="text-xs text-muted-foreground">Compra 100% segura e protegida</span>
+                    <span className="text-xs text-muted-foreground">
+                      Compra 100% segura e protegida
+                    </span>
                   </div>
 
                   {/* Submit button */}
@@ -406,7 +547,7 @@ const Checkout = () => {
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Checkout
+export default Checkout;

@@ -58,14 +58,12 @@ export default function ProdutosLayout1Page() {
     if (lojaRequestString == null) {
       console.log("lojaRequest é nulo.");
     } else {
-      // Convertendo o string armazenado no localStorage de volta para um objeto
       const lojaRequest = JSON.parse(lojaRequestString);
 
       console.log("lojaRequest:", lojaRequest);
       console.log("Produtos:", lojaRequest.produtos);
       console.log("Categorias:", lojaRequest.categoriasProduto);
 
-      // Definindo os produtos e categorias no estado
       setProducts(lojaRequest.produtos || []);
       setCategories(lojaRequest.categoriasProduto || []);
       setLoading(false);

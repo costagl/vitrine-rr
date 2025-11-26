@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/cart-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -55,6 +56,15 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     }
   };
 
+  const [subdominio, setSubdominio] = useState<string | null>(null);
+  const [idLoja, setIdLoja] = useState<string | null>(null);
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    setSubdominio(urlParams.get("subdominio"));
+    setIdLoja(urlParams.get("idLoja"));
+  }, []);
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent>
@@ -94,7 +104,10 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                     <div key={item.id} className="flex gap-4 py-4 border-b">
                       <div className="relative w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                         <Image
-                          src={item.imagemUrl || "/placeholder.svg?height=80&width=80"}
+                          src={
+                            item.imagemUrl ||
+                            "/placeholder.svg?height=80&width=80"
+                          }
                           alt={item.titulo || "Imagem do produto"}
                           className="object-cover"
                           width={500}
@@ -208,9 +221,11 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
 
               <SheetFooter className="flex-col gap-2 sm:flex-col">
                 <Link
-                  href="/loja/checkout"
+                  href={`/loja/checkout/?subdominio=${subdominio}&idLoja=${idLoja}`}
                   className="w-full"
-                  onClick={closeCart}
+                  onClick={() => {
+                    localStorage.setItem(`cartData_${subdominio}`, JSON.stringify(cart));
+                  }}
                 >
                   <Button className="w-full" size="lg">
                     Finalizar Compra

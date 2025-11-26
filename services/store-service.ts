@@ -1,5 +1,6 @@
 import { apiClient } from "@/utils/api-client";
 import { API_ENDPOINTS } from "@/config/api";
+import axios from "axios";
 import { getApiBaseUrl } from "@/config/api-url";
 
 export interface Store {
@@ -112,95 +113,21 @@ export class StoreService {
     return response.data!;
   }
 
-  static async verifyLayoutTheme(): Promise<LayoutThemeResponse> {
-    const response = await apiClient.get<LayoutThemeResponse>(
-      API_ENDPOINTS.STORE.VERIFY_LAYOUT_THEME
-    );
-    console.log(response);
-    return response.data!;
-  }
-
-  // TODO: Limpar Código Depois
   static async abrirMinhaLoja(): Promise<void> {
-    // Verificar se o token está presente
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      console.error(
-        "❌ Token de autenticação não encontrado. Faça login novamente."
-      );
-      return; // Early return para evitar a execução do código abaixo
-    }
-
-    console.log("✅ Token encontrado:", token);
-
-    // Criar headers com o token
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-      Accept: "application/json",
-    };
-
-    try {
-      console.log("PRIMEIRA LINHA");
-      const url = `${getApiBaseUrl()}${
-        API_ENDPOINTS.STORE.VERIFY_LAYOUT_THEME
-      }`;
-      console.log("❗ URL que será consumida:", url);
-
-      const response = await fetch(url, {
-        method: "GET",
-        headers: headers,
+    const userDataString = localStorage.getItem("user");
+    const userData = userDataString ? JSON.parse(userDataString) : null;
+    const idLoja = userData.loja.id;
+    const subdominio = userData.loja.subdominio;
+    axios
+      .get(`https://localhost:7083/loja/layout-tema/${idLoja}`)
+      .then((response) => {
+        console.log("DATA:", response.data);
+        const layoutSelecionado = response.data.tituloLayout;
+        let lojaUrl = `http://localhost:3000/loja/${layoutSelecionado}/?subdominio=${subdominio}&idLoja=${idLoja}`;
+        window.open(lojaUrl, "_blank");
+      })
+      .catch((error) => {
+        console.error("❌ Erro ao buscar dados de layout/tema:", error);
       });
-
-      // Verificar se a resposta foi bem-sucedida
-      if (!response.ok) {
-        const responseText = await response.text();
-        console.log("🚨 Resposta da API não OK:", response.status);
-        console.log("Erro detalhado:", responseText);
-
-        const errorData = JSON.parse(responseText);
-        throw new Error(errorData.message || `Erro HTTP ${response.status}`);
-      }
-
-      console.log("✅ Resposta da API foi bem-sucedida!");
-
-      // Parse a resposta de sucesso
-      const data = await response.json(); // já retorna um objeto JavaScript
-      console.log("🔍 Dados recebidos da API:", JSON.stringify(data, null, 2));
-
-      const { idTema, idLayout } = data;
-      console.log(`📦 idTema: ${idTema}, idLayout: ${idLayout}`);
-
-      let layouts: { [key: string]: string } = {
-        "1": "layout-1",
-        "2": "layout-2",
-        "3": "layout-3",
-        "4": "layout-4",
-      };
-      let temas: { [key: string]: string } = {
-        "1": "tema-1",
-        "2": "tema-2",
-        "3": "tema-3",
-        "4": "tema-4",
-      };
-
-      console.log("🔧 Layouts definidos:", layouts);
-      console.log("🔧 Temas definidos:", temas);
-
-      const layoutSelecionado = layouts[idLayout];
-      const temaSelecionado = temas[idTema];
-
-      console.log(
-        `✅ Layout Selecionado: ${layoutSelecionado}, Tema Selecionado: ${temaSelecionado}`
-      );
-
-      let lojaUrl = `http://localhost:3000/loja/${layoutSelecionado}`;
-      console.log("🔗 Redirecionando para a URL:", lojaUrl);
-
-      window.open(lojaUrl, "_blank");
-    } catch (error) {
-      console.error("❌ Erro ao buscar dados de layout/tema:", error);
-    }
   }
 }

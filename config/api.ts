@@ -31,9 +31,7 @@ export const API_ENDPOINTS = {
   STORE: {
     GET_STORE: "/loja",
     UPDATE_STORE: "/loja/atualizar",
-    // TODO: Atualizar "usuario".
     VERIFY_SUBDOMAIN: "/loja/verificar-subdominio", 
-    VERIFY_LAYOUT_THEME: (id: string) => `/loja/verificar-layout-tema/${id}`,
   },
   ORDERS: {
     GET_ORDERS: "/pedidos",

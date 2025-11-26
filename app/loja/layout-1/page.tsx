@@ -60,7 +60,13 @@ export default function Layout1Page() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    const idLoja = urlParams.get("idLoja");
     const subdominio = urlParams.get("subdominio");
+    const parametrosLocalStorage = {
+      idLoja,
+      subdominio,
+    };
+    localStorage.setItem("urlParams", JSON.stringify(parametrosLocalStorage));
 
     if (subdominio) {
       async function fetchLojaData() {
@@ -114,7 +120,7 @@ export default function Layout1Page() {
   }, [produtos, searchQuery]);
 
   const getProductRating = (id: string) => {
-    const idInt = parseInt(id)
+    const idInt = parseInt(id);
     const ratings = [2, 5, 3, 4, 1, 4, 3, 5];
     return ratings[idInt % ratings.length];
   };
