@@ -1,12 +1,20 @@
 export interface CartItem {
-  id: string
-  titulo: string
-  descricao: string
-  valorUnitario: number
-  valorPromocional?: number
-  imagemUrl?: string
-  categoria: string
-  estoque: number
+  id: string;
+  titulo: string;
+  descricao: string;
+  valorUnitario: number;
+  valorPromocional: number;
+  estoque: number;
+  ativo: number;
+  imagemUrl: string;
+  peso: number;
+  altura: number;
+  largura: number;
+  profundidade: number;
+  valorCusto: number;
+  categoriaProduto: string;
+  idCategoriaProduto: number;
+  idLoja: number;
   quantidade: number
   removed?: boolean
 }
@@ -30,10 +38,10 @@ export interface CartContextType {
 }
 
 export interface ProductFilters {
-  gender: string
-  clothingType: string
-  sortOrder: "lancamentos" | "menor-preco" | "maior-preco" | "mais-vendidos"
-  searchQuery: string
+  genero: string
+  tipoRoupa: string
+  ordemClassificacao: "lancamentos" | "menor-preco" | "maior-preco" | "mais-vendidos"
+  pesquisaConsulta: string
 }
 
 export interface FilterOption {

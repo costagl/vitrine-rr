@@ -94,10 +94,7 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                     <div key={item.id} className="flex gap-4 py-4 border-b">
                       <div className="relative w-20 h-20 bg-gray-100 rounded-md overflow-hidden flex-shrink-0">
                         <Image
-                          src={
-                            item.imagemUrl ||
-                            "/placeholder.svg?height=80&width=80"
-                          }
+                          src={item.imagemUrl || "/placeholder.svg?height=80&width=80"}
                           alt={item.titulo || "Imagem do produto"}
                           className="object-cover"
                           width={500}
@@ -122,9 +119,9 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                         <h4 className="font-medium text-sm line-clamp-2 mb-1">
                           {item.titulo}
                         </h4>
-                        {item.categoria && (
+                        {item.categoriaProduto && (
                           <Badge variant="secondary" className="text-xs mb-2">
-                            {item.categoria}
+                            {item.categoriaProduto}
                           </Badge>
                         )}
                         <div className="flex items-center justify-between">
@@ -199,8 +196,8 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
                   <span>{formatPrice(cart.total)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Frete</span>
-                  <span className="text-green-600">Grátis</span>
+                  {/* TODO: <span className="text-muted-foreground">Frete</span>
+                  <span className="text-green-600">Grátis</span> */}
                 </div>
                 <Separator />
                 <div className="flex justify-between font-semibold text-lg">

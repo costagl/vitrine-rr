@@ -87,10 +87,10 @@ const Checkout = () => {
 
   const handleEnderecoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    const updatedEndereco = { ...formData.enderecosEntrega[0], [name]: value } // Modificando apenas o primeiro endereço
+    const updatedEndereco = { ...formData.enderecosEntrega[0], [name]: value }
     setFormData({
       ...formData,
-      enderecosEntrega: [updatedEndereco], // Garantindo que apenas o primeiro endereço será atualizado
+      enderecosEntrega: [updatedEndereco],
     })
   }
 

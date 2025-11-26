@@ -10,41 +10,42 @@ import { Search, X } from "lucide-react"
 import type { ProductFilters } from "@/types/cart"
 
 interface ProductFiltersProps {
-  filters: ProductFilters
-  onFilterChange: (filters: ProductFilters) => void
+  filters: ProductFilters;
+  onFilterChange: (filters: ProductFilters) => void;
+  categories: { idCategoriaProduto: number; tituloCategoriaProduto: string }[]; // Array de categorias
 }
 
 export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps) {
-  const handleGenderChange = (value: string) => {
-    onFilterChange({ ...filters, gender: value as any })
+  const handlegeneroChange = (value: string) => {
+    onFilterChange({ ...filters, genero: value as any })
   }
 
-  const handleClothingTypeChange = (value: string) => {
-    onFilterChange({ ...filters, clothingType: value as any })
+  const handletipoRoupaChange = (value: string) => {
+    onFilterChange({ ...filters, tipoRoupa: value as any })
   }
 
   const handleSortChange = (value: string) => {
-    onFilterChange({ ...filters, sortOrder: value as any })
+    onFilterChange({ ...filters, ordemClassificacao: value as any })
   }
 
   const handleSearchChange = (value: string) => {
-    onFilterChange({ ...filters, searchQuery: value })
+    onFilterChange({ ...filters, pesquisaConsulta: value })
   }
 
   const clearFilters = () => {
     onFilterChange({
-      gender: "todos",
-      clothingType: "todos",
-      sortOrder: "lancamentos",
-      searchQuery: "",
+      genero: "todos",
+      tipoRoupa: "todos",
+      ordemClassificacao: "lancamentos",
+      pesquisaConsulta: "",
     })
   }
 
   const hasActiveFilters =
-    filters.gender !== "todos" ||
-    filters.clothingType !== "todos" ||
-    filters.sortOrder !== "lancamentos" ||
-    filters.searchQuery !== ""
+    filters.genero !== "todos" ||
+    filters.tipoRoupa !== "todos" ||
+    filters.ordemClassificacao !== "lancamentos" ||
+    filters.pesquisaConsulta !== ""
 
     
 
@@ -60,7 +61,7 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Buscar produtos..."
-              value={filters.searchQuery || ""}
+              value={filters.pesquisaConsulta || ""}
               onChange={(e) => handleSearchChange(e.target.value)}
               className="pl-9"
             />
@@ -78,35 +79,35 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
             </Button>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-2">
-            {filters.gender !== "todos" && (
+            {filters.genero !== "todos" && (
               <Badge variant="secondary" className="gap-1">
-                {filters.gender}
+                {filters.genero}
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-4 w-4 p-0 hover:bg-transparent"
-                  onClick={() => handleGenderChange("todos")}
+                  onClick={() => handlegeneroChange("todos")}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
-            {filters.clothingType !== "todos" && (
+            {filters.tipoRoupa !== "todos" && (
               <Badge variant="secondary" className="gap-1">
-                {filters.clothingType}
+                {filters.tipoRoupa}
                 <Button
                   variant="ghost"
                   size="sm"
                   className="h-4 w-4 p-0 hover:bg-transparent"
-                  onClick={() => handleClothingTypeChange("todos")}
+                  onClick={() => handletipoRoupaChange("todos")}
                 >
                   <X className="h-3 w-3" />
                 </Button>
               </Badge>
             )}
-            {filters.searchQuery && (
+            {filters.pesquisaConsulta && (
               <Badge variant="secondary" className="gap-1">
-                &quot{filters.searchQuery}&quot
+                &quot{filters.pesquisaConsulta}&quot
                 <Button
                   variant="ghost"
                   size="sm"
@@ -121,34 +122,34 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
         </Card>
       )}
 
-      {/* Gender Filter */}
+      {/* genero Filter */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Gênero</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup value={filters.gender || "todos"} onValueChange={handleGenderChange}>
+          <RadioGroup value={filters.genero || "todos"} onValueChange={handlegeneroChange}>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="todos" id="gender-all" />
-              <Label htmlFor="gender-all" className="font-normal cursor-pointer">
+              <RadioGroupItem value="todos" id="genero-all" />
+              <Label htmlFor="genero-all" className="font-normal cursor-pointer">
                 Todos
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="masculino" id="gender-male" />
-              <Label htmlFor="gender-male" className="font-normal cursor-pointer">
+              <RadioGroupItem value="masculino" id="genero-male" />
+              <Label htmlFor="genero-male" className="font-normal cursor-pointer">
                 Masculino
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="feminino" id="gender-female" />
-              <Label htmlFor="gender-female" className="font-normal cursor-pointer">
+              <RadioGroupItem value="feminino" id="genero-female" />
+              <Label htmlFor="genero-female" className="font-normal cursor-pointer">
                 Feminino
               </Label>
             </div>
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="unissex" id="gender-unisex" />
-              <Label htmlFor="gender-unisex" className="font-normal cursor-pointer">
+              <RadioGroupItem value="unissex" id="genero-unisex" />
+              <Label htmlFor="genero-unisex" className="font-normal cursor-pointer">
                 Unissex
               </Label>
             </div>
@@ -162,7 +163,7 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
           <CardTitle className="text-lg">Tipo de Roupa</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup value={filters.clothingType || "todos"} onValueChange={handleClothingTypeChange}>
+          <RadioGroup value={filters.tipoRoupa || "todos"} onValueChange={handletipoRoupaChange}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="todos" id="type-all" />
               <Label htmlFor="type-all" className="font-normal cursor-pointer">
@@ -221,7 +222,7 @@ export function ProductFilters({ filters, onFilterChange }: ProductFiltersProps)
           <CardTitle className="text-lg">Ordenar Por</CardTitle>
         </CardHeader>
         <CardContent>
-          <RadioGroup value={filters.sortOrder || "lancamentos"} onValueChange={handleSortChange}>
+          <RadioGroup value={filters.ordemClassificacao || "lancamentos"} onValueChange={handleSortChange}>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="lancamentos" id="sort-newest" />
               <Label htmlFor="sort-newest" className="font-normal cursor-pointer">

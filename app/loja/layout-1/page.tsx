@@ -29,7 +29,7 @@ import { useCart } from "@/contexts/cart-context";
 import { CartModal } from "@/components/layout-1/cart-modal";
 
 interface Product {
-  id: number;
+  id: string;
   titulo: string;
   descricao: string;
   valorUnitario: number;
@@ -69,14 +69,16 @@ export default function Layout1Page() {
 
         try {
           const response = await axios.get(
-            `https://localhost:7083/vitrine/${subdominio}/`
+            `https://localhost:7083/vitrine/${subdominio}`
           );
 
           if (response.data.lojaRequest) {
             setLoja(response.data.lojaRequest);
             setProdutos(response.data.lojaRequest.produtos || []);
-
-            // Preenchendo todasCategoriasProduto com os títulos das categorias
+            localStorage.setItem(
+              `${subdominio}`,
+              JSON.stringify(response.data.lojaRequest)
+            );
             todasCategoriasProduto =
               response.data.lojaRequest.categoriasProduto.map(
                 (categoria: { tituloCategoriaProduto: string }) =>
@@ -111,9 +113,10 @@ export default function Layout1Page() {
       .slice(0, 8);
   }, [produtos, searchQuery]);
 
-  const getProductRating = (id: number) => {
+  const getProductRating = (id: string) => {
+    const idInt = parseInt(id)
     const ratings = [2, 5, 3, 4, 1, 4, 3, 5];
-    return ratings[id % ratings.length];
+    return ratings[idInt % ratings.length];
   };
 
   const handleAddToCart = (produto: Product) => {
@@ -124,9 +127,20 @@ export default function Layout1Page() {
       valorPromocional: produto.valorPromocional,
       estoque: produto.estoque,
       imagemUrl: produto.imagemUrl,
-      categoria: produto.categoriaProduto || "Sem Categoria",
+      categoriaProduto: produto.categoriaProduto || "Sem Categoria",
+      ativo: produto.ativo,
       descricao: produto.descricao,
+      peso: produto.peso,
+      altura: produto.altura,
+      largura: produto.largura,
+      profundidade: produto.profundidade,
+      valorCusto: produto.valorCusto,
+      idCategoriaProduto: produto.idCategoriaProduto,
+      idLoja: produto.idLoja,
     });
+
+    console.log("produto:", produtos[0]);
+    console.log("cartItem", cart.items[0]);
   };
 
   if (isLoading) {
@@ -229,7 +243,7 @@ export default function Layout1Page() {
             {todasCategoriasProduto.map((categoria, index) => (
               <Link
                 key={index}
-                href="http://localhost:3000/loja/layout-1/produtos"
+                href={`http://localhost:3000/loja/layout-1/produtos/?subdominio=${loja.subdominio}`}
                 className="hover:text-blue-200 transition-colors font-medium"
               >
                 {categoria}

@@ -20,101 +20,79 @@ interface Product {
   titulo: string;
   descricao: string;
   valorUnitario: number;
-  valorPromocional?: number;
-  imagemUrl?: string;
-  categoria: string;
+  valorPromocional: number;
   estoque: number;
-  ativo: boolean;
+  ativo: number;
+  imagemUrl: string;
+  peso: number;
+  altura: number;
+  largura: number;
+  profundidade: number;
+  valorCusto: number;
+  categoriaProduto: string;
+  idCategoriaProduto: number;
+  idLoja: number;
 }
 
 export default function ProdutosLayout1Page() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<
+    { idCategoriaProduto: number; tituloCategoriaProduto: string }[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<Filters>({
-    gender: "todos",
-    clothingType: "todos",
-    sortOrder: "lancamentos",
-    searchQuery: "",
+    genero: "todos",
+    tipoRoupa: "todos",
+    ordemClassificacao: "lancamentos",
+    pesquisaConsulta: "",
   });
   const [isCartModalOpen, setIsCartModalOpen] = useState(false);
-
   const { addToCart, cart } = useCart();
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
+    const urlParams = new URLSearchParams(window.location.search);
+    const subdominio = urlParams.get("subdominio");
+    const lojaRequestString = localStorage.getItem(`${subdominio}`);
 
-        if (!token) {
-          setError("Você precisa estar autenticado");
-          return;
-        }
+    if (lojaRequestString == null) {
+      console.log("lojaRequest é nulo.");
+    } else {
+      // Convertendo o string armazenado no localStorage de volta para um objeto
+      const lojaRequest = JSON.parse(lojaRequestString);
 
-        const endpoint = `${getApiBaseUrl()}${API_ENDPOINTS.PRODUTO.LISTAR}`;
-        const response = await fetch(endpoint, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+      console.log("lojaRequest:", lojaRequest);
+      console.log("Produtos:", lojaRequest.produtos);
+      console.log("Categorias:", lojaRequest.categoriasProduto);
 
-        if (!response.ok) {
-          throw new Error("Erro ao carregar produtos");
-        }
-
-        const data = await response.json();
-        const productsData = Array.isArray(data) ? data : data.content || [];
-
-        const mappedProducts: Product[] = productsData.map((p: any) => ({
-          id: String(p.id),
-          titulo: p.titulo,
-          descricao: p.descricao || "",
-          valorUnitario: p.valorUnitario,
-          valorPromocional: p.valorPromocional,
-          imagemUrl: p.imagem,
-          categoria: p.tituloCategoriaProduto || "Sem Categoria",
-          estoque: p.estoque || 0,
-          ativo: p.ativo === 1,
-        }));
-
-        setProducts(mappedProducts);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Erro desconhecido");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
+      // Definindo os produtos e categorias no estado
+      setProducts(lojaRequest.produtos || []);
+      setCategories(lojaRequest.categoriasProduto || []);
+      setLoading(false);
+    }
   }, []);
 
   const filteredProducts = useMemo(() => {
     let result = products.filter((p) => p.ativo);
 
-    if (filters.searchQuery) {
-      const searchLower = filters.searchQuery.toLowerCase();
+    if (filters.pesquisaConsulta) {
+      const searchLower = filters.pesquisaConsulta.toLowerCase();
       result = result.filter(
         (p) =>
           p.titulo.toLowerCase().includes(searchLower) ||
           p.descricao.toLowerCase().includes(searchLower) ||
-          p.categoria.toLowerCase().includes(searchLower)
+          p.categoriaProduto.toLowerCase().includes(searchLower)
       );
     }
 
-    if (filters.gender && filters.gender !== "todos") {
+    // Filtrando por categoria (gênero ou tipo de roupa)
+    if (filters.genero && filters.genero !== "todos") {
       result = result.filter((p) =>
-        p.categoria.toLowerCase().includes(filters.gender!)
+        p.categoriaProduto.toLowerCase().includes(filters.genero.toLowerCase())
       );
     }
 
-    if (filters.clothingType && filters.clothingType !== "todos") {
-      result = result.filter((p) =>
-        p.categoria.toLowerCase().includes(filters.clothingType!)
-      );
-    }
-
-    switch (filters.sortOrder) {
+    switch (filters.ordemClassificacao) {
       case "menor-preco":
         result.sort(
           (a, b) =>
@@ -151,21 +129,25 @@ export default function ProdutosLayout1Page() {
     return Math.round(((original - promotional) / original) * 100);
   };
 
-  const handleAddToCart = (product: Product) => {
-    if (product.estoque === 0) return;
-
-    const cartItem: Omit<CartItem, "quantidade"> = {
-      id: product.id,
-      titulo: product.titulo,
-      descricao: product.descricao,
-      valorUnitario: product.valorUnitario,
-      valorPromocional: product.valorPromocional,
-      imagemUrl: product.imagemUrl,
-      categoria: product.categoria,
-      estoque: product.estoque,
-    };
-
-    addToCart(cartItem);
+  const handleAddToCart = (produto: Product) => {
+    addToCart({
+      id: produto.id.toString(),
+      titulo: produto.titulo,
+      valorUnitario: produto.valorUnitario,
+      valorPromocional: produto.valorPromocional,
+      estoque: produto.estoque,
+      imagemUrl: produto.imagemUrl,
+      categoriaProduto: produto.categoriaProduto || "Sem Categoria",
+      ativo: produto.ativo,
+      descricao: produto.descricao,
+      peso: produto.peso,
+      altura: produto.altura,
+      largura: produto.largura,
+      profundidade: produto.profundidade,
+      valorCusto: produto.valorCusto,
+      idCategoriaProduto: produto.idCategoriaProduto,
+      idLoja: produto.idLoja,
+    });
   };
 
   if (error) {
@@ -232,7 +214,11 @@ export default function ProdutosLayout1Page() {
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <aside className="lg:col-span-1">
-            <ProductFilters filters={filters} onFilterChange={setFilters} />
+            <ProductFilters
+              filters={filters}
+              onFilterChange={setFilters}
+              categories={categories}
+            />
           </aside>
 
           <main className="lg:col-span-3">
@@ -276,10 +262,10 @@ export default function ProdutosLayout1Page() {
                     variant="outline"
                     onClick={() =>
                       setFilters({
-                        gender: "todos",
-                        clothingType: "todos",
-                        sortOrder: "lancamentos",
-                        searchQuery: "",
+                        genero: "todos",
+                        tipoRoupa: "todos",
+                        ordemClassificacao: "lancamentos",
+                        pesquisaConsulta: "",
                       })
                     }
                   >
@@ -301,39 +287,37 @@ export default function ProdutosLayout1Page() {
                   return (
                     <Card
                       key={product.id}
-                      className="overflow-hidden hover:shadow-lg transition-shadow"
+                      className="flex flex-col justify-between h-full overflow-hidden hover:shadow-lg transition-shadow"
                     >
-                      <div className="relative">
-                        <div className="relative w-full h-64 bg-gray-100">
-                          <Image
-                            src={
-                              product.imagemUrl ||
-                              "/placeholder.svg?height=256&width=256"
-                            }
-                            alt={product.titulo}
-                            className="object-cover"
-                            width={500}
-                            height={300}
-                          />
-                          {hasDiscount && (
-                            <Badge
-                              variant="destructive"
-                              className="absolute top-2 right-2"
-                            >
-                              -
-                              {calculateDiscount(
-                                product.valorUnitario,
-                                product.valorPromocional!
-                              )}
-                              %
-                            </Badge>
-                          )}
-                        </div>
+                      <div className="relative w-full h-64 bg-gray-100">
+                        <Image
+                          src={product.imagemUrl || "/placeholder.svg"}
+                          alt={product.titulo}
+                          className="object-cover w-full h-full"
+                          width={500}
+                          height={300}
+                        />
+                        {hasDiscount && (
+                          <Badge
+                            variant="destructive"
+                            className="absolute top-2 right-2"
+                          >
+                            -
+                            {calculateDiscount(
+                              product.valorUnitario,
+                              product.valorPromocional!
+                            )}
+                            %
+                          </Badge>
+                        )}
                       </div>
 
-                      <CardContent className="p-4">
-                        <Badge variant="secondary" className="mb-2">
-                          {product.categoria}
+                      <CardContent className="flex flex-col justify-between p-4 h-full">
+                        <Badge
+                          variant="secondary"
+                          className="w-fit inline-block px-3 py-1 rounded-full mb-2"
+                        >
+                          {product.categoriaProduto}
                         </Badge>
                         <h3 className="font-semibold text-lg mb-2 line-clamp-2">
                           {product.titulo}
@@ -352,7 +336,7 @@ export default function ProdutosLayout1Page() {
                             (128)
                           </span>
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-4 flex flex-col justify-between flex-grow">
                           {hasDiscount && (
                             <p className="text-sm text-gray-500 line-through">
                               {formatPrice(product.valorUnitario)}
