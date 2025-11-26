@@ -52,6 +52,7 @@ export default function ProdutosLayout1Page() {
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    const idLoja = urlParams.get("idLoja");
     const subdominio = urlParams.get("subdominio");
     const lojaRequestString = localStorage.getItem(`${subdominio}`);
 

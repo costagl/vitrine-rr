@@ -34,7 +34,6 @@ interface ItemPedido {
 
 interface Pedido {
   idLoja: string;
-  idEnderecoEntrega: number;
   freteValor: number;
 }
 
@@ -57,29 +56,8 @@ export interface ClienteEnderecoPedidoVM {
 }
 
 const Checkout = () => {
-  const [idLojaUrl, setIdLoja] = useState<string>();
-
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idLoja = urlParams.get("idLoja");
-    const subdominio = urlParams.get("subdominio");
-
-    const savedCart = localStorage.getItem(`cartData_${subdominio}`);
-    if (savedCart) {
-      const parsedCart = JSON.parse(savedCart);
-      setFormData((prevData) => ({
-        ...prevData,
-        itensPedido: parsedCart.items.map((item: any) => ({
-          idProduto: parseInt(item.id),
-          tituloProduto: item.titulo,
-          quantidade: item.quantidade,
-          precoUnitario: item.valorUnitario,
-          precoTotal: item.valorUnitario * item.quantidade,
-        })),
-      }));
-    }
-  }, []);
   const { cart } = useCart();
+  const [idLoja, setIdLoja] = useState<string | null>(null); // Estado para idLoja
   const [formData, setFormData] = useState<ClienteEnderecoPedidoVM>({
     cpf: "",
     nomeCompleto: "",
@@ -96,8 +74,7 @@ const Checkout = () => {
     },
     pedidos: [
       {
-        idLoja: idLojaUrl || "0",
-        idEnderecoEntrega: 1,
+        idLoja: "",
         freteValor: 0,
       },
     ],
@@ -109,6 +86,44 @@ const Checkout = () => {
       precoTotal: item.valorUnitario * item.quantidade,
     })),
   });
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idLojaFromUrl = urlParams.get("idLoja");
+    const subdominio = urlParams.get("subdominio");
+
+    setIdLoja(idLojaFromUrl);
+
+    // Atualizar os itens do carrinho
+    const savedCart = localStorage.getItem(`cartData_${subdominio}`);
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+      setFormData((prevData) => ({
+        ...prevData,
+        itensPedido: parsedCart.items.map((item: any) => ({
+          idProduto: parseInt(item.id),
+          tituloProduto: item.titulo,
+          quantidade: item.quantidade,
+          precoUnitario: item.valorUnitario,
+          precoTotal: item.valorUnitario * item.quantidade,
+        })),
+      }));
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    if (idLoja) {
+      setFormData((prevData) => ({
+        ...prevData,
+        pedidos: [
+          {
+            idLoja: idLoja,
+            freteValor: prevData.pedidos[0].freteValor,
+          },
+        ],
+      }));
+    }
+  }, [idLoja]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -129,6 +144,10 @@ const Checkout = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!idLoja) {
+      alert("O ID da loja não foi encontrado.");
+      return;
+    }
 
     try {
       const response = await fetch("https://localhost:7083/pedido/cadastrar", {
@@ -146,6 +165,24 @@ const Checkout = () => {
       if (!response.ok) {
         throw new Error("Erro ao cadastrar o pedido");
       }
+
+      // Lógica para guardar os dados do pedido, caso necessário.
+      const subdominio = new URLSearchParams(window.location.search).get(
+        "subdominio"
+      );
+      if (subdominio) {
+        const data = localStorage.getItem(`cartData_${subdominio}`);
+
+        if (data) {
+          localStorage.setItem("dadosPedidoRealizado", data);
+          localStorage.removeItem(`cartData_${subdominio}`);
+        } else {
+          console.warn(
+            "Nenhum dado de carrinho encontrado para o subdomínio:",
+            subdominio
+          );
+        }
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         alert(error.message);
@@ -155,7 +192,6 @@ const Checkout = () => {
     }
   };
 
-  // Lógica de Frete
   const [cep, setCep] = useState("");
   const [frete, setFrete] = useState(0);
 
@@ -163,26 +199,8 @@ const Checkout = () => {
     setCep(e.target.value);
   };
 
-  // const handleFreteCheck = async () => {
-  //   const produtos = formData.itensPedido.map((item) => ({
-  //     id: item.idProduto.toString(),
-  //     width: 0,
-  //     height: 0,
-  //     length: 0,
-  //     weight: 0,
-  //     insurance_value: 0,
-  //     quantity: item.quantidade,
-  //   }));
-  //   const resultadoFrete = await CalcularFrete(cep, produtos);
-
-  //   if (resultadoFrete) {
-  //     setFrete(resultadoFrete.valorFrete);
-  //   }
-  // };
-
   const handleFreteCheck = async () => {
-    const TokenMelhorEnvio =
-      "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI5NTYiLCJqdGkiOiJlNTgwYjExNmYwZWM1MmYzZTM3YjI4OGMzYTRkZGI1MmJiMzhiNzUxMTZjMTJhOTVjMmQzNGI0OTM1ZmY1MDE1MWYzZGJmZjM1ZTliY2Y3ZiIsImlhdCI6MTc2NDE0NDUzMi40MTY2MjIsIm5iZiI6MTc2NDE0NDUzMi40MTY2MjQsImV4cCI6MTc5NTY4MDUzMi40MDgyMTIsInN1YiI6ImEwNmI3NzVjLTVjYmMtNDAwNS1hMDcxLWM2MWFlNjRkNDJkNyIsInNjb3BlcyI6WyJzaGlwcGluZy1jYWxjdWxhdGUiLCJzaGlwcGluZy10cmFja2luZyJdfQ.p8MFP6TxqVHUchsjiyM-Juxe-TG5iRDsP41TQMn60fj1gQPtV54k_pDoK3Z2V5w6rHV11NRbacQveK-CCsGLkJRSmuJ70csKkHmFgkwAAUotI-8jZaUaz7_yFQM9mj4YWHrHwwARJfSchKBIp8QDlctZHbjUNKO_bWVs2WQuGaYg4uuPcMNyQwe8bb41aV6tlDhmYU0jDgrmyrrHr9hKZt3UyFgFLPdfa4BxaaaSTbDLjXoYWsbOtcUOM2ea8BxHIqzBhBDvUaAgbyyTcZZ0fg2uAC5y19CPc27g8dXYKxKm8oTrhC6VfzSRJP8nGfoq-deeNCXVkMDGYN2oQH3eK1mhZffZiCHUCN8MhMpqXr4tvS4hCd9onDnrKr3OH6zcgcW8KYccNQHs7u2AVh6K0HdkZDSw2l8A2QlsE7V69AmY0gLlRKUzxehSUW0mZefGYhqv7xJy_gVSK7p4JzGQsyCDdp7RCER905cpWhYMKXo1Pl4wwtkM1OKL1_GTu_F_9Gp5Tx73KRzeJhSTWUYLTr441DDxIexuEjBuXlUwZyGf4zf_Or_RErYogSjF2IZHd4jwEwGbS5yfIBDcwmGZHLMOiirOMncBkKt3_pZnrW3i0g8WFkxCnU7IUodpNJbD0dVV4psiyD-B9aMcryhW5RxakKSxBUl-ou3yijYhkks";
+    const TokenMelhorEnvio = process.env.NEXT_PUBLIC_MELHORENVIO_TOKEN;
 
     const postData = {
       from: {
@@ -213,8 +231,16 @@ const Checkout = () => {
       const response = await axios.post("/frete/melhorenvio", postData, {
         headers,
       });
-      console.log("Dados enviados com sucesso:", response.data[0]);
       setFrete(parseFloat(response.data[0].price));
+      setFormData((prevData) => ({
+        ...prevData,
+        pedidos: [
+          {
+            idLoja: prevData.pedidos[0].idLoja,
+            freteValor: parseFloat(response.data[0].price),
+          },
+        ],
+      }));
     } catch (error) {
       console.error("Erro ao enviar dados:", error);
     }
@@ -518,12 +544,10 @@ const Checkout = () => {
                     <span className="text-lg font-semibold">Total</span>
                     <span className="text-lg font-bold text-primary">
                       R${" "}
-                      {
-                        formData.itensPedido.reduce(
-                          (acc, item) => acc + item.precoTotal,
-                          0
-                        ) + frete
-                      }
+                      {formData.itensPedido.reduce(
+                        (acc, item) => acc + item.precoTotal,
+                        0
+                      ) + frete}
                     </span>
                   </div>
 

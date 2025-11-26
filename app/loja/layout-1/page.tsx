@@ -249,7 +249,7 @@ export default function Layout1Page() {
             {todasCategoriasProduto.map((categoria, index) => (
               <Link
                 key={index}
-                href={`http://localhost:3000/loja/layout-1/produtos/?subdominio=${loja.subdominio}`}
+                href={`http://localhost:3000/loja/layout-1/produtos/?subdominio=${loja.subdominio}&idLoja=${loja.id}`}
                 className="hover:text-blue-200 transition-colors font-medium"
               >
                 {categoria}
@@ -283,7 +283,7 @@ export default function Layout1Page() {
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Truck className="h-8 w-8 text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Frete Grátis</h3>
+              <h3 className="text-xl font-semibold mb-2">Frete Grátis (Apenas layout, ainda não configurável e nem funcional.)</h3>
               <p className="text-gray-600">
                 Em compras acima de R$ 99 para todo o Brasil
               </p>

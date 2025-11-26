@@ -180,15 +180,15 @@ export default function MinhaLojaPage() {
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500">Visitas hoje</p>
-                  <p className="text-2xl font-bold">127</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Vendas hoje</p>
-                  <p className="text-2xl font-bold">12</p>
+                  <p className="text-2xl font-bold">0</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Receita hoje</p>
-                  <p className="text-2xl font-bold">R$ 1.247,00</p>
+                  <p className="text-2xl font-bold">R$ 0</p>
                 </div>
               </div>
             </CardContent>
