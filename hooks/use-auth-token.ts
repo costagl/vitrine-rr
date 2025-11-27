@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from 'react';
 
 export function useAuthToken() {
@@ -19,7 +21,6 @@ export function useAuthToken() {
 
     getToken();
 
-    // Adiciona listener para mudanças no localStorage
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'token') {
         setToken(e.newValue);

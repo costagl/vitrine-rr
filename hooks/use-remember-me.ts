@@ -9,44 +9,54 @@ export function useRememberMe() {
   // ✅ Carrega o estado inicial diretamente no useState.
   const [rememberMe, setRememberMe] = useState(() => {
     // A função é executada apenas uma vez na primeira renderização.
-    const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
-    return savedRememberMe
+    if (typeof window !== "undefined") {
+      const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
+      return savedRememberMe
+    }
+    return false
   })
 
   // ✅ Carrega o email de forma dependente do rememberMe salvo.
   const [rememberedEmail, setRememberedEmail] = useState(() => {
-    const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
-    const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY) || ""
+    if (typeof window !== "undefined") {
+      const savedRememberMe = localStorage.getItem(REMEMBER_ME_KEY) === "true"
+      const savedEmail = localStorage.getItem(REMEMBERED_EMAIL_KEY) || ""
     
-    // Retorna o email salvo APENAS se a opção 'rememberMe' também estiver marcada.
-    return savedRememberMe ? savedEmail : ""
+      // Retorna o email salvo APENAS se a opção 'rememberMe' também estiver marcada.
+      return savedRememberMe ? savedEmail : ""
+    }
+    return ""
   })
   
   const handleRememberMeChange = (checked: boolean) => {
     setRememberMe(checked)
 
-    if (checked) {
-      localStorage.setItem(REMEMBER_ME_KEY, "true")
-    } else {
-      // Se desmarcar, limpar dados salvos
-      localStorage.removeItem(REMEMBER_ME_KEY)
-      localStorage.removeItem(REMEMBERED_EMAIL_KEY)
-      setRememberedEmail("")
+    if (typeof window !== "undefined") {
+      if (checked) {
+        localStorage.setItem(REMEMBER_ME_KEY, "true")
+      } else {
+        // Se desmarcar, limpar dados salvos
+        localStorage.removeItem(REMEMBER_ME_KEY)
+        localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+        setRememberedEmail("")
+      }
     }
   }
 
   const saveEmailIfRemembered = (email: string) => {
-    if (rememberMe) {
+    if (typeof window !== "undefined" && rememberMe) {
       localStorage.setItem(REMEMBERED_EMAIL_KEY, email)
       setRememberedEmail(email)
     }
   }
 
   const clearRememberedData = () => {
-    localStorage.removeItem(REMEMBER_ME_KEY)
-    localStorage.removeItem(REMEMBERED_EMAIL_KEY)
-    setRememberMe(false)
-    setRememberedEmail("")
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(REMEMBER_ME_KEY)
+      localStorage.removeItem(REMEMBERED_EMAIL_KEY)
+      setRememberMe(false)
+      setRememberedEmail("")
+    }
   }
 
   return {

@@ -94,8 +94,10 @@ const Checkout = () => {
 
     setIdLoja(idLojaFromUrl);
 
-    // Atualizar os itens do carrinho
-    const savedCart = localStorage.getItem(`cartData_${subdominio}`);
+    let savedCart = null
+    if (typeof window !== "undefined") {
+    savedCart = localStorage.getItem(`cartData_${subdominio}`);
+    }
     if (savedCart) {
       const parsedCart = JSON.parse(savedCart);
       setFormData((prevData) => ({
@@ -150,7 +152,7 @@ const Checkout = () => {
     }
 
     try {
-      const response = await fetch("https://localhost:7083/pedido/cadastrar", {
+      const response = await fetch("http://34.39.207.214/pedido/cadastrar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

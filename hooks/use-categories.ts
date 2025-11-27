@@ -1,3 +1,5 @@
+"use client"
+
 import { CategoryService } from "@/services/category-service";
 import { manageLocalStorage } from "@/contexts/auth-context";
 import type { LoginResponse } from "@/types/api";

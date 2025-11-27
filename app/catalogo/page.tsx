@@ -65,7 +65,7 @@ export default function CatalogoPage() {
 
   // Buscar lojas da API ao montar o componente
   useEffect(() => {
-    fetch("https://localhost:7083/loja", {
+    fetch("http://34.39.207.214/loja", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

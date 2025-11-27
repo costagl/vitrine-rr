@@ -1,3 +1,5 @@
+"use client"
+
 import { apiClient } from "@/utils/api-client"
 import { API_ENDPOINTS } from "@/config/api"
 import type { Product, CreateProductRequest, UpdateProductRequest, ProductResponse } from "@/types/product"

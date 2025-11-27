@@ -75,7 +75,7 @@ export default function Layout1Page() {
 
         try {
           const response = await axios.get(
-            `https://localhost:7083/vitrine/${subdominio}`
+            `http://34.39.207.214/vitrine/${subdominio}`
           );
 
           if (response.data.lojaRequest) {

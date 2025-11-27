@@ -1,3 +1,5 @@
+"use client"
+
 import { getApiBaseUrl } from "@/config/api-url"
 import { API_CONFIG } from "@/config/api"
 import type { ApiResponse } from "@/types/api"
@@ -11,12 +13,10 @@ class ApiClient {
     this.timeout = API_CONFIG.TIMEOUT
     this.defaultHeaders = { ...API_CONFIG.HEADERS }
 
-    // Log da configuração em desenvolvimento
     if (process.env.NODE_ENV === "development") {
       console.log(`🔗 API Client configurado para: ${getApiBaseUrl()}`)
     }
 
-    // Inicialize o token apenas no cliente, se necessário
     if (typeof window !== "undefined") {
       this.authToken = localStorage.getItem("token")
     }

@@ -1,3 +1,5 @@
+"use client"
+
 import { apiClient } from "@/utils/api-client";
 import { API_ENDPOINTS } from "@/config/api";
 import axios from "axios";
@@ -119,7 +121,7 @@ export class StoreService {
     const idLoja = userData.loja.id;
     const subdominio = userData.loja.subdominio;
     axios
-      .get(`https://localhost:7083/loja/layout-tema/${idLoja}`)
+      .get(`http://34.39.207.214/loja/layout-tema/${idLoja}`)
       .then((response) => {
         console.log("DATA:", response.data);
         const layoutSelecionado = response.data.tituloLayout;

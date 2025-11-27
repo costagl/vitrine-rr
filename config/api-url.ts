@@ -1,5 +1,5 @@
 // 🔗 CONFIGURAÇÃO CENTRALIZADA DA API
-export const API_BASE_URL = "https://localhost:7083"
+export const API_BASE_URL = "http://34.39.207.214"
 
 // Função para obter a URL base da API
 export const getApiBaseUrl = (): string => {

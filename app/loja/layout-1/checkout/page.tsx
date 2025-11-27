@@ -78,7 +78,7 @@ export default function Layout1CheckoutPage() {
     };
 
     try {
-      const response = await fetch("https://localhost:7083/pedido/cadastrar", {
+      const response = await fetch("http://34.39.207.214/pedido/cadastrar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

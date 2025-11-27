@@ -15,18 +15,18 @@ interface User {
   id: string;
   nome: string;
   email: string;
-  cpfCnpj: string;          
-  telefone?: string;        
-  dataNascimento?: string;  
+  cpfCnpj: string;
+  telefone?: string;
+  dataNascimento?: string;
   loja?: {
     id: string;
-    nomeLoja: string;       
+    nomeLoja: string;
     idCategoria: string;
-    categoria: string;    
+    categoria: string;
     subdominio: string;
-    descricao?: string;     
-    avaliacao?: number;     
-    logo?: string;          
+    descricao?: string;
+    avaliacao?: number;
+    logo?: string;
   };
 }
 
@@ -47,16 +47,22 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Função para gerenciar localStorage de maneira centralizada
-export const manageLocalStorage = (action: "get" | "set" | "remove", key: string, value?: any) => {
-  switch (action) {
-    case "get":
-      return localStorage.getItem(key);
-    case "set":
-      localStorage.setItem(key, JSON.stringify(value));
-      break;
-    case "remove":
-      localStorage.removeItem(key);
-      break;
+export const manageLocalStorage = (
+  action: "get" | "set" | "remove",
+  key: string,
+  value?: any
+) => {
+  if (typeof window !== "undefined") {
+    switch (action) {
+      case "get":
+        return localStorage.getItem(key);
+      case "set":
+        localStorage.setItem(key, JSON.stringify(value));
+        break;
+      case "remove":
+        localStorage.removeItem(key);
+        break;
+    }
   }
 };
 
@@ -69,58 +75,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const loadUserData = async () => {
-      const storedToken = manageLocalStorage("get", "token");
-      const storedRefreshToken = manageLocalStorage("get", "refreshToken") || null;
-      const storedUser = manageLocalStorage("get", "user");
+      if (typeof window !== "undefined") {
+        const storedToken = manageLocalStorage("get", "token");
+        const storedRefreshToken = manageLocalStorage("get", "refreshToken") || null;
+        const storedUser = manageLocalStorage("get", "user");
 
-      if (storedToken && storedUser) {
-        try {
-          const userData = JSON.parse(storedUser);
-          setToken(storedToken);
-          setRefreshToken(storedRefreshToken);
-          setUser(userData);
-          setIsAuthenticated(true);
-          console.log("✅ Usuário autenticado automaticamente");
-        } catch (error) {
-          console.error("❌ Erro ao carregar dados do usuário:", error);
-          manageLocalStorage("remove", "token");
-          manageLocalStorage("remove", "refreshToken");
-          manageLocalStorage("remove", "user");
+        if (storedToken && storedUser) {
+          try {
+            const userData = JSON.parse(storedUser);
+            setToken(storedToken);
+            setRefreshToken(storedRefreshToken);
+            setUser(userData);
+            setIsAuthenticated(true);
+            console.log("✅ Usuário autenticado automaticamente");
+          } catch (error) {
+            console.error("❌ Erro ao carregar dados do usuário:", error);
+            manageLocalStorage("remove", "token");
+            manageLocalStorage("remove", "refreshToken");
+            manageLocalStorage("remove", "user");
+          }
+        } else {
+          // console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
         }
-      } else {
-        // console.log("⚠️ Nenhum token encontrado - usuário não autenticado");
+        setLoading(false);
       }
-
-      setLoading(false);
     };
 
-    // Chama a função assíncrona para carregar os dados
     loadUserData();
-
-    // Testar conectividade com a API usando a configuração centralizada
-    // const testarAPI = async () => {
-    //   try {
-    //     const healthUrl = getApiUrl("usuario/health");
-
-    //     const response = await fetch(healthUrl, {
-    //       method: "GET",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       signal: AbortSignal.timeout(5000),
-    //     });
-
-    //     if (response.ok) {
-    //       console.log("✅ API funcionando!");
-    //     } else {
-    //       console.log("❌ API respondeu com erro:", response.status);
-    //     }
-    //   } catch (error) {
-    //     console.log("❌ Erro ao conectar com a API:", (error as Error).message);
-    //   }
-    // };
-
-    // testarAPI();
   }, []);
 
   // Função de login
@@ -129,39 +110,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     newRefreshToken: string | undefined,
     userData: LoginResponse["user"]
   ) => {
-    manageLocalStorage("set", "token", newToken); // Armazena o token no localStorage
-    manageLocalStorage("set", "user", userData); // Armazena os dados do usuário no localStorage
+    if (typeof window !== "undefined") {
+      manageLocalStorage("set", "token", newToken); // Armazena o token no localStorage
+      manageLocalStorage("set", "user", userData); // Armazena os dados do usuário no localStorage
 
-    if (newRefreshToken) {
-      manageLocalStorage("set", "refreshToken", newRefreshToken);
-      setRefreshToken(newRefreshToken);
+      if (newRefreshToken) {
+        manageLocalStorage("set", "refreshToken", newRefreshToken);
+        setRefreshToken(newRefreshToken);
+      }
+
+      setToken(newToken);
+      setUser(userData);
+      setIsAuthenticated(true);
     }
-
-    setToken(newToken);
-    setUser(userData);
-    setIsAuthenticated(true);
   };
 
   const logout = async () => {
     try {
-      // Chama o serviço de logout
-      await AuthService.logout();
-      manageLocalStorage("remove", "token");
-      manageLocalStorage("remove", "refreshToken");
-      manageLocalStorage("remove", "user");
-      setToken(null);
-      setRefreshToken(null);
-      setUser(null);
-      setIsAuthenticated(false);
+      if (typeof window !== "undefined") {
+        // Chama o serviço de logout
+        await AuthService.logout();
+        manageLocalStorage("remove", "token");
+        manageLocalStorage("remove", "refreshToken");
+        manageLocalStorage("remove", "user");
+        setToken(null);
+        setRefreshToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } catch (error) {
       // Mesmo com erro, limpa os dados locais
-      manageLocalStorage("remove", "token");
-      manageLocalStorage("remove", "refreshToken");
-      manageLocalStorage("remove", "user");
-      setToken(null);
-      setRefreshToken(null);
-      setUser(null);
-      setIsAuthenticated(false);
+      if (typeof window !== "undefined") {
+        manageLocalStorage("remove", "token");
+        manageLocalStorage("remove", "refreshToken");
+        manageLocalStorage("remove", "user");
+        setToken(null);
+        setRefreshToken(null);
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     }
   };
 
