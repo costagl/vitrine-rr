@@ -51,24 +51,28 @@ export default function ProdutosLayout1Page() {
   const { addToCart, cart } = useCart();
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const idLoja = urlParams.get("idLoja");
-    const subdominio = urlParams.get("subdominio");
-    const lojaRequestString = localStorage.getItem(`${subdominio}`);
+    const fetchData = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const subdominio = urlParams.get("subdominio");
+      const lojaRequestString = localStorage.getItem(`${subdominio}`);
 
-    if (lojaRequestString == null) {
-      console.log("lojaRequest é nulo.");
-    } else {
-      const lojaRequest = JSON.parse(lojaRequestString);
+      if (lojaRequestString == null) {
+        console.log("lojaRequest é nulo.");
+      } else {
+        const lojaRequest = JSON.parse(lojaRequestString);
 
-      console.log("lojaRequest:", lojaRequest);
-      console.log("Produtos:", lojaRequest.produtos);
-      console.log("Categorias:", lojaRequest.categoriasProduto);
+        console.log("lojaRequest:", lojaRequest);
+        console.log("Produtos:", lojaRequest.produtos);
+        console.log("Categorias:", lojaRequest.categoriasProduto);
 
-      setProducts(lojaRequest.produtos || []);
-      setCategories(lojaRequest.categoriasProduto || []);
-      setLoading(false);
-    }
+        // Use async setState inside a function after fetching data
+        setProducts(lojaRequest.produtos || []);
+        setCategories(lojaRequest.categoriasProduto || []);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const filteredProducts = useMemo(() => {
@@ -84,7 +88,6 @@ export default function ProdutosLayout1Page() {
       );
     }
 
-    // Filtrando por categoria (gênero ou tipo de roupa)
     if (filters.genero && filters.genero !== "todos") {
       result = result.filter((p) =>
         p.categoriaProduto.toLowerCase().includes(filters.genero.toLowerCase())
@@ -107,7 +110,7 @@ export default function ProdutosLayout1Page() {
         );
         break;
       case "mais-vendidos":
-        result.sort(() => Math.random() - 0.5);
+        // result.sort(() => Math.random() - 0.5);
         break;
       case "lancamentos":
       default:

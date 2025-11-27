@@ -56,14 +56,28 @@ export function CartModal({ open, onOpenChange }: CartModalProps) {
     }
   };
 
-  const [subdominio, setSubdominio] = useState<string | null>(null);
-  const [idLoja, setIdLoja] = useState<string | null>(null);
+  // Funções auxiliares para inicializar os parâmetros da URL
+  function getSubdominio() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("subdominio");
+    } catch {
+      return null;
+    }
+  }
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    setSubdominio(urlParams.get("subdominio"));
-    setIdLoja(urlParams.get("idLoja"));
-  }, []);
+  function getIdLoja() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get("idLoja");
+    } catch {
+      return null;
+    }
+  }
+
+  // Usando os valores de URL diretamente no useState
+  const [subdominio, setSubdominio] = useState<string | null>(getSubdominio());
+  const [idLoja, setIdLoja] = useState<string | null>(getIdLoja());
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

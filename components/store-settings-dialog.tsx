@@ -48,35 +48,52 @@ interface ThemeOption {
 
 const LAYOUTS_PER_PAGE = 3;
 
+// Funções auxiliares para inicializar a partir do localStorage
+function getInitialLayout() {
+  try {
+    const userDataString = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const userData = userDataString ? JSON.parse(userDataString) : null;
+    return userData?.loja?.idLayout?.toString() ?? "";
+  } catch {
+    return "";
+  }
+}
+
+function getInitialTheme() {
+  try {
+    const userDataString = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const userData = userDataString ? JSON.parse(userDataString) : null;
+    return userData?.loja?.idTema?.toString() ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export function StoreSettingsDialog({
   open,
   onOpenChange,
 }: StoreSettingsDialogProps) {
-  const [selectedLayout, setSelectedLayout] = useState<string>("");
-  const [selectedTheme, setSelectedTheme] = useState<string>("");
+  const [selectedLayout, setSelectedLayout] = useState<string>(getInitialLayout);
+  const [selectedTheme, setSelectedTheme] = useState<string>(getInitialTheme);
   const [activeTab, setActiveTab] = useState<"layout" | "theme">("layout");
   const [currentPage, setCurrentPage] = useState(0);
 
-  // Estados para armazenar os dados dos layouts e temas
   const [layouts, setLayouts] = useState<LayoutOption[]>([]);
   const [themes, setThemes] = useState<ThemeOption[]>([]);
 
-  // Total de páginas baseado no número de layouts por página
   const totalPages = Math.ceil(layouts.length / LAYOUTS_PER_PAGE);
   const startIndex = currentPage * LAYOUTS_PER_PAGE;
   const endIndex = startIndex + LAYOUTS_PER_PAGE;
   const currentLayouts = layouts.slice(startIndex, endIndex);
 
-  // Carregar layouts e temas da API e recuperar o layout/tema selecionado
   useEffect(() => {
     const fetchLayoutsAndThemes = async () => {
       try {
         const response = await axios.get("https://localhost:7083/loja/listar-layouts-temas");
-        const { layouts, temas } = response.data;
+        const { layouts: fetchedLayouts, temas } = response.data;
 
-        // Atualizando os estados com os dados recebidos
         setLayouts(
-          layouts.map((layout: any) => ({
+          fetchedLayouts.map((layout: any) => ({
             id: layout.id.toString(),
             name: layout.titulo,
             description: layout.descricao,
@@ -101,51 +118,35 @@ export function StoreSettingsDialog({
     };
 
     fetchLayoutsAndThemes();
-
-    // Recuperar dados da loja do localStorage
-    const userDataString = localStorage.getItem("user");
-    const userData = userDataString ? JSON.parse(userDataString) : null;
-
-    // Se os dados do usuário estiverem disponíveis no localStorage
-    if (userData && userData.loja) {
-      // Definir o layout e tema selecionados com base nos dados da loja
-      setSelectedLayout(userData.loja.idLayout || "");
-      setSelectedTheme(userData.loja.idTema || "");
-    }
   }, []);
 
-  // Função para navegar para a página anterior
   const handlePrevPage = () => {
     setCurrentPage((prev) => Math.max(0, prev - 1));
   };
 
-  // Função para navegar para a próxima página
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(totalPages - 1, prev + 1));
   };
 
-  // Função de salvar e fazer a requisição para o backend
   const handleSave = async () => {
-    // Recuperando o ID da loja do localStorage
     const userDataString = localStorage.getItem("user");
     const userData = userDataString ? JSON.parse(userDataString) : null;
 
     if (userData && userData.loja && userData.loja.id) {
       const lojaId = userData.loja.id;
 
-      // Montando o payload para enviar ao backend
       const payload = {
         NovoLayoutId: selectedLayout || 0,
         NovoTemaId: selectedTheme || 0,
       };
 
       try {
-        const response = await axios.put(
+        const constResponse = await axios.put(
           `https://localhost:7083/loja/alterar-layout-tema/${lojaId}`,
           payload
         );
-        console.log(response.data); // Pode mostrar o que o backend retornou
-        onOpenChange(false); // Fecha o modal após salvar
+        console.log(constResponse.data);
+        onOpenChange(false); 
       } catch (error) {
         console.error("Erro ao salvar layout e tema", error);
       }

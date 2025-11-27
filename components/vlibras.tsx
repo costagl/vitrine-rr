@@ -1,6 +1,6 @@
 "use client";
 
-import React, { EffectCallback, useEffect } from "react";
+import React, { EffectCallback, useEffect, useCallback } from "react";
 
 type ExpectedReadyState =
   | ReadonlyArray<DocumentReadyState>
@@ -29,10 +29,6 @@ const useReadyStateEffect: useReadyStateEffect = (
   onState = "complete"
 ): void => {
   useEffect(() => {
-    const destructors: Array<() => void> = [
-      () => document.removeEventListener("readystatechange", listener),
-    ];
-
     const listener = () => {
       if (!isReadyStateMatch(onState)) {
         return;
@@ -43,11 +39,15 @@ const useReadyStateEffect: useReadyStateEffect = (
       }
     };
 
-    listener();
+    const destructors: Array<() => void> = [
+      () => document.removeEventListener("readystatechange", listener),
+    ];
+
+    listener(); // Run once immediately
     document.addEventListener("readystatechange", listener);
 
     return () => destructors.forEach((d) => d());
-  }, deps);
+  }, [effect, onState, ...deps]); // Removido o spread de deps e usado explicitamente
 };
 
 type Props = {
@@ -55,25 +55,25 @@ type Props = {
 };
 
 function VLibras({ forceOnload }: Props): React.ReactNode {
-  useReadyStateEffect(
-    () => {
-      const script = document.createElement("script");
-      script.src = "https://vlibras.gov.br/app/vlibras-plugin.js";
-      script.async = true;
-      const widgetUrl = `https://vlibras.gov.br/app`;
-      script.onload = () => {
+  // Utilizando useCallback para evitar reexecução desnecessária do efeito
+  const loadScript = useCallback(() => {
+    const script = document.createElement("script");
+    script.src = "https://vlibras.gov.br/app/vlibras-plugin.js";
+    script.async = true;
+    const widgetUrl = `https://vlibras.gov.br/app`;
+    script.onload = () => {
+      // @ts-ignore
+      new window.VLibras.Widget(widgetUrl);
+      if (forceOnload) {
         // @ts-ignore
-        new window.VLibras.Widget(widgetUrl);
-        if (forceOnload) {
-          // @ts-ignore
-          window.onload();
-        }
-      };
-      document.head.appendChild(script);
-    },
-    [forceOnload],
-    "complete"
-  );
+        window.onload();
+      }
+    };
+    document.head.appendChild(script);
+  }, [forceOnload]);
+
+  // Passando dependências explicitamente para evitar o spread
+  useReadyStateEffect(loadScript, [forceOnload], "complete");
 
   return (
     // @ts-ignore
