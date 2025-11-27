@@ -25,7 +25,8 @@ export function FormInput({
   required = false,
   ...rest
 }: FormInputProps) {
-  const hasError = error && attempted;
+  const hasError = !!(error && attempted);
+
   const inputClassName = hasError
     ? "border-red-500 focus:ring-red-500 focus:border-red-500"
     : "";

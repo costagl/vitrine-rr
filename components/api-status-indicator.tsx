@@ -38,7 +38,8 @@ export function ApiStatusIndicator({ showDetails = false }: ApiStatusIndicatorPr
         </span>
       )}
 
-      <Button variant="ghost" size="sm" onClick={checkApiHealth} disabled={isLoading} className="h-6 w-6 p-0">
+      {/* LINHA CORRIGIDA: Envolver checkApiHealth em uma função anônima () => */}
+      <Button variant="ghost" size="sm" onClick={() => checkApiHealth()} disabled={isLoading} className="h-6 w-6 p-0">
         <RefreshCw className={`h-3 w-3 ${isLoading ? "animate-spin" : ""}`} />
       </Button>
     </div>

@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { Label } from "@/components/ui/label"
-import { ErrorMessage } from "./error-message"
+import type React from "react";
+import { Label } from "@/components/ui/label";
+import { ErrorMessage } from "./error-message";
 
 interface SubdomainInputProps {
-  id: string
-  name: string
-  label: string
-  value: string
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
-  error?: string
-  attempted: boolean
-  storeName: string
+  id: string;
+  name: string;
+  label: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string;
+  attempted: boolean;
+  storeName: string;
 }
 
 export function SubdomainInput({
@@ -25,8 +25,11 @@ export function SubdomainInput({
   attempted,
   storeName,
 }: SubdomainInputProps) {
-  const hasError = error && attempted
+  const hasError = !!(error && attempted);
 
+  const inputClassName = hasError
+    ? "border-red-500 focus:ring-red-500 focus:border-red-500"
+    : "";
   // Função de validação
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const regex = /^[a-z]+$/; // Aceita apenas letras minúsculas sem espaços ou caracteres especiais
@@ -36,7 +39,7 @@ export function SubdomainInput({
     if (regex.test(inputValue) || inputValue === "") {
       onChange(e); // Chama onChange apenas se o valor for válido
     }
-  }
+  };
 
   return (
     <div className="space-y-3">
@@ -87,5 +90,5 @@ export function SubdomainInput({
 
       <ErrorMessage message={error || ""} show={hasError} />
     </div>
-  )
+  );
 }
