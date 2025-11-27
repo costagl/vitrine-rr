@@ -89,7 +89,7 @@ export function StoreSettingsDialog({
   useEffect(() => {
     const fetchLayoutsAndThemes = async () => {
       try {
-        const response = await axios.get("http://34.39.207.214/loja/listar-layouts-temas");
+        const response = await axios.get("https://vitrineapi.duckdns.org/loja/listar-layouts-temas");
         const { layouts: fetchedLayouts, temas } = response.data;
 
         setLayouts(
@@ -142,7 +142,7 @@ export function StoreSettingsDialog({
 
       try {
         const constResponse = await axios.put(
-          `http://34.39.207.214/loja/alterar-layout-tema/${lojaId}`,
+          `https://vitrineapi.duckdns.org/loja/alterar-layout-tema/${lojaId}`,
           payload
         );
         console.log(constResponse.data);

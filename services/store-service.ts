@@ -121,7 +121,7 @@ export class StoreService {
     const idLoja = userData.loja.id;
     const subdominio = userData.loja.subdominio;
     axios
-      .get(`http://34.39.207.214/loja/layout-tema/${idLoja}`)
+      .get(`https://vitrineapi.duckdns.org/loja/layout-tema/${idLoja}`)
       .then((response) => {
         console.log("DATA:", response.data);
         const layoutSelecionado = response.data.tituloLayout;
