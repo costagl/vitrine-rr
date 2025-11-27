@@ -1,13 +1,12 @@
 // 🔗 CONFIGURAÇÃO CENTRALIZADA DA API
-export const API_BASE_URL = "http://34.39.207.214"
+export const API_BASE_URL = "https://localhost:7083"
 
 // Função para obter a URL base da API
 export const getApiBaseUrl = (): string => {
   // Prioriza a variável de ambiente se estiver definida
-  const useUrl = process.env.NEXT_PUBLIC_USE_API_URL === 'true'
-  const apiUrl = "https://b28db93386e5.ngrok-free.app"
-  if (useUrl) {
-    console.log("🌍 Usando URL da variável de ambiente:", apiUrl)
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL
+  if (apiUrl) {
+    console.log("🌍 Usando URL da variável de ambiente:")
     return apiUrl
   }
   // Caso contrário, usa a URL configurada acima
