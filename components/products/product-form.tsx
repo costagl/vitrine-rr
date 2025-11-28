@@ -560,7 +560,7 @@ export function ProductForm({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="profundidade">Profundidade (cm)</Label>
+              <Label htmlFor="profundidade">Comprimento (cm)</Label>
               <Input
                 id="profundidade"
                 type="number"

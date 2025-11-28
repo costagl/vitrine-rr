@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import axios from "axios";
+import { API_BASE_URL } from "@/config/api-url";
 
 interface StoreSettingsDialogProps {
   open: boolean;
@@ -89,7 +90,7 @@ export function StoreSettingsDialog({
   useEffect(() => {
     const fetchLayoutsAndThemes = async () => {
       try {
-        const response = await axios.get("https://vitrineapi.duckdns.org/loja/listar-layouts-temas");
+        const response = await axios.get(`${API_BASE_URL}/loja/listar-layouts-temas`);
         const { layouts: fetchedLayouts, temas } = response.data;
 
         setLayouts(
@@ -142,7 +143,7 @@ export function StoreSettingsDialog({
 
       try {
         const constResponse = await axios.put(
-          `https://vitrineapi.duckdns.org/loja/alterar-layout-tema/${lojaId}`,
+          `${API_BASE_URL}/loja/alterar-layout-tema/${lojaId}`,
           payload
         );
         console.log(constResponse.data);

@@ -4,6 +4,7 @@ import { apiClient } from "@/utils/api-client";
 import { API_ENDPOINTS } from "@/config/api";
 import axios from "axios";
 import { getApiBaseUrl } from "@/config/api-url";
+import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
 
 export interface Store {
   id: string;
@@ -121,11 +122,11 @@ export class StoreService {
     const idLoja = userData.loja.id;
     const subdominio = userData.loja.subdominio;
     axios
-      .get(`https://vitrineapi.duckdns.org/loja/layout-tema/${idLoja}`)
+      .get(`${API_BASE_URL}/loja/layout-tema/${idLoja}`)
       .then((response) => {
         console.log("DATA:", response.data);
         const layoutSelecionado = response.data.tituloLayout;
-        let lojaUrl = `http://localhost:3000/loja/${layoutSelecionado}/?subdominio=${subdominio}&idLoja=${idLoja}`;
+        let lojaUrl = `${LOCAL_BASE_URL}/loja/${layoutSelecionado}/?subdominio=${subdominio}&idLoja=${idLoja}`;
         window.open(lojaUrl, "_blank");
       })
       .catch((error) => {

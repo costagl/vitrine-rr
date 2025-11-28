@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { Link, MapPin, ArrowLeft, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { API_BASE_URL } from "@/config/api-url";
 
 export default function Layout1CheckoutPage() {
   const [step, setStep] = useState(1);
@@ -78,7 +79,7 @@ export default function Layout1CheckoutPage() {
     };
 
     try {
-      const response = await fetch("https://vitrineapi.duckdns.org/pedido/cadastrar", {
+      const response = await fetch(`${API_BASE_URL}/pedido/cadastrar`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

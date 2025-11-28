@@ -27,6 +27,7 @@ import {
 import axios from "axios";
 import { useCart } from "@/contexts/cart-context";
 import { CartModal } from "@/components/layout-1/cart-modal";
+import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
 
 interface Product {
   id: string;
@@ -75,7 +76,7 @@ export default function Layout1Page() {
 
         try {
           const response = await axios.get(
-            `https://vitrineapi.duckdns.org/vitrine/${subdominio}`
+            `${API_BASE_URL}/vitrine/${subdominio}`
           );
 
           if (response.data.lojaRequest) {
@@ -249,7 +250,7 @@ export default function Layout1Page() {
             {todasCategoriasProduto.map((categoria, index) => (
               <Link
                 key={index}
-                href={`http://localhost:3000/loja/layout-1/produtos/?subdominio=${loja.subdominio}&idLoja=${loja.id}`}
+                href={`${LOCAL_BASE_URL}/loja/layout-1/produtos/?subdominio=${loja.subdominio}&idLoja=${loja.id}`}
                 className="hover:text-blue-200 transition-colors font-medium"
               >
                 {categoria}

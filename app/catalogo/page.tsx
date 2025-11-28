@@ -15,6 +15,7 @@ import {
   Users,
 } from "lucide-react";
 import { CategoryService } from "@/services/category-service";
+import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
 
 interface Store {
   id: string;
@@ -65,7 +66,7 @@ export default function CatalogoPage() {
 
   // Buscar lojas da API ao montar o componente
   useEffect(() => {
-    fetch("https://vitrineapi.duckdns.org/loja", {
+    fetch(`${API_BASE_URL}/loja`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -85,14 +86,14 @@ export default function CatalogoPage() {
           subdomain: loja.subdominio,
           logotipo: loja.logotipo,
           descricao: loja.descricao || "Descrição não disponível",
-          rating: loja.avaliacao || 5,
-          totalAvaliacoes: loja.totalAvaliacoes || 5,
-          cidade: loja.cidade || "Resende",
-          estado: loja.estado || "RJ",
-          totalProdutos: loja.totalProdutos || 20,
+          rating: loja.avaliacao || 0,
+          totalAvaliacoes: loja.totalAvaliacoes || 0,
+          cidade: loja.cidade || "Cidade",
+          estado: loja.estado || "XY",
+          totalProdutos: loja.totalProdutos || 0,
           imagemCapa: loja.logotipo || "/placeholder.svg?height=200&width=300",
           ativo: loja.ativo || true,
-          criadaEm: loja.dataCriacao || "2025-01-01",
+          dataCriacao: loja.dataCriacao || "2025-01-01",
           tituloTema: loja.tituloTema || "tema-1",
           tituloLayout: loja.tituloLayout || "layout-1",
         }));
@@ -139,7 +140,7 @@ export default function CatalogoPage() {
     subdominio: string,
     idLoja: string
   ) => {
-    const storeUrl = `http://localhost:3000/loja/${tituloLayout}/?subdominio=${subdominio}&idLoja=${idLoja}`;
+    const storeUrl = `${LOCAL_BASE_URL}/loja/${tituloLayout}/?subdominio=${subdominio}&idLoja=${idLoja}`;
     window.open(storeUrl, "_blank");
   };
 
