@@ -340,7 +340,7 @@ export function PedidosClient() {
                         <div className="flex items-center gap-2">
                           <span className="font-semibold">Pedido #{order.idPedido}</span>
                           <Badge className={(statusConfig as any)[order.status]?.color}>
-                            {(statusConfig as any)[order.status]?.label || "Desconhecido"}
+                            {(statusConfig as any)[order.status]?.label || "Pendente"}
                           </Badge>
                         </div>
                         <div className="text-sm font-semibold">{order.nomeCompleto}</div>

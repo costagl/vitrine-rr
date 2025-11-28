@@ -1,70 +1,114 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useMemo } from "react" // Importação de hooks do React: useState, useEffect e useMemo, que permitem controlar o estado, realizar efeitos colaterais e memorizar valores respectivamente.
-import { useRouter } from "next/navigation" // Hook do Next.js para controle de navegação entre páginas.
-import { useAuth } from "@/contexts/auth-context" // Hook customizado para acessar o contexto de autenticação do usuário.
-import { Button } from "@/components/ui/button" // Componente de botão reutilizável da UI.
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card" // Componentes reutilizáveis para exibir informações em formato de cartão.
-import { Badge } from "@/components/ui/badge" // Componente de badge para exibir contadores ou status.
-import Navbar from "@/components/navbar" // Componente de navegação (barra superior).
-import { ProductForm } from "@/components/products/product-form" // Componente de formulário para adicionar ou editar produtos.
-import { ProductList } from "@/components/products/product-list" // Componente para listar os produtos.
-import { ProductSearch } from "@/components/products/product-search" // Componente de pesquisa para filtrar produtos.
-import { ProductStats } from "@/components/products/product-stats" // Componente para exibir estatísticas dos produtos.
-import { ProductDetailModal } from "@/components/products/product-detail-modal" // Componente de modal para exibir detalhes do produto selecionado.
-import { Plus, Package, ArrowLeft } from "lucide-react" // Ícones utilizados na interface, fornecidos pelo pacote lucide-react.
-import Link from "next/link" // Componente de link do Next.js para navegação sem recarregar a página.
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from "@/hooks/use-products" // Hooks customizados para realizar operações CRUD nos produtos (listar, criar, editar, excluir).
-import { useAuthToken } from "@/hooks/use-auth-token" // Hook customizado para acessar o token de autenticação.
-import type { Product, CreateProductRequest, ProductSearchParams } from "@/types/product" // Tipagens relacionadas aos produtos, incluindo a estrutura do produto, dados de criação e parâmetros de pesquisa.
+import { useState, useEffect, useMemo } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import Navbar from "@/components/navbar";
+import { ProductForm } from "@/components/products/product-form";
+import { ProductList } from "@/components/products/product-list";
+import { ProductSearch } from "@/components/products/product-search";
+import { ProductStats } from "@/components/products/product-stats";
+import { ProductDetailModal } from "@/components/products/product-detail-modal";
+import { Plus, Package, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import {
+  useProducts,
+  useCreateProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "@/hooks/use-products";
+import { useAuthToken } from "@/hooks/use-auth-token";
+import type {
+  Product,
+  CreateProductRequest,
+  ProductSearchParams,
+} from "@/types/product";
+import { CategoryProduct } from "@/types/category";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/api-url";
+import useSWR from "swr";
 
 export default function ProductsManagementPage() {
-  const { isAuthenticated, user } = useAuth()
-  const router = useRouter()
-  const [showForm, setShowForm] = useState(false)
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null)
-  const [detailModalOpen, setDetailModalOpen] = useState(false)
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
+  const { isAuthenticated, user } = useAuth();
+  const router = useRouter();
+  const [showForm, setShowForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchParams, setSearchParams] = useState<ProductSearchParams>({
     busca: "",
     idCategoriaProduto: "",
     ativo: null,
-  })
+  });
 
   // Hooks para operações CRUD
-  const { products, isLoading, error, mutate } = useProducts()
-  const { mutate: createProduct, isLoading: isCreating, error: createError } = useCreateProduct()
-  const { mutate: updateProduct, isLoading: isUpdating, error: updateError } = useUpdateProduct()
-  const { mutate: deleteProduct, isLoading: isDeleting, error: deleteError } = useDeleteProduct()
-  const { token, isLoading: authTokenLoading } = useAuthToken()
 
+  const {
+    mutate: createProduct,
+    isLoading: isCreating,
+    error: createError,
+  } = useCreateProduct();
+  const {
+    mutate: updateProduct,
+    isLoading: isUpdating,
+    error: updateError,
+  } = useUpdateProduct();
+  const {
+    mutate: deleteProduct,
+    isLoading: isDeleting,
+    error: deleteError,
+  } = useDeleteProduct();
+  const { token, isLoading: authTokenLoading } = useAuthToken();
+
+  const fetcher = (url: string) => axios.get(url).then(res => res.data.data || []);
+
+  const { data: categories = [] } = useSWR<CategoryProduct[]>(
+    user?.loja?.id
+      ? `${API_BASE_URL}/categoria/produtos/${user.loja.id}`
+      : null,
+    fetcher
+  );
+  const {
+    data: products = [],
+    error,
+    isLoading,
+    mutate,
+  } = useSWR<Product[]>(
+    user?.loja?.id ? `${API_BASE_URL}/produto/listar/${user.loja.id}` : null,
+    fetcher
+  );
   // Filtrar produtos localmente
   const filteredProducts = useMemo(() => {
-    let filtered = [...products]
+    let filtered = [...products];
 
     // Filtro de busca
     if (searchParams.busca) {
-      const searchLower = searchParams.busca.toLowerCase()
+      const searchLower = searchParams.busca.toLowerCase();
       filtered = filtered.filter(
         (p) =>
           p.titulo.toLowerCase().includes(searchLower) ||
           p.sku.toLowerCase().includes(searchLower) ||
-          p.descricao?.toLowerCase().includes(searchLower),
-      )
+          p.descricao?.toLowerCase().includes(searchLower)
+      );
     }
 
     // Filtro de categoria
     if (searchParams.idCategoriaProduto) {
-      filtered = filtered.filter((p) => p.idCategoriaProduto === searchParams.idCategoriaProduto)
+      filtered = filtered.filter(
+        (p) => p.idCategoriaProduto === searchParams.idCategoriaProduto
+      );
     }
 
     // Filtro de status ativo
     if (searchParams.ativo !== null && searchParams.ativo !== undefined) {
-      filtered = filtered.filter((p) => p.ativo === searchParams.ativo)
+      filtered = filtered.filter((p) => p.ativo === searchParams.ativo);
     }
 
-    return filtered
-  }, [products, searchParams])
+    return filtered;
+  }, [products, searchParams]);
 
   // Redirecionamento caso não esteja autenticado
   useEffect(() => {
@@ -79,34 +123,34 @@ export default function ProductsManagementPage() {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-    if (!authTokenLoading && !token) {
-      router.push("/login")
-    }
+      if (!authTokenLoading && !token) {
+        router.push("/login");
+      }
     }, 2000);
 
     return () => clearTimeout(timeout);
-  }, [token, authTokenLoading, router])
+  }, [token, authTokenLoading, router]);
 
   const handleAddProduct = () => {
-    setEditingProduct(null)
-    setShowForm(true)
-  }
+    setEditingProduct(null);
+    setShowForm(true);
+  };
 
   const handleEditProduct = (product: Product) => {
-    setEditingProduct(product)
-    setShowForm(true)
-  }
+    setEditingProduct(product);
+    setShowForm(true);
+  };
 
   const handleDeleteProduct = async (productId: number) => {
     if (confirm("Tem certeza que deseja excluir este produto?")) {
       try {
-        await deleteProduct(productId.toString())
-        mutate()
+        await deleteProduct(productId.toString());
+        mutate();
       } catch (err) {
-        console.error("Erro ao excluir produto:", err)
+        console.error("Erro ao excluir produto:", err);
       }
     }
-  }
+  };
 
   const handleSaveProduct = async (productData: CreateProductRequest) => {
     try {
@@ -114,26 +158,26 @@ export default function ProductsManagementPage() {
         await updateProduct({
           ...productData,
           id: editingProduct.id.toString(),
-        })
+        });
       } else {
-        await createProduct(productData)
+        await createProduct(productData);
       }
-      setShowForm(false)
-      setEditingProduct(null)
-      mutate()
+      setShowForm(false);
+      setEditingProduct(null);
+      mutate();
     } catch (err) {
-      console.error("Erro ao salvar produto:", err)
+      console.error("Erro ao salvar produto:", err);
     }
-  }
+  };
 
   const handleSearchChange = (newParams: Partial<ProductSearchParams>) => {
-    setSearchParams((prev) => ({ ...prev, ...newParams }))
-  }
+    setSearchParams((prev) => ({ ...prev, ...newParams }));
+  };
 
   const handleViewProductDetails = (product: Product) => {
-    setSelectedProduct(product)
-    setDetailModalOpen(true)
-  }
+    setSelectedProduct(product);
+    setDetailModalOpen(true);
+  };
 
   // Verifica se o token está sendo carregado
   if (authTokenLoading) {
@@ -141,10 +185,10 @@ export default function ProductsManagementPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
-  if (!token) return null
+  if (!token) return null;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -164,7 +208,9 @@ export default function ProductsManagementPage() {
                 <Package className="h-8 w-8" />
                 Gerenciar Produtos
               </h1>
-              <p className="text-gray-600 mt-1">{user?.loja?.nomeLoja && `Loja: ${user.loja.nomeLoja}`}</p>
+              <p className="text-gray-600 mt-1">
+                {user?.loja?.nomeLoja && `Loja: ${user.loja.nomeLoja}`}
+              </p>
             </div>
           </div>
           <Button
@@ -181,26 +227,34 @@ export default function ProductsManagementPage() {
         <ProductStats products={filteredProducts} isLoading={isLoading} />
 
         {/* Barra de Pesquisa */}
-        <ProductSearch searchParams={searchParams} onSearchChange={handleSearchChange} />
+        <ProductSearch
+          searchParams={searchParams}
+          onSearchChange={handleSearchChange}
+          categories={categories}
+        />
 
         {/* Formulário de Produto */}
         {showForm && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>{editingProduct ? "Editar Produto" : "Adicionar Novo Produto"}</CardTitle>
+              <CardTitle>
+                {editingProduct ? "Editar Produto" : "Adicionar Novo Produto"}
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ProductForm
                 product={editingProduct}
                 onSave={handleSaveProduct}
                 onCancel={() => {
-                  setShowForm(false)
-                  setEditingProduct(null)
+                  setShowForm(false);
+                  setEditingProduct(null);
                 }}
                 isLoading={isCreating || isUpdating}
               />
               {(createError || updateError) && (
-                <div className="text-red-500 mt-2">{createError?.message || updateError?.message}</div>
+                <div className="text-red-500 mt-2">
+                  {createError?.message || updateError?.message}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -211,7 +265,9 @@ export default function ProductsManagementPage() {
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <span>Lista de Produtos</span>
-              <Badge variant="secondary">{filteredProducts.length} produto(s)</Badge>
+              <Badge variant="secondary">
+                {filteredProducts.length} produto(s)
+              </Badge>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -221,7 +277,9 @@ export default function ProductsManagementPage() {
                 <p className="mt-2 text-gray-500">Carregando produtos...</p>
               </div>
             ) : error ? (
-              <div className="text-red-500 text-center py-8">Erro ao carregar produtos: {error.message}</div>
+              <div className="text-red-500 text-center py-8">
+                Erro ao carregar produtos: {error.message}
+              </div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 {products.length === 0
@@ -237,7 +295,11 @@ export default function ProductsManagementPage() {
                 isDeleting={isDeleting}
               />
             )}
-            {deleteError && <div className="text-red-500 mt-2">Erro ao excluir produto: {deleteError.message}</div>}
+            {deleteError && (
+              <div className="text-red-500 mt-2">
+                Erro ao excluir produto: {deleteError.message}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -251,5 +313,5 @@ export default function ProductsManagementPage() {
         />
       </div>
     </div>
-  )
+  );
 }

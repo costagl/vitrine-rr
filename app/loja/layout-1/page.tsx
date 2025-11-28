@@ -26,7 +26,7 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import { useCart } from "@/contexts/cart-context";
-import { CartModal } from "@/components/layout-1/cart-modal";
+import { CartModal } from "@/components/layouts/cart-modal";
 import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
 
 interface Product {

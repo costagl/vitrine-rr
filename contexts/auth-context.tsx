@@ -5,6 +5,8 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
+  useCallback,
   type ReactNode,
 } from "react";
 import { AuthService } from "@/services/auth-service";
@@ -105,7 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   // Função de login
-  const login = (
+  const login = useCallback((
     newToken: string,
     newRefreshToken: string | undefined,
     userData: LoginResponse["user"]
@@ -123,9 +125,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(userData);
       setIsAuthenticated(true);
     }
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       if (typeof window !== "undefined") {
         // Chama o serviço de logout
@@ -150,20 +152,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsAuthenticated(false);
       }
     }
-  };
+  }, []);
+
+  const authContextValue = useMemo(() => ({
+    isAuthenticated,
+    token,
+    refreshToken,
+    user,
+    login,
+    logout,
+    loading,
+  }), [isAuthenticated, token, refreshToken, user, loading, login, logout]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        token,
-        refreshToken,
-        user,
-        login,
-        logout,
-        loading,
-      }}
-    >
+    <AuthContext.Provider value={authContextValue}>
       {children}
     </AuthContext.Provider>
   );

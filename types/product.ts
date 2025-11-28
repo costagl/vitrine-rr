@@ -39,6 +39,7 @@ export interface CreateProductRequest {
 }
 
 export interface UpdateProductRequest {
+  idLoja: number;
   titulo?: string;
   valorUnitario?: number;
   valorPromocional?: number;
@@ -89,4 +90,21 @@ export interface ApiError {
   message: string;
   status: number;
   errors?: string[];
+}
+
+export interface BackendErrorResponse {
+    erro: string; 
+}
+
+export class ServiceApiError extends Error implements ApiError {
+    status: number;
+    errors?: string[];
+
+    constructor(message: string, status: number, errors?: string[]) {
+        super(message);
+        this.message = message; // Atribui a mensagem customizada
+        this.status = status;
+        this.errors = errors;
+        this.name = 'ApiError';
+    }
 }

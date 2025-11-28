@@ -4,25 +4,29 @@ import { useState } from "react"
 import useSWR, { mutate as globalMutate } from "swr"
 import { useToast } from "@/hooks/use-toast"
 import { ProductService } from "@/services/product-service"
-import type { CreateProductRequest, UpdateProductRequest, Product, ApiError } from "@/types/product"
+import type { CreateProductRequest, UpdateProductRequest, Product, ApiError, BackendErrorResponse, ServiceApiError } from "@/types/product"
 
 /**
  * Hook para listar produtos
  */
-export function useProducts() {
+export function useProducts(idLoja: string | null | undefined) {
   const { toast } = useToast()
 
-  const { data, error, isLoading, mutate } = useSWR<Product[]>("products", () => ProductService.listarProdutos(), {
-    onError: (err: ApiError) => {
-      console.error("Erro ao listar produtos:", err)
-      toast({
-        title: "Erro ao carregar produtos",
-        description: err.message || "Não foi possível carregar a lista de produtos.",
-        variant: "destructive",
-      })
-    },
-    revalidateOnFocus: false,
-  })
+  const { data, error, isLoading, mutate } = useSWR<Product[]>(
+    idLoja ? `products-${idLoja}` : null, // Chave do SWR agora depende do idLoja
+    () => (idLoja ? ProductService.listarProdutosPorLoja(parseInt(idLoja)) : []),
+    {
+      onError: (err: ApiError) => {
+        console.error("Erro ao listar produtos:", err)
+        toast({
+          title: "Erro ao carregar produtos",
+          description: err.message || "Não foi possível carregar a lista de produtos.",
+          variant: "destructive",
+        })
+      },
+      revalidateOnFocus: false,
+    }
+  )
 
   return {
     products: data || [],
@@ -78,7 +82,7 @@ export function useCreateProduct() {
       const result = await ProductService.cadastrarProduto(data)
 
       // Invalidar cache para recarregar a lista
-      globalMutate("products")
+      globalMutate(`products-${data.idLoja}`);
 
       toast({
         title: "Produto cadastrado",
@@ -114,8 +118,8 @@ export function useUpdateProduct() {
       const result = await ProductService.alterarProduto(id, updateData)
 
       // Invalidar cache para recarregar a lista e o detalhe
-      globalMutate("products")
-      globalMutate(`product-${id}`)
+      globalMutate(`products-${updateData.idLoja}`);
+      globalMutate(`product-${id}`);
 
       toast({
         title: "Produto atualizado",
@@ -150,7 +154,7 @@ export function useDeleteProduct() {
       await ProductService.excluirProduto(id)
 
       // Invalidar cache para recarregar a lista
-      globalMutate("products")
+      globalMutate(`products-${id}`);
 
       toast({
         title: "Produto excluído",

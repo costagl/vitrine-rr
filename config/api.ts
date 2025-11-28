@@ -40,8 +40,9 @@ export const API_ENDPOINTS = {
   },
   PRODUTO: {
     CADASTRAR: "/produto/cadastrar",
-    LISTAR: "/produto/listar",
-    LISTAR_POR_ID: (id: string) => `/produto/listar/${id}`,
+    LISTAR_TODOS: "/produto/listar",
+    LISTAR_POR_LOJA: (idLoja: number) => `/produto/listar/${idLoja}`,
+    BUSCAR: (id: string) => `/produto/${id}`,
     ALTERAR: (id: string) => `/produto/alterar/${id}`,
     EXCLUIR: (id: string) => `/produto/excluir/${id}`,
   },

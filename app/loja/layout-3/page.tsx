@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,48 +21,99 @@ import {
   Crown,
   Gem,
 } from "lucide-react";
+import axios from "axios";
+import { useCart } from "@/contexts/cart-context";
+import { CartModal } from "@/components/layouts/cart-modal";
+import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
+
+interface Product {
+  id: string;
+  titulo: string;
+  descricao: string;
+  valorUnitario: number;
+  valorPromocional: number;
+  estoque: number;
+  ativo: number;
+  imagemUrl: string;
+  peso: number;
+  altura: number;
+  largura: number;
+  profundidade: number;
+  valorCusto: number;
+  categoriaProduto: string;
+  idCategoriaProduto: number;
+  idLoja: number;
+}
 
 export default function Layout3Page() {
-  const produtos = [
-    {
-      id: 1,
-      nome: "Conjunto Artístico Premium",
-      preco: 189.9,
-      imagem: "/placeholder.svg?height=350&width=350",
-      categoria: "Arte",
-      cores: ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4"],
-      rating: 4.9,
-      especial: true,
-    },
-    {
-      id: 2,
-      nome: "Pincéis Profissionais",
-      preco: 89.9,
-      imagem: "/placeholder.svg?height=350&width=350",
-      categoria: "Pincéis",
-      cores: ["#8B4513", "#D2691E", "#CD853F"],
-      rating: 4.7,
-    },
-    {
-      id: 3,
-      nome: "Tinta Acrílica Vibrante",
-      preco: 45.9,
-      imagem: "/placeholder.svg?height=350&width=350",
-      categoria: "Tintas",
-      cores: ["#FF1493", "#00CED1", "#FFD700", "#32CD32"],
-      rating: 4.8,
-      novo: true,
-    },
-    {
-      id: 4,
-      nome: "Canvas Premium 40x60",
-      preco: 129.9,
-      imagem: "/placeholder.svg?height=350&width=350",
-      categoria: "Telas",
-      cores: ["#F5F5DC", "#FFFAF0"],
-      rating: 4.6,
-    },
-  ];
+  const [produtos, setProdutos] = useState<Product[]>([]);
+  const [loja, setLoja] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const { cart, addToCart } = useCart();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const subdominio = urlParams.get("subdominio");
+
+    if (subdominio) {
+      async function fetchLojaData() {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/vitrine/${subdominio}`
+          );
+          if (response.data.lojaRequest) {
+            setLoja(response.data.lojaRequest);
+            setProdutos(response.data.lojaRequest.produtos || []);
+          } else {
+            throw new Error("Loja não encontrada");
+          }
+        } catch (err: any) {
+          setError(err.message || "Erro ao carregar dados da loja");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchLojaData();
+    }
+  }, []);
+
+  const produtosFiltrados = useMemo(() => {
+    return produtos.filter((p) => p.ativo === 1);
+  }, [produtos]);
+
+  const handleAddToCart = (produto: Product) => {
+    addToCart({
+      id: produto.id.toString(),
+      titulo: produto.titulo,
+      valorUnitario: produto.valorUnitario,
+      valorPromocional: produto.valorPromocional,
+      estoque: produto.estoque,
+      imagemUrl: produto.imagemUrl,
+      categoriaProduto: produto.categoriaProduto || "Sem Categoria",
+      ativo: produto.ativo,
+      descricao: produto.descricao,
+      peso: produto.peso,
+      altura: produto.altura,
+      largura: produto.largura,
+      profundidade: produto.profundidade,
+      valorCusto: produto.valorCusto,
+      idCategoriaProduto: produto.idCategoriaProduto,
+      idLoja: produto.idLoja,
+    });
+  };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50">
@@ -127,14 +181,15 @@ export default function Layout3Page() {
                 <Heart className="h-5 w-5 text-purple-600" />
               </Button>
 
-              <Button
+                            <Button
                 variant="ghost"
                 size="sm"
                 className="p-2 hover:bg-purple-100 rounded-full relative"
+                onClick={() => setIsCartModalOpen(true)}
               >
                 <ShoppingCart className="h-5 w-5 text-purple-600" />
                 <span className="absolute -top-1 -right-1 bg-gradient-to-r from-pink-500 to-purple-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  4
+                  {cart.itemCount}
                 </span>
               </Button>
             </div>
@@ -256,8 +311,8 @@ export default function Layout3Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {produtos.map((produto) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {produtosFiltrados.map((produto) => (
               <Card
                 key={produto.id}
                 className="group hover:shadow-2xl transition-all duration-500 border-0 overflow-hidden bg-white/80 backdrop-blur-sm"
@@ -265,42 +320,13 @@ export default function Layout3Page() {
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden">
                     <Image
-                      src={produto.imagem || "/placeholder.svg"}
-                      alt={produto.nome}
+                      src={produto.imagemUrl || "/placeholder.svg"}
+                      alt={produto.titulo}
                       className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
                       width={500}
                       height={300}
                     />
-
-                    {/* Overlay com efeitos */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-
-                    {/* Badges */}
-                    <div className="absolute top-3 left-3 flex flex-col gap-2">
-                      {produto.especial && (
-                        <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white border-0 shadow-lg">
-                          <Zap className="h-3 w-3 mr-1" />
-                          ESPECIAL
-                        </Badge>
-                      )}
-                      {produto.novo && (
-                        <Badge className="bg-gradient-to-r from-green-400 to-emerald-500 text-white border-0 shadow-lg">
-                          <Sparkles className="h-3 w-3 mr-1" />
-                          NOVO
-                        </Badge>
-                      )}
-                    </div>
-
-                    {/* Cores do produto */}
-                    <div className="absolute bottom-3 left-3 flex gap-1">
-                      {produto.cores.map((cor, index) => (
-                        <div
-                          key={index}
-                          className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-                          style={{ backgroundColor: cor }}
-                        ></div>
-                      ))}
-                    </div>
                   </div>
 
                   <div className="p-6">
@@ -308,36 +334,21 @@ export default function Layout3Page() {
                       variant="secondary"
                       className="text-xs mb-3 bg-purple-100 text-purple-700"
                     >
-                      {produto.categoria}
+                      {produto.categoriaProduto}
                     </Badge>
 
                     <h3 className="font-bold text-lg mb-3 group-hover:text-purple-600 transition-colors">
-                      {produto.nome}
+                      {produto.titulo}
                     </h3>
-
-                    <div className="flex items-center gap-1 mb-4">
-                      {[...Array(5)].map((_, i) => (
-                        <Star
-                          key={i}
-                          className={`h-4 w-4 ${
-                            i < Math.floor(produto.rating)
-                              ? "text-yellow-400 fill-current"
-                              : "text-gray-300"
-                          }`}
-                        />
-                      ))}
-                      <span className="text-sm text-gray-500 ml-1">
-                        ({produto.rating})
-                      </span>
-                    </div>
 
                     <div className="flex items-center justify-between">
                       <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                        R$ {produto.preco.toFixed(2).replace(".", ",")}
+                        R$ {produto.valorUnitario.toFixed(2).replace(".", ",")}
                       </span>
                       <Button
                         size="sm"
                         className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0"
+                        onClick={() => handleAddToCart(produto)}
                       >
                         <ShoppingCart className="h-4 w-4" />
                       </Button>
@@ -496,8 +507,9 @@ export default function Layout3Page() {
               para artistas apaixonados.
             </p>
           </div>
-        </div>
+                </div>
       </footer>
+      <CartModal open={isCartModalOpen} onOpenChange={setIsCartModalOpen} />
     </div>
   );
 }

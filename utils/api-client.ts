@@ -94,8 +94,6 @@ class ApiClient {
     const controller = this.createAbortController()
     const fullUrl = `${getApiBaseUrl()}${endpoint}`
 
-    // console.log(`🔍 Fazendo Requisição ${method}: ${fullUrl}`)
-
     try {
       const headers = this.getHeaders()
 

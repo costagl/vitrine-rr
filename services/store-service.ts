@@ -76,7 +76,7 @@ export class StoreService {
 
   static async getProducts(): Promise<Product[]> {
     const response = await apiClient.get<Product[]>(
-      API_ENDPOINTS.PRODUTO.LISTAR
+      API_ENDPOINTS.PRODUTO.LISTAR_TODOS
     );
     return response.data!;
   }

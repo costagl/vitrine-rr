@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,22 +15,29 @@ import { Search, X } from "lucide-react";
 import type { ProductSearchParams } from "@/types/product";
 import { CategoryProduct } from "@/types/category";
 import { useDebounce } from "@/hooks/use-debounce";
-import {
-  getProductCategoriesById,
-  getCategoryTitleById,
-} from "@/hooks/use-categories";
 
 interface ProductSearchProps {
   searchParams: ProductSearchParams;
-  onSearchChange: (params: ProductSearchParams) => void;
+  onSearchChange: (params: Partial<ProductSearchParams>) => void;
+  categories: CategoryProduct[];
 }
 
 export function ProductSearch({
   searchParams,
   onSearchChange,
+  categories,
 }: ProductSearchProps) {
   const [searchTerm, setSearchTerm] = useState(searchParams.busca || "");
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const categoryTitles = useMemo(() => {
+    if (categories.length === 0) return {};
+    const titles: { [key: string]: string } = {};
+    for (const category of categories) {
+      titles[category.id] = category.titulo;
+    }
+    return titles;
+  }, [categories]);
 
   // Atualizar busca quando o termo digitado for alterado (com debounce)
   useEffect(() => {
@@ -38,28 +45,7 @@ export function ProductSearch({
       onSearchChange({ busca: debouncedSearchTerm });
     }
   }, [debouncedSearchTerm, onSearchChange, searchParams.busca]);
-
-  // Carregar categorias de produtos
-  const [categories, setCategories] = useState<CategoryProduct[]>([]);
-  const [categoryTitles, setCategoryTitles] = useState<{ [key: string]: string }>({});
-  const [loadingCategories, setLoadingCategories] = useState(true);
-
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const fetchedCategories = await getProductCategoriesById();
-      setCategories(fetchedCategories);
-
-      // Carregar títulos das categorias
-      const titles: { [key: string]: string } = {};
-      for (const category of fetchedCategories) {
-        titles[category.id] = category.titulo;
-      }
-      setCategoryTitles(titles);
-      setLoadingCategories(false);
-    };
-
-    fetchCategories();
-  }, []);
+ // A dependência agora é o tamanho do array de categorias
 
   // Manipuladores de mudança nos filtros
   const handleCategoryChange = (value: string) => {
@@ -127,12 +113,11 @@ export function ProductSearch({
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todas as categorias</SelectItem>
-              {!loadingCategories &&
-                categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.titulo}
-                  </SelectItem>
-                ))}
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.titulo}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -170,8 +155,10 @@ export function ProductSearch({
 
           {searchParams.idCategoriaProduto && (
             <div className="bg-primary/10 text-primary text-xs px-2 py-1 rounded-full flex items-center">
-              {/* Usando o título da categoria carregado */}
-              Categoria: {categoryTitles[searchParams.idCategoriaProduto] || "Carregando..."}
+              {/* Usando o título da categoria diretamente da prop */}
+              Categoria: {
+                categories.find(c => c.id.toString() === searchParams.idCategoriaProduto)?.titulo || "Carregando..."
+              }
               <Button
                 variant="ghost"
                 size="sm"

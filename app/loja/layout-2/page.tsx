@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,56 +18,100 @@ import {
   Users,
 } from "lucide-react";
 import Image from "next/image";
+import axios from "axios";
+import { useCart } from "@/contexts/cart-context";
+import { CartModal } from "@/components/layouts/cart-modal";
+import { API_BASE_URL, LOCAL_BASE_URL } from "@/config/api-url";
+
+interface Product {
+  id: string;
+  titulo: string;
+  descricao: string;
+  valorUnitario: number;
+  valorPromocional: number;
+  estoque: number;
+  ativo: number;
+  imagemUrl: string;
+  peso: number;
+  altura: number;
+  largura: number;
+  profundidade: number;
+  valorCusto: number;
+  categoriaProduto: string;
+  idCategoriaProduto: number;
+  idLoja: number;
+}
 
 export default function Layout2Page() {
-  const produtos = [
-    {
-      id: 1,
-      nome: "Smartphone Pro Max",
-      preco: 2499.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Eletrônicos",
-      novo: true,
-    },
-    {
-      id: 2,
-      nome: "Fones Wireless Premium",
-      preco: 399.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Áudio",
-      destaque: true,
-    },
-    {
-      id: 3,
-      nome: "Notebook Ultra Slim",
-      preco: 3299.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Computadores",
-    },
-    {
-      id: 4,
-      nome: "Smartwatch Fitness",
-      preco: 899.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Wearables",
-      novo: true,
-    },
-    {
-      id: 5,
-      nome: "Câmera Digital 4K",
-      preco: 1899.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Fotografia",
-    },
-    {
-      id: 6,
-      nome: 'Tablet Pro 12"',
-      preco: 1599.9,
-      imagem: "/placeholder.svg?height=400&width=400",
-      categoria: "Tablets",
-      destaque: true,
-    },
-  ];
+  const [produtos, setProdutos] = useState<Product[]>([]);
+  const [loja, setLoja] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isCartModalOpen, setIsCartModalOpen] = useState(false);
+  const { cart, addToCart } = useCart();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const idLoja = urlParams.get("idLoja");
+    const subdominio = urlParams.get("subdominio");
+
+    if (subdominio) {
+      async function fetchLojaData() {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const response = await axios.get(
+            `${API_BASE_URL}/vitrine/${subdominio}`
+          );
+          if (response.data.lojaRequest) {
+            setLoja(response.data.lojaRequest);
+            setProdutos(response.data.lojaRequest.produtos || []);
+          } else {
+            throw new Error("Loja não encontrada");
+          }
+        } catch (err: any) {
+          setError(err.message || "Erro ao carregar dados da loja");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+      fetchLojaData();
+    }
+  }, []);
+
+  const produtosFiltrados = useMemo(() => {
+    return produtos.filter((p) => p.ativo === 1);
+  }, [produtos]);
+
+  const handleAddToCart = (produto: Product) => {
+    addToCart({
+      id: produto.id.toString(),
+      titulo: produto.titulo,
+      valorUnitario: produto.valorUnitario,
+      valorPromocional: produto.valorPromocional,
+      estoque: produto.estoque,
+      imagemUrl: produto.imagemUrl,
+      categoriaProduto: produto.categoriaProduto || "Sem Categoria",
+      ativo: produto.ativo,
+      descricao: produto.descricao,
+      peso: produto.peso,
+      altura: produto.altura,
+      largura: produto.largura,
+      profundidade: produto.profundidade,
+      valorCusto: produto.valorCusto,
+      idCategoriaProduto: produto.idCategoriaProduto,
+      idLoja: produto.idLoja,
+    });
+  };
+
+  if (isLoading) {
+    return <div>Carregando...</div>;
+  }
+
+  if (error) {
+    return <div>{error}</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,10 +166,10 @@ export default function Layout2Page() {
                 <User className="h-5 w-5" />
               </Button>
 
-              <Button variant="ghost" size="sm" className="p-2 relative">
+                            <Button variant="ghost" size="sm" className="p-2 relative" onClick={() => setIsCartModalOpen(true)}>
                 <ShoppingBag className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-black text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  2
+                  {cart.itemCount}
                 </span>
               </Button>
 
@@ -215,8 +262,8 @@ export default function Layout2Page() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {produtos.map((produto) => (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {produtosFiltrados.map((produto) => (
               <Card
                 key={produto.id}
                 className="group border-0 shadow-none hover:shadow-lg transition-all duration-300"
@@ -224,39 +271,30 @@ export default function Layout2Page() {
                 <CardContent className="p-0">
                   <div className="relative overflow-hidden bg-gray-50 aspect-square mb-6">
                     <Image
-                      src={produto.imagem || "/placeholder.svg"}
-                      alt={produto.nome}
+                      src={produto.imagemUrl || "/placeholder.svg"}
+                      alt={produto.titulo}
                       className="w-full h-full object-contain p-8 group-hover:scale-105 transition-transform duration-500"
                       width={500}
                       height={300}
                     />
-                    {produto.novo && (
-                      <Badge className="absolute top-4 left-4 bg-black text-white rounded-none">
-                        NOVO
-                      </Badge>
-                    )}
-                    {produto.destaque && (
-                      <Badge className="absolute top-4 left-4 bg-yellow-400 text-black rounded-none">
-                        DESTAQUE
-                      </Badge>
-                    )}
                   </div>
 
                   <div className="px-2">
                     <div className="text-sm text-gray-500 font-light mb-2">
-                      {produto.categoria}
+                      {produto.categoriaProduto}
                     </div>
                     <h3 className="font-light text-lg mb-3 group-hover:text-gray-600 transition-colors">
-                      {produto.nome}
+                      {produto.titulo}
                     </h3>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-light">
-                        R$ {produto.preco.toFixed(2).replace(".", ",")}
+                        R$ {produto.valorUnitario.toFixed(2).replace(".", ",")}
                       </span>
                       <Button
                         variant="ghost"
                         size="sm"
                         className="opacity-0 group-hover:opacity-100 transition-opacity p-2"
+                        onClick={() => handleAddToCart(produto)}
                       >
                         <ArrowRight className="h-4 w-4" />
                       </Button>
@@ -330,7 +368,7 @@ export default function Layout2Page() {
       </section>
 
       {/* Footer Minimalista */}
-      <footer className="bg-white py-16">
+            <footer className="bg-white py-16">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -427,6 +465,7 @@ export default function Layout2Page() {
           </div>
         </div>
       </footer>
+      <CartModal open={isCartModalOpen} onOpenChange={setIsCartModalOpen} />
     </div>
   );
 }
