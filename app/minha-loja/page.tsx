@@ -197,7 +197,7 @@ export default function MinhaLojaPage() {
           {/* Pedidos Recentes */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Pedidos Recentes</CardTitle>
+              <CardTitle className="text-xl">Pedidos Recentes {"(A implementar)"}</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">

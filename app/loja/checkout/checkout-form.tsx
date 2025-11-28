@@ -27,7 +27,7 @@ import { API_BASE_URL } from "@/config/api-url";
 
 interface ItemPedido {
   idProduto: number;
-  tituloProduto: string;
+  titulo: string;
   quantidade: number;
   precoUnitario: number;
   precoTotal: number;
@@ -40,6 +40,7 @@ interface ItemPedido {
 interface Pedido {
   idLoja: string;
   freteValor: number;
+  status: string
 }
 
 export interface ClienteEnderecoPedidoVM {
@@ -81,11 +82,12 @@ const CheckoutForm = () => {
       {
         idLoja: "",
         freteValor: 0,
+        status: "Pendente"
       },
     ],
     itensPedido: cart.items.map((item) => ({
       idProduto: parseInt(item.id),
-      tituloProduto: item.titulo,
+      titulo: item.titulo,
       quantidade: item.quantidade,
       precoUnitario: item.valorUnitario,
       precoTotal: item.valorUnitario * item.quantidade,
@@ -130,6 +132,7 @@ const CheckoutForm = () => {
           {
             idLoja: idLoja,
             freteValor: prevData.pedidos[0].freteValor,
+            status: "Pendente"
           },
         ],
       }));
@@ -153,12 +156,29 @@ const CheckoutForm = () => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!idLoja) {
       alert("O ID da loja não foi encontrado.");
       return;
     }
+
+    const payload = {
+      ...formData,
+      cpf: formData.cpf.replace(/\D/g, ''), // Remove todos os não-dígitos
+      pedidos: formData.pedidos.map(p => ({
+        ...p,
+        idLoja: parseInt(p.idLoja, 10),
+        itensPedido: formData.itensPedido, // Move os itens para dentro do pedido
+      })),
+    };
+    // Remove o itensPedido do nível raiz, pois ele já foi movido
+    delete (payload as any).itensPedido;
+
+    // --- LOG PARA DEBUG AQUI ---
+    console.log("DADOS DO PEDIDO (JSON):");
+    console.log(JSON.stringify(payload, null, 2));
+    // ---------------------------
 
     try {
       const response = await fetch(`${API_BASE_URL}/pedido/cadastrar`, {
@@ -166,14 +186,16 @@ const CheckoutForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
-      console.log(data.message);
-      console.log(data.error);
+      console.log("Resposta da API (message):", data.message);
+      console.log("Resposta da API (error):", data.error);
 
       if (!response.ok) {
+        // Se der Bad Request, isso vai ajudar a ver o que o backend retornou
+        console.error("Detalhes do erro 400/500:", data); 
         throw new Error("Erro ao cadastrar o pedido");
       }
 
@@ -204,61 +226,102 @@ const CheckoutForm = () => {
   };
 
   const [cep, setCep] = useState("");
-  const [frete, setFrete] = useState(0);
+  const [frete, setFrete] = useState<number>(0);
+  const [isCalculatingFrete, setIsCalculatingFrete] = useState(false);
+  const [cepError, setCepError] = useState<string | null>(null);
 
-  const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCep(e.target.value);
+  const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let cepValue = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
+    
+    if (cepValue.length > 5) {
+      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+    }
+    
+    setCep(cepValue);
+    setCepError(null); // Limpa o erro ao digitar
+    setFrete(0); // Reseta o frete ao mudar o CEP
+
+    const unformattedCep = cepValue.replace(/\D/g, '');
+    if (unformattedCep.length === 8) {
+      await handleFreteCheck(unformattedCep);
+    }
   };
 
-  const handleFreteCheck = async () => {
-    const TokenMelhorEnvio = process.env.NEXT_PUBLIC_MELHORENVIO_TOKEN;
-
-    const postData = {
-      from: {
-        postal_code: "06660740",
-      },
-      to: {
-        postal_code: cep,
-      },
-      products: formData.itensPedido.map((item) => ({
-        id: item.idProduto.toString(),
-        width: item.largura || 1,
-        height: item.altura || 1,
-        length: item.profundidade || 1,
-        weight: item.peso || 1,
-        insurance_value: 1,
-        quantity: item.quantidade,
-      })),
-    };
-
-    const headers = {
-      Accept: "application/json",
-      Authorization: `Bearer ${TokenMelhorEnvio}`,
-      "Content-Type": "application/json",
-      "User-Agent": "Vitrine (glameiramc@gmail.com)",
-    };
+    const handleFreteCheck = async (cepToCalculate: string) => {
+    setIsCalculatingFrete(true);
+    setCepError(null);
+    setFrete(0);
 
     try {
-      // console.log(
-      //   "PostData Melhor Envio:",
-      //   JSON.stringify(headers, null, 2),
-      //   JSON.stringify(postData, null, 2)
-      // );
-      const response = await axios.post("/frete/melhorenvio", postData, {
-        headers,
-      });
-      setFrete(parseFloat(response.data[0].price));
+      // 1. Buscar endereço no ViaCEP
+      const viaCepResponse = await axios.get(`https://viacep.com.br/ws/${cepToCalculate}/json/`);
+      const addressData = viaCepResponse.data;
+
+      if (addressData.erro) {
+        throw new Error("CEP não encontrado");
+      }
+
+      // 2. Preencher os campos do formulário com os dados do ViaCEP
+      setFormData(prevData => ({
+        ...prevData,
+        enderecoEntrega: {
+          ...prevData.enderecoEntrega,
+          logradouro: addressData.logradouro,
+          bairro: addressData.bairro,
+          cidade: addressData.localidade,
+          estado: addressData.uf,
+          cep: cepToCalculate,
+        }
+      }));
+
+      // 3. Calcular o frete com o Melhor Envio
+      const TokenMelhorEnvio = process.env.NEXT_PUBLIC_MELHORENVIO_TOKEN;
+
+      const postData = {
+        from: { postal_code: "06660740" },
+        to: { postal_code: cepToCalculate },
+        products: formData.itensPedido.map((item) => ({
+          id: item.idProduto.toString(),
+          width: item.largura || 1,
+          height: item.altura || 1,
+          length: item.profundidade || 1,
+          weight: item.peso || 1,
+          insurance_value: 1,
+          quantity: item.quantidade,
+        })),
+      };
+
+      const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${TokenMelhorEnvio}`,
+        "Content-Type": "application/json",
+        "User-Agent": "Vitrine (glameiramc@gmail.com)",
+      };
+
+      const response = await axios.post("/frete/melhorenvio", postData, { headers });
+      
+      if (!response.data || response.data.length === 0) {
+        throw new Error("Não foi possível calcular o frete para este CEP.");
+      }
+
+      const freteValue = parseFloat(response.data[0].price);
+      setFrete(freteValue);
       setFormData((prevData) => ({
         ...prevData,
         pedidos: [
           {
             idLoja: prevData.pedidos[0].idLoja,
-            freteValor: parseFloat(response.data[0].price),
+            freteValor: freteValue,
+            status: "Pendente"
           },
         ],
       }));
     } catch (error) {
-      console.error("Erro ao enviar dados:", error);
+      console.error("Erro ao processar CEP/Frete:", error);
+      setCepError("CEP Inválido ou erro ao calcular frete.");
+      setFrete(0);
+    } finally {
+      setIsCalculatingFrete(false);
     }
   };
 
@@ -388,6 +451,34 @@ const CheckoutForm = () => {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="cep">CEP</Label>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="text"
+                          id="cep"
+                          name="cep"
+                          value={cep}
+                          onChange={handleCepChange}
+                          required
+                          placeholder="00000-000"
+                          className={cepError ? "border-red-500" : ""}
+                          disabled={isCalculatingFrete}
+                        />
+                        {isCalculatingFrete && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>}
+                      </div>
+                      {cepError && <p className="text-sm text-red-500 mt-1">{cepError}</p>}
+                      {frete > 0 && !cepError && (
+                        <div className="mt-4">
+                          {/* <p className="font-medium text-lg">Valor do Frete:</p>
+                          <p className="text-xl text-primary">
+                            R$ {frete}
+                          </p> */}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="md:col-span-2 space-y-2">
                       <Label htmlFor="logradouro">Logradouro</Label>
                       <Input
@@ -440,38 +531,7 @@ const CheckoutForm = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="cep">CEP</Label>
-                      <div className="flex items-center gap-2">
-                        <Input
-                          type="text"
-                          id="cep"
-                          name="cep"
-                          value={cep}
-                          onChange={handleCepChange}
-                          required
-                          placeholder="00000-000"
-                        />
-                        <Button
-                          type="button"
-                          onClick={handleFreteCheck}
-                          size="sm"
-                        >
-                          Verificar Frete
-                        </Button>
-                      </div>
-                      {frete > 0 && (
-                        <div className="mt-4">
-                          <p className="font-medium text-lg">Valor do Frete:</p>
-                          <p className="text-xl text-primary">
-                            {/* R$ {frete.toFixed(2)} */}
-                            R$ {frete}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="cidade">Cidade</Label>
                       <Input
@@ -519,7 +579,7 @@ const CheckoutForm = () => {
                     {formData.itensPedido.map((item, index) => (
                       <div key={index} className="flex justify-between text-sm">
                         <div>
-                          <p className="font-medium">{item.tituloProduto}</p>
+                          <p className="font-medium">{item.titulo}</p>
                           <p className="text-muted-foreground">
                             Quantidade: {item.quantidade}
                           </p>
