@@ -1,7 +1,7 @@
-export const API_BASE_URL = "http://localhost:5000"
-export const LOCAL_BASE_URL =  "http://localhost:3000"
-// export const API_BASE_URL = "https://vitrineapi.duckdns.org";
-// export const LOCAL_BASE_URL = "https://vitrinedev.vercel.app";
+// export const API_BASE_URL = "http://localhost:5000"
+// export const LOCAL_BASE_URL =  "http://localhost:3000"
+export const API_BASE_URL = "https://vitrineapi.duckdns.org";
+export const LOCAL_BASE_URL = "https://vitrinedev.vercel.app";
 
 // Função para obter a URL base da API
 export const getApiBaseUrl = (): string => {
