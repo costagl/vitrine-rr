@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 interface ProductListProps {
   products: Product[];
   onEdit: (product: Product) => void;
-  onDelete: (productId: number) => void;
+  onDelete: (productId: string) => void;
   onOpenDetail?: (product: Product) => void;
   isDeleting?: boolean;
 }

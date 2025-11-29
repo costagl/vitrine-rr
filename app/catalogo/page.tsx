@@ -84,14 +84,14 @@ export default function CatalogoPage() {
           nome: loja.nomeLoja,
           categoria: loja.categoriaLoja,
           subdomain: loja.subdominio,
-          logotipo: loja.logotipo,
           descricao: loja.descricao || "Descrição não disponível",
           rating: loja.avaliacao || 0,
           totalAvaliacoes: loja.totalAvaliacoes || 0,
           cidade: loja.cidade || "Cidade",
           estado: loja.estado || "XY",
           totalProdutos: loja.totalProdutos || 0,
-          imagemCapa: loja.logotipo || "/placeholder.svg?height=200&width=300",
+          logotipo: loja.logotipoUrl || "/placeholder.svg?height=200&width=300",
+          imagemCapa: loja.imagemBannerUrl || "/placeholder.svg?height=200&width=300",
           ativo: loja.ativo || true,
           dataCriacao: loja.dataCriacao || "2025-01-01",
           tituloTema: loja.tituloTema || "tema-1",
@@ -242,7 +242,7 @@ export default function CatalogoPage() {
                 {/* Imagem da Loja */}
                 <div className="relative">
                   <Image
-                    src={loja.logotipo || "/placeholder.svg"}
+                    src={loja.imagemCapa || "/placeholder.svg"}
                     alt={loja.nome}
                     className="w-full h-48 object-cover"
                     width={500}
@@ -279,8 +279,8 @@ export default function CatalogoPage() {
                       </span>
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <Users className="h-4 w-4" />
-                      <span>{loja.totalProdutos} produtos</span>
+                      {/* <Users className="h-4 w-4" />
+                      <span>{loja.totalProdutos} produtos</span> */}
                     </div>
                     <div className="flex items-center gap-1 text-sm text-gray-500">
                       <Star className="h-4 w-4" />

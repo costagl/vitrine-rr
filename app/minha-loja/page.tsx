@@ -8,14 +8,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/navbar";
 import { StoreSettingsDialog } from "@/components/store-settings-dialog";
-import { ExternalLink, Store, Copy, Globe, Settings } from "lucide-react";
+import { ExternalLink, Store, Copy, Globe, Settings, PackageSearch } from "lucide-react";
 import { StoreService } from "@/services/store-service";
 import Link from "next/link";
+import axios from "axios";
+import { API_BASE_URL } from "@/config/api-url";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface RecentOrder {
+  idPedido: number;
+  status: string;
+  tempoDecorrido: string;
+}
+
+interface SummaryData {
+  idLoja: number;
+  quantidadeProdutosVendidos: number;
+  receitaTotal: number;
+}
 
 export default function MinhaLojaPage() {
   const { isAuthenticated, user } = useAuth();
   const router = useRouter();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
+  const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -26,6 +44,32 @@ export default function MinhaLojaPage() {
 
     return () => clearTimeout(timeout);
   }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      if (user?.loja?.id) {
+        setIsLoading(true);
+        try {
+          const fetchOrders = axios.get(`${API_BASE_URL}/pedido/ultimos/${user.loja.id}`);
+          const fetchSummary = axios.get(`${API_BASE_URL}/pedido/resumo/${user.loja.id}`);
+
+          const [ordersResponse, summaryResponse] = await Promise.all([fetchOrders, fetchSummary]);
+
+          setRecentOrders(ordersResponse.data || []);
+          setSummaryData(summaryResponse.data);
+        } catch (error) {
+          console.error("Erro ao buscar dados da loja:", error);
+          setRecentOrders([]);
+          setSummaryData(null);
+        } finally {
+          setIsLoading(false);
+    }
+      }
+    };
+
+    fetchStoreData();
+  }, [user?.loja?.id]);
+
 
   const copyStoreUrl = () => {
     if (user?.loja) {
@@ -174,61 +218,73 @@ export default function MinhaLojaPage() {
           {/* Painel de Estatísticas */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Estatísticas</CardTitle>
+              <CardTitle className="text-xl">Estatísticas Gerais</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm text-gray-500">Visitas hoje</p>
-                  <p className="text-2xl font-bold">0</p>
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-8 w-1/2" />
+                  <Skeleton className="h-8 w-3/4" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Vendas hoje</p>
-                  <p className="text-2xl font-bold">0</p>
+              ) : summaryData ? (
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-gray-500">Produtos Vendidos</p>
+                    <p className="text-2xl font-bold">{summaryData.quantidadeProdutosVendidos}</p>
+                  </div>
+                  {/* <div>
+                    <p className="text-sm text-gray-500">Vendas hoje</p>
+                    <p className="text-2xl font-bold">{recentOrders.length}</p>
+                  </div> */}
+                  <div>
+                    <p className="text-sm text-gray-500">Receita Total</p>
+                    <p className="text-2xl font-bold">
+                      {summaryData.receitaTotal.toLocaleString("pt-BR", {
+                        style: "currency",
+                        currency: "BRL",
+                      })}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Receita hoje</p>
-                  <p className="text-2xl font-bold">R$ 0</p>
-                </div>
-              </div>
+              ) : (
+                <p className="text-gray-500">Não há dados de estatísticas.</p>
+              )}
             </CardContent>
           </Card>
 
           {/* Pedidos Recentes */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-xl">Pedidos Recentes {"(A implementar)"}</CardTitle>
+              <CardTitle className="text-xl">Pedidos Recentes</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center pb-2 border-b">
-                  <div>
-                    <p className="font-medium">#12345</p>
-                    <p className="text-sm text-gray-500">Há 2 horas</p>
-                  </div>
-                  <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
-                    Pago
-                  </Badge>
+              {isLoading ? (
+                <div className="space-y-4">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
                 </div>
-                <div className="flex justify-between items-center pb-2 border-b">
-                  <div>
-                    <p className="font-medium">#12344</p>
-                    <p className="text-sm text-gray-500">Há 3 horas</p>
-                  </div>
-                  <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
-                    Pendente
-                  </Badge>
+              ) : recentOrders && recentOrders.length > 0 ? (
+                <div className="space-y-3">
+                  {recentOrders.map((order) => (
+                    <div key={order.idPedido} className="flex justify-between items-center pb-2 border-b">
+                      <div>
+                        <p className="font-medium">#{order.idPedido}</p>
+                        <p className="text-sm text-gray-500">{order.tempoDecorrido}</p>
+                      </div>
+                      <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+                        {order.status}
+                      </Badge>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between items-center pb-2 border-b">
-                  <div>
-                    <p className="font-medium">#12343</p>
-                    <p className="text-sm text-gray-500">Há 5 horas</p>
-                  </div>
-                  <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
-                    Enviado
-                  </Badge>
+              ) : (
+                <div className="text-center text-gray-500 py-8">
+                  <PackageSearch className="mx-auto h-12 w-12 text-gray-400" />
+                  <p className="mt-2">Não há pedidos recentes.</p>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
 

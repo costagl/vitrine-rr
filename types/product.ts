@@ -1,5 +1,5 @@
 export interface Product {
-  id: number;
+  id: string;
   titulo: string;
   idLoja: number;
   valorUnitario: number;
@@ -20,7 +20,7 @@ export interface Product {
 }
 
 export interface CreateProductRequest {
-  id: number;
+  id: string;
   titulo: string;
   idLoja: number;
   valorUnitario: number;

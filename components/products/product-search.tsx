@@ -50,7 +50,7 @@ export function ProductSearch({
   // Manipuladores de mudança nos filtros
   const handleCategoryChange = (value: string) => {
     onSearchChange({
-      idCategoriaProduto: value === "all" ? undefined : value,
+      idCategoriaProduto: value === "all" ? "" : value,
     });
   };
 

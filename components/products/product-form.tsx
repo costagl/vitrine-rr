@@ -41,7 +41,7 @@ export function ProductForm({
 
   // Estado do formulário
   const [formData, setFormData] = useState<CreateProductRequest>({
-    id: 0,
+    id: "",
     titulo: "",
     idLoja: user?.loja?.id ? Number.parseInt(user.loja.id) : 0,
     valorUnitario: 0,
@@ -234,23 +234,28 @@ export function ProductForm({
   };
 
   // Função de envio do formulário
-  const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Verificar se a imagem foi carregada com sucesso
     if (isImageLoading) {
       setErrors((prev) => ({
         ...prev,
-        imagem:
-          "A imagem ainda está sendo carregada. Tente novamente em instantes.",
+        imagem: "A imagem ainda está sendo carregada. Tente novamente em instantes.",
       }));
       return;
     }
 
     if (validateForm()) {
-      // Esperar até que a URL da imagem tenha sido definida antes de chamar o onSave
-      if (formData.imagem.trim()) {
-        onSave(formData);
+      const dataToSend = { ...formData };
+      
+      // Se não for um produto existente (ou seja, é um novo produto),
+      // removemos o ID para que o backend possa gerá-lo.
+      if (!product?.id) {
+        delete (dataToSend as Partial<CreateProductRequest>).id;
+      }
+
+      if (dataToSend.imagem.trim()) {
+        onSave(dataToSend);
       } else {
         setErrors((prev) => ({
           ...prev,

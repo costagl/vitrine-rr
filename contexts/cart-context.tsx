@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import type { Cart, CartItem, CartContextType } from "@/types/cart";
 
@@ -15,7 +15,6 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   });
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { toast } = useToast();
-  const [isShowingToast, setIsShowingToast] = useState(false);
 
   // Função para pegar o subdomínio da URL
   const getSubdominio = () => {
@@ -59,10 +58,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     return { items, total, itemCount };
   };
 
-  // Adicionar ao carrinho
-  const addToCart = (newItem: Omit<CartItem, "quantidade">) => {
-    if (isShowingToast) return;
-
+    // Adicionar ao carrinho
+  const addToCart = useCallback((newItem: Omit<CartItem, "quantidade">) => {
     setCart((prevCart) => {
       const existingItem = prevCart.items.find(
         (item) => item.id === newItem.id
@@ -71,13 +68,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       let newItems: CartItem[];
       if (existingItem) {
         if (existingItem.quantidade >= newItem.estoque) {
-          setIsShowingToast(true);
           toast({
             title: "Estoque insuficiente",
             description: "Quantidade máxima já adicionada ao carrinho",
             variant: "destructive",
           });
-          setTimeout(() => setIsShowingToast(false), 1000);
           return prevCart;
         }
         newItems = prevCart.items.map((item) =>
@@ -85,30 +80,26 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             ? { ...item, quantidade: item.quantidade + 1 }
             : item
         );
-        setIsShowingToast(true);
         toast({
           title: "Quantidade atualizada",
           description: `${newItem.titulo} - Quantidade: ${
             existingItem.quantidade + 1
           }`,
         });
-        setTimeout(() => setIsShowingToast(false), 1000);
       } else {
         newItems = [...prevCart.items, { ...newItem, quantidade: 1 }];
-        setIsShowingToast(true);
         toast({
           title: "Produto adicionado",
           description: `${newItem.titulo} foi adicionado ao carrinho`,
         });
-        setTimeout(() => setIsShowingToast(false), 1000);
       }
 
       return calculateTotals(newItems);
     });
-  };
+  }, [toast]);
 
   // Remover do carrinho
-  const removeFromCart = (itemId: string) => {
+  const removeFromCart = useCallback((itemId: string) => {
     setCart((prevCart) => {
       const item = prevCart.items.find((i) => i.id === itemId);
       const newItems = prevCart.items.filter((item) => item.id !== itemId);
@@ -122,16 +113,15 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       return calculateTotals(newItems);
     });
-  };
+  }, [toast]);
 
   // Atualizar quantidade
-  const updateQuantity = (itemId: string, quantity: number) => {
+  const updateQuantity = useCallback((itemId: string, quantity: number) => {
     if (quantity <= 0) {
       removeFromCart(itemId);
       return;
     }
 
-    // Atualiza a quantidade respeitando o estoque
     setCart((prevCart) => {
       const newItems = prevCart.items.map((item) => {
         if (item.id === itemId) {
@@ -143,10 +133,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
       return calculateTotals(newItems);
     });
-  };
+  }, [removeFromCart]);
 
   // Limpar carrinho
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCart({
       items: [],
       total: 0,
@@ -156,26 +146,25 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       title: "Carrinho limpo",
       description: "Todos os produtos foram removidos do carrinho",
     });
-  };
+  }, [toast]);
 
-  // Abrir/Fechar carrinho
-  const openCart = () => setIsCartOpen(true);
-  const closeCart = () => setIsCartOpen(false);
+  const openCart = useCallback(() => setIsCartOpen(true), []);
+  const closeCart = useCallback(() => setIsCartOpen(false), []);
+
+  const value = useMemo(() => ({
+    cart,
+    isCartOpen,
+    addToCart,
+    removeFromCart,
+    updateQuantity,
+    clearCart,
+    openCart,
+    closeCart,
+    itemCount: cart.itemCount,
+  }), [cart, isCartOpen, addToCart, removeFromCart, updateQuantity, clearCart, openCart, closeCart]);
 
   return (
-    <CartContext.Provider
-      value={{
-        cart,
-        isCartOpen,
-        addToCart,
-        removeFromCart,
-        updateQuantity,
-        clearCart,
-        openCart,
-        closeCart,
-        itemCount: cart.itemCount,
-      }}
-    >
+    <CartContext.Provider value={value}>
       {children}
     </CartContext.Provider>
   );

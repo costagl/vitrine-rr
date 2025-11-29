@@ -56,8 +56,8 @@ export interface SubdomainVerifyResponse {
 }
 
 export interface LayoutThemeResponse {
-  layoutId: number;
-  themeId: number;
+  layoutId: string;
+  themeId: string;
 }
 
 export class StoreService {

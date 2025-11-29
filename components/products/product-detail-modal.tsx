@@ -28,7 +28,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   product: Product | null;
   onEdit?: (product: Product) => void;
-  onDelete?: (productId: number) => void;
+  onDelete?: (productId: string) => void;
 }
 
 export function ProductDetailModal({
@@ -47,10 +47,6 @@ export function ProductDetailModal({
       currency: "BRL",
     }).format(value);
   };
-
-  console.log(product);
-  console.log(product);
-  console.log(product);
   
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

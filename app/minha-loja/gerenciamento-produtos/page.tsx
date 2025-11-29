@@ -1,35 +1,34 @@
-"use client";
+"use client"
 
-import { useState, useEffect, useMemo } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/auth-context";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/navbar";
-import { ProductForm } from "@/components/products/product-form";
-import { ProductList } from "@/components/products/product-list";
-import { ProductSearch } from "@/components/products/product-search";
-import { ProductStats } from "@/components/products/product-stats";
-import { ProductDetailModal } from "@/components/products/product-detail-modal";
-import { Plus, Package, ArrowLeft } from "lucide-react";
-import Link from "next/link";
+import { useState, useEffect, useMemo, useCallback } from "react"
+import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import Navbar from "@/components/navbar"
+import { ProductForm } from "@/components/products/product-form"
+import { ProductList } from "@/components/products/product-list"
+import { ProductSearch } from "@/components/products/product-search"
+import { ProductStats } from "@/components/products/product-stats"
+import { ProductDetailModal } from "@/components/products/product-detail-modal"
+import { Plus, Package, ArrowLeft } from "lucide-react"
+import Link from "next/link"
+import { ProductService } from "@/services/product-service";
 import {
-  useProducts,
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
-} from "@/hooks/use-products";
-import { useAuthToken } from "@/hooks/use-auth-token";
+} from "@/hooks/use-products"
+import { useAuthToken } from "@/hooks/use-auth-token"
 import type {
   Product,
   CreateProductRequest,
   ProductSearchParams,
-} from "@/types/product";
+} from "@/types/product"
 import { CategoryProduct } from "@/types/category";
 import axios from "axios";
 import { API_BASE_URL } from "@/config/api-url";
-import useSWR from "swr";
 
 export default function ProductsManagementPage() {
   const { isAuthenticated, user } = useAuth();
@@ -44,42 +43,76 @@ export default function ProductsManagementPage() {
     ativo: null,
   });
 
-  // Hooks para operações CRUD
+  const [products, setProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<any | null>(null);
 
-  const {
-    mutate: createProduct,
-    isLoading: isCreating,
-    error: createError,
-  } = useCreateProduct();
-  const {
-    mutate: updateProduct,
-    isLoading: isUpdating,
-    error: updateError,
-  } = useUpdateProduct();
-  const {
-    mutate: deleteProduct,
-    isLoading: isDeleting,
-    error: deleteError,
-  } = useDeleteProduct();
+  const { mutate: createProduct, isLoading: isCreating, error: createError } = useCreateProduct();
+  const { mutate: updateProduct, isLoading: isUpdating, error: updateError } = useUpdateProduct();
+  const { mutate: deleteProduct, isLoading: isDeleting, error: deleteError } = useDeleteProduct();
   const { token, isLoading: authTokenLoading } = useAuthToken();
+  const [categories, setCategories] = useState<CategoryProduct[]>([]);
 
-  const fetcher = (url: string) => axios.get(url).then(res => res.data.data || []);
+  const handleApiResponse = (response: any) => {
+    const data = response.data;
+    if (data && typeof data === 'object' && Array.isArray(data.data)) {
+      // Caso: { message: "...", data: [] }
+      return data.data;
+    } else if (Array.isArray(data)) {
+      // Caso: [{...}, {...}]
+      return data;
+    }
+    return []; // Fallback para um array vazio se o formato for inesperado
+  };
 
-  const { data: categories = [] } = useSWR<CategoryProduct[]>(
-    user?.loja?.id
-      ? `${API_BASE_URL}/categoria/produtos/${user.loja.id}`
-      : null,
-    fetcher
-  );
-  const {
-    data: products = [],
-    error,
-    isLoading,
-    mutate,
-  } = useSWR<Product[]>(
-    user?.loja?.id ? `${API_BASE_URL}/produto/listar/${user.loja.id}` : null,
-    fetcher
-  );
+  const refetchProducts = useCallback(() => {
+    if (user?.loja?.id && token) {
+      setIsLoading(true);
+      axios.get(`${API_BASE_URL}/produto/listar/${user.loja.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      .then(response => {
+        setProducts(handleApiResponse(response));
+      })
+      .catch(err => {
+        console.error("Erro ao recarregar produtos:", err);
+        setError(err.message || "Falha ao recarregar produtos");
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+    }
+  }, [user?.loja?.id, token]);
+
+  useEffect(() => {
+    const fetchInitialData = async () => {
+      if (user?.loja?.id && token) {
+        setIsLoading(true);
+        setError(null);
+        try {
+          const categoriesPromise = axios.get(`${API_BASE_URL}/categoria/produtos/${user.loja.idCategoria}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          const productsPromise = axios.get(`${API_BASE_URL}/produto/listar/${user.loja.id}`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+
+          const [categoriesResponse, productsResponse] = await Promise.all([categoriesPromise, productsPromise]);
+
+          setCategories(categoriesResponse.data);
+          setProducts(handleApiResponse(productsResponse));
+        } catch (err: any) {
+          console.error("Erro ao buscar dados iniciais:", err);
+          setError(err.message || "Falha ao carregar dados da página");
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchInitialData();
+  }, [user?.loja?.id, user?.loja?.idCategoria, token]);
+  
   // Filtrar produtos localmente
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -98,7 +131,7 @@ export default function ProductsManagementPage() {
     // Filtro de categoria
     if (searchParams.idCategoriaProduto) {
       filtered = filtered.filter(
-        (p) => p.idCategoriaProduto === searchParams.idCategoriaProduto
+        (p) => p.idCategoriaProduto.toString() === searchParams.idCategoriaProduto
       );
     }
 
@@ -141,11 +174,11 @@ export default function ProductsManagementPage() {
     setShowForm(true);
   };
 
-  const handleDeleteProduct = async (productId: number) => {
+  const handleDeleteProduct = async (productId: string) => {
     if (confirm("Tem certeza que deseja excluir este produto?")) {
       try {
         await deleteProduct(productId.toString());
-        mutate();
+        refetchProducts(); // Recarrega os produtos
       } catch (err) {
         console.error("Erro ao excluir produto:", err);
       }
@@ -164,7 +197,7 @@ export default function ProductsManagementPage() {
       }
       setShowForm(false);
       setEditingProduct(null);
-      mutate();
+      refetchProducts(); // Recarrega os produtos
     } catch (err) {
       console.error("Erro ao salvar produto:", err);
     }
@@ -278,7 +311,7 @@ export default function ProductsManagementPage() {
               </div>
             ) : error ? (
               <div className="text-red-500 text-center py-8">
-                Erro ao carregar produtos: {error.message}
+                Erro ao carregar produtos: {error}
               </div>
             ) : filteredProducts.length === 0 ? (
               <div className="text-center py-8 text-gray-500">

@@ -17,7 +17,7 @@ import { API_BASE_URL } from "@/config/api-url"
 
 // A interface foi atualizada para refletir a nova estrutura de dados
 interface EnderecoEntrega {
-  enderecoEntregaId: number
+  enderecoEntregaId: string
   logradouro: string
   numero: string
   complemento: string

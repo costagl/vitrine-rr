@@ -40,7 +40,7 @@ interface ItemPedido {
 interface Pedido {
   idLoja: string;
   freteValor: number;
-  status: string
+  status: string;
 }
 
 export interface ClienteEnderecoPedidoVM {
@@ -62,7 +62,7 @@ export interface ClienteEnderecoPedidoVM {
 }
 
 const CheckoutForm = () => {
-  const { cart } = useCart();
+  const { cart, clearCart } = useCart();
   const [idLoja, setIdLoja] = useState<string | null>(null); // Estado para idLoja
   const [formData, setFormData] = useState<ClienteEnderecoPedidoVM>({
     cpf: "",
@@ -82,7 +82,7 @@ const CheckoutForm = () => {
       {
         idLoja: "",
         freteValor: 0,
-        status: "Pendente"
+        status: "Pendente",
       },
     ],
     itensPedido: cart.items.map((item) => ({
@@ -94,7 +94,7 @@ const CheckoutForm = () => {
       peso: item.peso,
       altura: item.altura,
       largura: item.largura,
-      profundidade: item.profundidade
+      profundidade: item.profundidade,
     })),
   });
 
@@ -132,7 +132,7 @@ const CheckoutForm = () => {
           {
             idLoja: idLoja,
             freteValor: prevData.pedidos[0].freteValor,
-            status: "Pendente"
+            status: "Pendente",
           },
         ],
       }));
@@ -156,7 +156,7 @@ const CheckoutForm = () => {
     });
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!idLoja) {
       alert("O ID da loja não foi encontrado.");
@@ -165,8 +165,8 @@ const handleSubmit = async (e: React.FormEvent) => {
 
     const payload = {
       ...formData,
-      cpf: formData.cpf.replace(/\D/g, ''), // Remove todos os não-dígitos
-      pedidos: formData.pedidos.map(p => ({
+      cpf: formData.cpf.replace(/\D/g, ""), // Remove todos os não-dígitos
+      pedidos: formData.pedidos.map((p) => ({
         ...p,
         idLoja: parseInt(p.idLoja, 10),
         itensPedido: formData.itensPedido, // Move os itens para dentro do pedido
@@ -190,12 +190,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       });
 
       const data = await response.json();
-      console.log("Resposta da API (message):", data.message);
-      console.log("Resposta da API (error):", data.error);
+      // Concatenando a string descritiva com o valor da variável
 
       if (!response.ok) {
         // Se der Bad Request, isso vai ajudar a ver o que o backend retornou
-        console.error("Detalhes do erro 400/500:", data); 
+        console.error("Detalhes do erro 400/500:", data);
         throw new Error("Erro ao cadastrar o pedido");
       }
 
@@ -203,18 +202,16 @@ const handleSubmit = async (e: React.FormEvent) => {
       const subdominio = new URLSearchParams(window.location.search).get(
         "subdominio"
       );
-      if (subdominio) {
-        const data = localStorage.getItem(`cartData_${subdominio}`);
 
-        if (data) {
-          localStorage.setItem("dadosPedidoRealizado", data);
-          localStorage.removeItem(`cartData_${subdominio}`);
-        } else {
-          console.warn(
-            "Nenhum dado de carrinho encontrado para o subdomínio:",
-            subdominio
-          );
+      if (subdominio) {
+        if (data.success != true) {
+          alert("API: " + data.error);
+        } else if (data.success == true) {
+          alert("API: " + data.message);
+          clearCart();
         }
+        console.log("Resposta da API (message):", data.message);
+        console.log("Resposta da API (error):", data.error);
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -231,30 +228,32 @@ const handleSubmit = async (e: React.FormEvent) => {
   const [cepError, setCepError] = useState<string | null>(null);
 
   const handleCepChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    let cepValue = e.target.value.replace(/\D/g, ''); // Remove todos os não-dígitos
-    
+    let cepValue = e.target.value.replace(/\D/g, ""); // Remove todos os não-dígitos
+
     if (cepValue.length > 5) {
-      cepValue = cepValue.slice(0, 5) + '-' + cepValue.slice(5, 8);
+      cepValue = cepValue.slice(0, 5) + "-" + cepValue.slice(5, 8);
     }
-    
+
     setCep(cepValue);
     setCepError(null); // Limpa o erro ao digitar
     setFrete(0); // Reseta o frete ao mudar o CEP
 
-    const unformattedCep = cepValue.replace(/\D/g, '');
+    const unformattedCep = cepValue.replace(/\D/g, "");
     if (unformattedCep.length === 8) {
       await handleFreteCheck(unformattedCep);
     }
   };
 
-    const handleFreteCheck = async (cepToCalculate: string) => {
+  const handleFreteCheck = async (cepToCalculate: string) => {
     setIsCalculatingFrete(true);
     setCepError(null);
     setFrete(0);
 
     try {
       // 1. Buscar endereço no ViaCEP
-      const viaCepResponse = await axios.get(`https://viacep.com.br/ws/${cepToCalculate}/json/`);
+      const viaCepResponse = await axios.get(
+        `https://viacep.com.br/ws/${cepToCalculate}/json/`
+      );
       const addressData = viaCepResponse.data;
 
       if (addressData.erro) {
@@ -262,7 +261,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       }
 
       // 2. Preencher os campos do formulário com os dados do ViaCEP
-      setFormData(prevData => ({
+      setFormData((prevData) => ({
         ...prevData,
         enderecoEntrega: {
           ...prevData.enderecoEntrega,
@@ -271,7 +270,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           cidade: addressData.localidade,
           estado: addressData.uf,
           cep: cepToCalculate,
-        }
+        },
       }));
 
       // 3. Calcular o frete com o Melhor Envio
@@ -298,8 +297,10 @@ const handleSubmit = async (e: React.FormEvent) => {
         "User-Agent": "Vitrine (glameiramc@gmail.com)",
       };
 
-      const response = await axios.post("/frete/melhorenvio", postData, { headers });
-      
+      const response = await axios.post("/frete/melhorenvio", postData, {
+        headers,
+      });
+
       if (!response.data || response.data.length === 0) {
         throw new Error("Não foi possível calcular o frete para este CEP.");
       }
@@ -312,7 +313,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           {
             idLoja: prevData.pedidos[0].idLoja,
             freteValor: freteValue,
-            status: "Pendente"
+            status: "Pendente",
           },
         ],
       }));
@@ -465,9 +466,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                           className={cepError ? "border-red-500" : ""}
                           disabled={isCalculatingFrete}
                         />
-                        {isCalculatingFrete && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>}
+                        {isCalculatingFrete && (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary"></div>
+                        )}
                       </div>
-                      {cepError && <p className="text-sm text-red-500 mt-1">{cepError}</p>}
+                      {cepError && (
+                        <p className="text-sm text-red-500 mt-1">{cepError}</p>
+                      )}
                       {frete > 0 && !cepError && (
                         <div className="mt-4">
                           {/* <p className="font-medium text-lg">Valor do Frete:</p>
