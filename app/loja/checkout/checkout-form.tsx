@@ -332,7 +332,7 @@ const CheckoutForm = () => {
     } catch (error) {
       console.error("Erro ao processar CEP/Frete:", error);
       setCepError("CEP Inválido ou erro ao calcular frete.");
-      setFrete(0);
+      setFrete(20);
     } finally {
       setIsCalculatingFrete(false);
     }
