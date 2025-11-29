@@ -31,6 +31,7 @@ interface ItemPedido {
   quantidade: number;
   precoUnitario: number;
   precoTotal: number;
+  precoPromocional?: number;
   peso: number;
   altura: number;
   largura: number;
@@ -85,17 +86,28 @@ const CheckoutForm = () => {
         status: "Pendente",
       },
     ],
-    itensPedido: cart.items.map((item) => ({
-      idProduto: parseInt(item.id),
-      titulo: item.titulo,
-      quantidade: item.quantidade,
-      precoUnitario: item.valorUnitario,
-      precoTotal: item.valorUnitario * item.quantidade,
-      peso: item.peso,
-      altura: item.altura,
-      largura: item.largura,
-      profundidade: item.profundidade,
-    })),
+    itensPedido: cart.items.map((item) => {
+      const precoDeCalculo =
+        item.valorPromocional && item.valorPromocional > 0
+          ? item.valorPromocional
+          : item.valorUnitario;
+
+      return {
+        idProduto: parseInt(item.id),
+        titulo: item.titulo,
+        quantidade: item.quantidade,
+        precoUnitario: item.valorUnitario,
+        precoPromocional: item.valorPromocional || 0,
+
+        // 2. O cálculo utiliza o preço definido acima.
+        precoTotal: precoDeCalculo * item.quantidade,
+
+        peso: item.peso,
+        altura: item.altura,
+        largura: item.largura,
+        profundidade: item.profundidade,
+      };
+    }),
   });
 
   useEffect(() => {
