@@ -190,13 +190,13 @@ export default function Layout2Page() {
             </div>
             <div className="relative">
               <div className="aspect-square bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl flex items-center justify-center">
-                <Image
+                {/* <Image
                   src="/modern-product-showcase.png"
                   alt="Produto em destaque"
                   className="w-4/5 h-4/5 object-contain"
                   width={500}
                   height={500}
-                />
+                /> */}
               </div>
             </div>
           </div>
